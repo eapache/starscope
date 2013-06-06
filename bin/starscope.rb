@@ -5,5 +5,11 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require "starscope"
 
-scope = StarScope::DB.new('.')
+if ARGV.count == 0
+  paths = ['.']
+else
+  paths = ARGV
+end
+
+scope = StarScope::DB.new(paths)
 puts scope

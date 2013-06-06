@@ -9,8 +9,12 @@ module StarScope::Lang
     end
 
     def self.extract(file, &block)
-      ast = Parser::CurrentRuby.parse_file(file)
-      Extractor.new(ast, file).extract &block
+      begin
+        ast = Parser::CurrentRuby.parse_file(file)
+      rescue
+      else
+        Extractor.new(ast, file).extract &block
+      end
     end
 
     private
@@ -64,6 +68,8 @@ module StarScope::Lang
             else
               @scope + [node.children[1]]
             end
+          else
+            [node.type]
           end
         end
       end

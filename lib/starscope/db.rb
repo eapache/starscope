@@ -2,16 +2,19 @@ require 'starscope/langs/ruby'
 
 class StarScope::DB
 
-  def initialize(directory)
-    @directory = directory
-
-    Dir["#{directory}/**/*"].each do |file|
-      next if not File.file? file
-      next if not StarScope::Lang::Ruby.match_file file
-      StarScope::Lang::Ruby.extract file do |tblname, value, location|
-        table[tblname] ||= {}
-        table[tblname][value[-1]] ||= {}
-        table[tblname][value[-1]][value] = location
+  def initialize(dirs)
+    langs = [StarScope::Lang::Ruby]
+    dirs.each do |dir|
+      Dir["#{dir}/**/*"].each do |file|
+        next if not File.file? file
+        langs.each do |lang|
+          next if not lang.match_file file
+          lang.extract file do |tblname, value, location|
+            tables[tblname] ||= {}
+            tables[tblname][value[-1]] ||= {}
+            tables[tblname][value[-1]][value] = location
+          end
+        end
       end
     end
   end
@@ -19,7 +22,7 @@ class StarScope::DB
   def to_s
     ret = ""
 
-    table.each do |name, tbl|
+    tables.each do |name, tbl|
       ret += "== Table: #{name} ==\n"
       tbl.each do |val, maps|
         ret += "#{val}\n"
@@ -34,8 +37,8 @@ class StarScope::DB
 
   private
 
-  def table
-    @table ||= {}
+  def tables
+    @tables ||= {}
   end
 
 end
