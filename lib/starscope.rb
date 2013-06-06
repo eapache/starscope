@@ -1,5 +1,7 @@
 require "starscope/version"
 
 module Starscope
-  # Your code goes here...
+  def build_db
+    puts Dir["**/*"]
+  end
 end
