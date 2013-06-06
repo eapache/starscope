@@ -1,32 +1,31 @@
 require 'starscope/langs/ruby'
 
+LANGS = [StarScope::Lang::Ruby]
+
 class StarScope::DB
 
   def initialize(dirs)
-    langs = [StarScope::Lang::Ruby]
-    dirs.each do |dir|
+    @dirs = dirs
+    @files = {}
+    @tables = {}
+
+    @dirs.each do |dir|
       Dir["#{dir}/**/*"].each do |file|
-        next if not File.file? file
-        langs.each do |lang|
-          next if not lang.match_file file
-          lang.extract file do |tblname, value, location|
-            tables[tblname] ||= {}
-            tables[tblname][value[-1]] ||= {}
-            tables[tblname][value[-1]][value] = location
-          end
-        end
+        add_file(file)
       end
     end
   end
 
   def update
-    abort "not yet implemented"
+    @files.keys.each {|f| update_file(f)}
+    cur_files = @dirs.each {|d| Dir["#{d}/**/*"]}.flatten
+    (cur_files - @files.keys).each {|f| add_file(f)}
   end
 
   def to_s
     ret = ""
 
-    tables.each do |name, tbl|
+    @tables.each do |name, tbl|
       ret += "== Table: #{name} ==\n"
       tbl.each do |val, maps|
         ret += "#{val}\n"
@@ -41,8 +40,33 @@ class StarScope::DB
 
   private
 
-  def tables
-    @tables ||= {}
+  def add_file(file)
+    return if not File.file? file
+
+    @files[file] = File.mtime(file)
+
+    LANGS.each do |lang|
+      next if not lang.match_file file
+      lang.extract file do |tblname, value, location|
+        @tables[tblname] ||= {}
+        @tables[tblname][value[-1]] ||= {}
+        @tables[tblname][value[-1]][value] = location
+      end
+    end
+  end
+
+  def remove_file(file)
+    #TODO Actually remove from tables
+    @files.delete(file)
+  end
+
+  def update_file(file)
+    if not File.exists?(file)
+      remove_file(file)
+    elsif @files[file] < File.mtime(file)
+      remove_file(file)
+      add_file(file)
+    end
   end
 
 end
