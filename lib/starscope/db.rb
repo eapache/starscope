@@ -19,6 +19,10 @@ class StarScope::DB
     end
   end
 
+  def update
+    abort "not yet implemented"
+  end
+
   def to_s
     ret = ""
 

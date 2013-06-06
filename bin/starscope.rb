@@ -13,10 +13,12 @@ OptionParser.new do |opts|
 
   opts.on("-d", "--dump-db", "Dumps the database to standard-out") do
     options[:dump] = true
+    options[:action] = true
   end
 
   opts.on("-q", "--query QUERY", "Queries the database") do |query|
     options[:query] = query
+    options[:action] = true
   end
 
   opts.on("-r", "--read-db READ", "Reads the database from PATH") do |path|
@@ -25,16 +27,19 @@ OptionParser.new do |opts|
 
   opts.on("-u", "--update", "Updates the database being read") do
     options[:update] = true
+    options[:action] = true
   end
 
   opts.on("-w", "--write-db PATH", "Writes the database to PATH") do |path|
     options[:write] = path
+    options[:action] = true
   end
 
 end.parse!
 
 abort "Cannot specify both a query and a dump" if options[:query] and options[:dump]
 abort "Must have a database to read if updating" if options[:update] and not options[:read]
+abort "Must specify an action" if not options[:action]
 
 db = if options[:read]
        Marshal::load(IO.read(options[:read]))
@@ -53,7 +58,15 @@ if options[:query]
 end
 
 if options[:update]
-  abort "not yet implemented"
+  db.update
+
+  # If an update was specified without a specific file to write to,
+  # we update the database in-place
+  if not options[:write]
+    File.open(options[:read],'w') do |file|
+      Marshal.dump(db, file)
+    end
+  end
 end
 
 if options[:write]
