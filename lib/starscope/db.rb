@@ -56,8 +56,12 @@ class StarScope::DB
   end
 
   def remove_file(file)
-    #TODO Actually remove from tables
     @files.delete(file)
+    @tables.each do |name, tbl|
+      tbl.keys.each do |key|
+        tbl[key] = tbl[key].delete_if {|k, loc| loc.file == file}
+      end
+    end
   end
 
   def update_file(file)
