@@ -1,7 +1,11 @@
 require "starscope/version"
+require "starscope/parsers/ruby"
 
 module StarScope
   def self.build_db
-    puts Dir["**/*"]
+    files = Dir["**/*"]
+    files.each do |file|
+      Parsers::Ruby.parse(file)
+    end
   end
 end

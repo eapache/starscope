@@ -1,0 +1,3 @@
+
+class StarScope::Parser
+end
