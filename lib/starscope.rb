@@ -9,6 +9,8 @@ module StarScope
     parser.set_db(db)
     Dir["**/*"].each do |file|
       parser.parse(file)
+    rescue
+      puts "Error parsing #{file}!"
     end
   end
 end
