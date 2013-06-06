@@ -3,11 +3,10 @@ require "parser/current"
 
 module StarScope::Parsers
   class Ruby < StarScope::Parser
-    def self.parse(file)
+    def parse(file)
       return unless file =~ /.*\.rb/
-      contents = IO.read(file)
-      puts file
-      p Parser::CurrentRuby.parse(contents)
+      puts "Parsing #{file}..."
+      ast = Parser::CurrentRuby.parse_file(file)
     end
   end
 end
