@@ -3,14 +3,21 @@ require "starscope/parsers/ruby"
 require "starscope/db"
 
 module StarScope
-  def self.build_db
-    db = DB.new
-    parser = Parsers::Ruby.new
-    parser.set_db(db)
-    Dir["**/*"].each do |file|
-      parser.parse(file)
-    rescue
-      puts "Error parsing #{file}!"
+  class StarScope
+    def initialize
+      @db = DB.new
+      @parser = Parsers::Ruby.new
+      @parser.db = @db
+    end
+
+    def build_db(directory)
+      Dir["#{directory}/**/*"].each do |file|
+        @parser.parse(file)
+      end
+    end
+
+    def print_db
+      puts @db
     end
   end
 end

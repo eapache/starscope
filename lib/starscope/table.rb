@@ -1,2 +1,0 @@
-class StarScope::Table
-end
