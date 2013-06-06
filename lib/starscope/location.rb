@@ -5,4 +5,8 @@ class StarScope::Location
     @file = file
     @line = line
   end
+
+  def to_s
+    "#{file}:#{line}"
+  end
 end

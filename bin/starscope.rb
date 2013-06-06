@@ -5,6 +5,5 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require "starscope"
 
-scope = StarScope::StarScope.new
-scope.build_db '.'
-scope.print_db
+scope = StarScope::DB.new('.')
+puts scope
