@@ -32,21 +32,24 @@ module StarScope::Lang
       def extract_tree(tree, &block)
         extract_node tree, &block
 
-        scope_count = 0
+        new_scope = []
         if [:class, :module].include? tree.type
-          new_scope = scoped_name(tree.children[0])
+          new_scope << scoped_name(tree.children[0])
           @scope << new_scope
-          scope_count = new_scope.count
         end
 
         tree.children.each {|node| extract_tree node, &block if node.is_a? AST::Node}
 
-        @scope.pop(scope_count)
+        @scope.pop(new_scope.count)
       end
 
       def extract_node(node)
         if node.type == :send
           yield :calls, scoped_name(node), node.source_map.expression.line
+
+          if node.children[0].nil? and node.children[1] == :require
+            yield :includes, node.children[2].children[0].split("/"), node.source_map.expression.line
+          end
         end
       end
 
