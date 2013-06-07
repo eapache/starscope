@@ -75,7 +75,12 @@ class StarScope::DB
   def query(table, value)
     fqn = value.split("::")
     results = @tables[table][fqn[-1].to_sym]
-    puts results.sort {|a,b| b.score_match(fqn) <=> a.score_match(fqn)}
+    results.sort! {|a,b| b.score_match(fqn) <=> a.score_match(fqn)}
+    best_score = results[0].score_match(fqn)
+    results.each do |result|
+      return if best_score - result.score_match(fqn) > 4
+      puts result
+    end
   end
 
   private
