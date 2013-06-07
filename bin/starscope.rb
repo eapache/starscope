@@ -13,8 +13,8 @@ DEFAULT_DB=".starscope.db"
 OptionParser.new do |opts|
   opts.banner = "Usage: starscope.rb [options] [PATHS]"
 
-  opts.on("-d", "--dump-db", "Dumps the database to standard-out") do
-    options[:dump] = true
+  opts.on("-d", "--dump [TABLE]", "Dumps the DB or specified table to standard-out") do |tbl|
+    options[:dump] = tbl || true
   end
 
   opts.on("-n", "--no-auto", "Don't automatically create or update the database") do
@@ -74,5 +74,9 @@ if options[:summary]
 end
 
 if options[:dump]
-  db.dump
+  if options[:dump].is_a? String
+    db.dump_table(options[:dump].to_sym)
+  else
+    db.dump_all
+  end
 end

@@ -23,17 +23,19 @@ class StarScope::DB
     (cur_files - @files.keys).each {|f| add_file(f)}
   end
 
-  def dump
-    @tables.each do |name, tbl|
-      puts "== Table: #{name} =="
-      tbl.each do |val, data|
-        puts "#{val}"
-        data.each do |datum|
-          print "\t"
-          puts datum
-        end
+  def dump_table(table)
+    puts "== Table: #{table} =="
+    @tables[table].each do |val, data|
+      puts "#{val}"
+      data.each do |datum|
+        print "\t"
+        puts datum
       end
     end
+  end
+
+  def dump_all
+    @tables.keys.each {|tbl| dump_table(tbl)}
   end
 
   def print_summary
