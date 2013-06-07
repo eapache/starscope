@@ -50,7 +50,7 @@ module StarScope::Lang
       def extract_node(node)
         if node.type == :send
           loc = StarScope::Location.new(@file, node.source_map.expression.line)
-          yield :send, scoped_name(node), loc
+          yield :calls, scoped_name(node), loc
         end
       end
 
