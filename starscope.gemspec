@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
   s.summary       = "A code indexer and analyzer"
   s.description   = "A tool like the venerable cscope, but for ruby and other languages"
   s.authors       = ["Evan Huus"]
+  s.homepage      = 'https://github.com/eapache/starscope'
   s.email         = 'evan.huus@jadedpixel.com'
   s.files         = `git ls-files`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
