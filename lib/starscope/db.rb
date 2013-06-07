@@ -1,5 +1,6 @@
 require 'starscope/langs/ruby'
 require "starscope/datum"
+require 'zlib'
 
 LANGS = [StarScope::Lang::Ruby]
 
@@ -13,28 +14,23 @@ class StarScope::DB
 
   def load(file)
     File.open(file, 'r') do |file|
-      raise "File version doesn't match" if StarScope::VERSION != file.gets.chomp
-      len = file.gets.to_i
-      @dirs = Marshal::load(file.read(len))
-      len = file.gets.to_i
-      @files = Marshal::load(file.read(len))
-      len = file.gets.to_i
-      @tables = Marshal::load(file.read(len))
+      Zlib::GzipReader.wrap(file) do |file|
+        raise "File version doesn't match" if StarScope::VERSION != file.gets.chomp
+        @dirs   = load_part(file)
+        @files  = load_part(file)
+        @tables = load_part(file)
+      end
     end
   end
 
   def save(file)
     File.open(file, 'w') do |file|
-      file.puts StarScope::VERSION
-      dat = Marshal.dump(@dirs)
-      file.puts dat.length
-      file.write dat
-      dat = Marshal.dump(@files)
-      file.puts dat.length
-      file.write dat
-      dat = Marshal.dump(@tables)
-      file.puts dat.length
-      file.write dat
+      Zlib::GzipWriter.wrap(file) do |file|
+        file.puts StarScope::VERSION
+        save_part(file, @dirs)
+        save_part(file, @files)
+        save_part(file, @tables)
+      end
     end
   end
 
@@ -81,6 +77,17 @@ class StarScope::DB
   end
 
   private
+
+  def load_part(file)
+    len = file.gets.to_i
+    Marshal::load(file.read(len))
+  end
+
+  def save_part(file, val)
+    dat = Marshal.dump(val)
+    file.puts dat.length
+    file.write dat
+  end
 
   def add_file(file)
     return if not File.file? file
