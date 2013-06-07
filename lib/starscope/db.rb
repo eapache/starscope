@@ -6,6 +6,8 @@ LANGS = [StarScope::Lang::Ruby]
 
 class StarScope::DB
 
+  DB_FORMAT = 1
+
   def initialize
     @dirs = []
     @files = {}
@@ -15,7 +17,7 @@ class StarScope::DB
   def load(file)
     File.open(file, 'r') do |file|
       Zlib::GzipReader.wrap(file) do |file|
-        raise "File version doesn't match" if StarScope::VERSION != file.gets.chomp
+        raise "Database format not recognized" if DB_FORMAT != file.gets.to_i
         @dirs   = load_part(file)
         @files  = load_part(file)
         @tables = load_part(file)
@@ -26,7 +28,7 @@ class StarScope::DB
   def save(file)
     File.open(file, 'w') do |file|
       Zlib::GzipWriter.wrap(file) do |file|
-        file.puts StarScope::VERSION
+        file.puts DB_FORMAT
         save_part(file, @dirs)
         save_part(file, @files)
         save_part(file, @tables)
