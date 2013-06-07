@@ -50,7 +50,7 @@ class StarScope::DB
       lang.extract file do |tblname, value, location|
         @tables[tblname] ||= {}
         @tables[tblname][value[-1]] ||= {}
-        @tables[tblname][value[-1]][value] = location
+        @tables[tblname][value[-1]][value[0..-2]] = location
       end
     end
   end
