@@ -23,7 +23,7 @@ class StarScope::Datum
       i -= 1
     end
 
-    score
+    score - @scope.count - i + 1
   end
 
   def location
