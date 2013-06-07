@@ -50,11 +50,12 @@ db = if options[:read]
      end
 
 if options[:dump]
-  puts db
+  db.dump
 end
 
 if options[:query]
-  abort "not yet implemented"
+  table, value = options[:query].split(',', 2)
+  db.query(table.to_sym, value.to_sym)
 end
 
 if options[:update]

@@ -22,20 +22,20 @@ class StarScope::DB
     (cur_files - @files.keys).each {|f| add_file(f)}
   end
 
-  def to_s
-    ret = ""
-
+  def dump
     @tables.each do |name, tbl|
-      ret += "== Table: #{name} ==\n"
+      puts "== Table: #{name} =="
       tbl.each do |val, maps|
-        ret += "#{val}\n"
+        puts "#{val}"
         maps.each do |scoped_val, loc|
-          ret += "\t#{scoped_val.join ' '} -- #{loc}\n"
+          puts "\t#{scoped_val.join ' '} -- #{loc}"
         end
       end
     end
-    
-    ret
+  end
+
+  def query(table, value)
+    puts @tables[table][value]
   end
 
   private
