@@ -6,51 +6,62 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'optparse'
 require "starscope"
 
-options = {}
+options = {auto: true}
+DEFAULT_DB=".starscope.db"
 
+# Options Parsing
 OptionParser.new do |opts|
   opts.banner = "Usage: starscope.rb [options] [PATHS]"
 
   opts.on("-d", "--dump-db", "Dumps the database to standard-out") do
     options[:dump] = true
-    options[:action] = true
+  end
+
+  opts.on("-n", "--no-auto", "Don't automatically create or update the database") do
+    options[:auto] = false
   end
 
   opts.on("-q", "--query QUERY", "Queries the database") do |query|
     options[:query] = query
-    options[:action] = true
   end
 
-  opts.on("-r", "--read-db READ", "Reads the database from PATH") do |path|
+  opts.on("-r", "--read-db READ", "Reads the database from PATH instead of #{DEFAULT_DB}") do |path|
     options[:read] = path
   end
 
-  opts.on("-u", "--update", "Updates the database being read") do
-    options[:update] = true
-    options[:action] = true
+  opts.on("-s", "--summary", "Print a database summary to standard-out") do
+    options[:summary] = true
   end
 
-  opts.on("-w", "--write-db PATH", "Writes the database to PATH") do |path|
+  opts.on("-w", "--write-db PATH", "Writes the database to PATH instead of #{DEFAULT_DB}") do |path|
     options[:write] = path
-    options[:action] = true
   end
 
 end.parse!
 
-abort "Cannot specify both a query and a dump" if options[:query] and options[:dump]
-abort "Must have a database to read if updating" if options[:update] and not options[:read]
-abort "Must specify an action" if not options[:action]
+# Load the database
+if options[:read]
+  db = Marshal::load(IO.read(options[:read]))
+  new = false
+elsif File.exists?(DEFAULT_DB)
+  db = Marshal::load(IO.read(DEFAULT_DB))
+  new = false
+elsif ARGV.empty?
+  db = StarScope::DB.new(['.'])
+  new = true
+else
+  db = StarScope::DB.new(ARGV)
+  new = true
+end
 
-db = if options[:read]
-       Marshal::load(IO.read(options[:read]))
-     elsif ARGV.empty?
-       StarScope::DB.new(['.'])
-     else
-       StarScope::DB.new(ARGV)
-     end
+# Update it
+db.update if options[:auto] and not new
 
-if options[:dump]
-  db.dump
+# Write it
+if options[:auto] || options[:write]
+  File.open(options[:write] || DEFAULT_DB, 'w') do |file|
+    Marshal.dump(db, file)
+  end
 end
 
 if options[:query]
@@ -58,20 +69,10 @@ if options[:query]
   db.query(table.to_sym, value.to_sym)
 end
 
-if options[:update]
-  db.update
-
-  # If an update was specified without a specific file to write to,
-  # we update the database in-place
-  if not options[:write]
-    File.open(options[:read],'w') do |file|
-      Marshal.dump(db, file)
-    end
-  end
+if options[:summary]
+  db.print_summary
 end
 
-if options[:write]
-  File.open(options[:write],'w') do |file|
-    Marshal.dump(db, file)
-  end
+if options[:dump]
+  db.dump
 end
