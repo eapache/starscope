@@ -1,5 +1,5 @@
 require 'starscope/langs/ruby'
-require "starscope/location"
+require "starscope/datum"
 
 LANGS = [StarScope::Lang::Ruby]
 
@@ -26,10 +26,11 @@ class StarScope::DB
   def dump
     @tables.each do |name, tbl|
       puts "== Table: #{name} =="
-      tbl.each do |val, maps|
+      tbl.each do |val, data|
         puts "#{val}"
-        maps.each do |scoped_val, loc|
-          puts "\t#{scoped_val.join ' '} -- #{loc}"
+        data.each do |datum|
+          print "\t"
+          puts datum
         end
       end
     end
@@ -48,11 +49,11 @@ class StarScope::DB
 
     LANGS.each do |lang|
       next if not lang.match_file file
-      lang.extract file do |tblname, value, lineno|
-        location = StarScope::Location.new(file, lineno)
+      lang.extract file do |tblname, fqn, lineno|
+        datum = StarScope::Datum.new(fqn, file, lineno)
         @tables[tblname] ||= {}
-        @tables[tblname][value[-1]] ||= {}
-        @tables[tblname][value[-1]][value[0..-2]] = location
+        @tables[tblname][datum.key] ||= []
+        @tables[tblname][datum.key] << datum
       end
     end
   end
@@ -60,8 +61,8 @@ class StarScope::DB
   def remove_file(file)
     @files.delete(file)
     @tables.each do |name, tbl|
-      tbl.keys.each do |key|
-        tbl[key] = tbl[key].delete_if {|k, loc| loc.file == file}
+      tbl.each do |key, val|
+        val.delete_if {|dat| dat.file == file}
       end
     end
   end
