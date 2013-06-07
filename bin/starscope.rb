@@ -11,30 +11,41 @@ DEFAULT_DB=".starscope.db"
 
 # Options Parsing
 OptionParser.new do |opts|
-  opts.banner = "Usage: starscope.rb [options] [PATHS]"
+  opts.banner = <<END
+Usage: starscope.rb [options] [PATHS]
 
-  opts.on("-d", "--dump [TABLE]", "Dumps the DB or specified table to standard-out") do |tbl|
+If you don't pass any of -n, -r, -w or PATHS the default behaviour is to recurse
+in the current directory and build or update the database `#{DEFAULT_DB}`.
+
+Query scopes must be specified with `::`, for example -q calls,File::mtime.
+END
+
+  opts.separator "\nQueries"
+  opts.on("-d", "--dump [TABLE]", "Dumps the DB or specified table to stdout") do |tbl|
     options[:dump] = tbl || true
   end
-
-  opts.on("-n", "--no-auto", "Don't automatically create or update the database") do
-    options[:auto] = false
-  end
-
-  opts.on("-q", "--query QUERY", "Queries the database") do |query|
+  opts.on("-q", "--query TABLE,QUERY", "Looks up QUERY in TABLE") do |query|
     options[:query] = query
   end
-
-  opts.on("-r", "--read-db READ", "Reads the database from PATH instead of #{DEFAULT_DB}") do |path|
-    options[:read] = path
-  end
-
-  opts.on("-s", "--summary", "Print a database summary to standard-out") do
+  opts.on("-s", "--summary", "Print a database summary to stdout") do
     options[:summary] = true
   end
 
-  opts.on("-w", "--write-db PATH", "Writes the database to PATH instead of #{DEFAULT_DB}") do |path|
+  opts.separator "\nDatabase Management"
+  opts.on("-n", "--no-auto", "Don't automatically update/create the database") do
+    options[:auto] = false
+  end
+  opts.on("-r", "--read-db READ", "Reads the DB from PATH instead of the default") do |path|
+    options[:read] = path
+  end
+  opts.on("-w", "--write-db PATH", "Writes the DB to PATH instead of the default") do |path|
     options[:write] = path
+  end
+
+  opts.separator "\nMisc"
+  opts.on("-v", "--version", "Print the version number") do
+    puts StarScope::VERSION
+    exit
   end
 
 end.parse!

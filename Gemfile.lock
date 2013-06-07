@@ -1,3 +1,9 @@
+PATH
+  remote: .
+  specs:
+    starscope (0.0.1)
+      parser
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -29,7 +35,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.3)
-  parser
   pry
   pry-debugger
   rake
+  starscope!
