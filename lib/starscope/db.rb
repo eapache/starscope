@@ -78,6 +78,7 @@ class StarScope::DB
     results.sort! {|a,b| b.score_match(fqn) <=> a.score_match(fqn)}
     best_score = results[0].score_match(fqn)
     results.each do |result|
+      # 4 is a guess at the best heuristic, not magic
       return if best_score - result.score_match(fqn) > 4
       puts result
     end
