@@ -5,12 +5,42 @@ LANGS = [StarScope::Lang::Ruby]
 
 class StarScope::DB
 
-  def initialize(dirs)
-    @dirs = dirs
+  def initialize
+    @dirs = []
     @files = {}
     @tables = {}
+  end
 
-    @dirs.each do |dir|
+  def load(file)
+    File.open(file, 'r') do |file|
+      raise "File version doesn't match" if StarScope::VERSION != file.gets.chomp
+      len = file.gets.to_i
+      @dirs = Marshal::load(file.read(len))
+      len = file.gets.to_i
+      @files = Marshal::load(file.read(len))
+      len = file.gets.to_i
+      @tables = Marshal::load(file.read(len))
+    end
+  end
+
+  def save(file)
+    File.open(file, 'w') do |file|
+      file.puts StarScope::VERSION
+      dat = Marshal.dump(@dirs)
+      file.puts dat.length
+      file.write dat
+      dat = Marshal.dump(@files)
+      file.puts dat.length
+      file.write dat
+      dat = Marshal.dump(@tables)
+      file.puts dat.length
+      file.write dat
+    end
+  end
+
+  def add_dirs(dirs)
+    @dirs << dirs
+    dirs.each do |dir|
       Dir["#{dir}/**/*"].each do |file|
         add_file(file)
       end

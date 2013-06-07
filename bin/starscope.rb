@@ -40,18 +40,20 @@ OptionParser.new do |opts|
 end.parse!
 
 # Load the database
+db = StarScope::DB.new
+new = true
 if options[:read]
-  db = Marshal::load(IO.read(options[:read]))
+  db.load(options[:read])
   new = false
 elsif File.exists?(DEFAULT_DB)
-  db = Marshal::load(IO.read(DEFAULT_DB))
+  db.load(DEFAULT_DB)
   new = false
-elsif ARGV.empty?
-  db = StarScope::DB.new(['.'])
-  new = true
+end
+
+if ARGV.empty?
+  db.add_dirs(['.']) if new
 else
-  db = StarScope::DB.new(ARGV)
-  new = true
+  db.add_dirs(ARGV)
 end
 
 # Update it
@@ -59,9 +61,7 @@ db.update if options[:auto] and not new
 
 # Write it
 if options[:auto] || options[:write]
-  File.open(options[:write] || DEFAULT_DB, 'w') do |file|
-    Marshal.dump(db, file)
-  end
+  db.save(options[:write] || DEFAULT_DB)
 end
 
 if options[:query]
