@@ -15,10 +15,8 @@ class StarScope::Datum
     fqn[0...-1].reverse.each do |test|
       if test.to_sym == @scope[i]
         score += 5
-      elsif Regexp.new(test).match(@scope[i])
-        score += 3
       elsif Regexp.new(test, Regexp::IGNORECASE).match(@scope[i])
-        score += 1
+        score += 2
       end
       i -= 1
     end
