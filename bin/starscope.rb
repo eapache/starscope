@@ -35,7 +35,7 @@ END
   opts.on("-n", "--no-auto", "Don't automatically update/create the database") do
     options[:auto] = false
   end
-  opts.on("-r", "--read-db READ", "Reads the DB from PATH instead of the default") do |path|
+  opts.on("-r", "--read-db PATH", "Reads the DB from PATH instead of the default") do |path|
     options[:read] = path
   end
   opts.on("-w", "--write-db PATH", "Writes the DB to PATH instead of the default") do |path|
