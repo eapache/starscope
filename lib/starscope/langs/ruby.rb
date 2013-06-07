@@ -34,8 +34,8 @@ module StarScope::Lang
 
         new_scope = []
         if [:class, :module].include? tree.type
-          new_scope << scoped_name(tree.children[0])
-          @scope << new_scope
+          new_scope = scoped_name(tree.children[0])
+          @scope += new_scope
         end
 
         tree.children.each {|node| extract_tree node, &block if node.is_a? AST::Node}
@@ -54,9 +54,9 @@ module StarScope::Lang
       end
 
       def scoped_name(node)
-        if node.is_a? Symbol
-          [node]
-        elsif node.is_a? AST::Node
+        if node.type == :block
+          scoped_name(node.children[0])
+        elsif [:lvar, :ivar, :cvar, :gvar, :const, :send].include? node.type
           if node.children[0].is_a? Symbol
             [node.children[0]]
           elsif node.children[0].is_a? AST::Node
@@ -67,9 +67,9 @@ module StarScope::Lang
             else
               @scope + [node.children[1]]
             end
-          else
-            [node.type]
           end
+        else
+          [node.type]
         end
       end
     end

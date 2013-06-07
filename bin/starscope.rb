@@ -66,7 +66,7 @@ end
 
 if options[:query]
   table, value = options[:query].split(',', 2)
-  db.query(table.to_sym, value.to_sym)
+  db.query(table.to_sym, value)
 end
 
 if options[:summary]

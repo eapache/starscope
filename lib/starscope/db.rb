@@ -45,7 +45,9 @@ class StarScope::DB
   end
 
   def query(table, value)
-    puts @tables[table][value]
+    fqn = value.split("::")
+    results = @tables[table][fqn[-1].to_sym]
+    puts results.sort {|a,b| b.score_match(fqn) <=> a.score_match(fqn)}
   end
 
   private
