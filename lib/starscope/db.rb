@@ -1,4 +1,5 @@
 require 'starscope/langs/ruby'
+require "starscope/location"
 
 LANGS = [StarScope::Lang::Ruby]
 
@@ -47,7 +48,8 @@ class StarScope::DB
 
     LANGS.each do |lang|
       next if not lang.match_file file
-      lang.extract file do |tblname, value, location|
+      lang.extract file do |tblname, value, lineno|
+        location = StarScope::Location.new(file, lineno)
         @tables[tblname] ||= {}
         @tables[tblname][value[-1]] ||= {}
         @tables[tblname][value[-1]][value[0..-2]] = location

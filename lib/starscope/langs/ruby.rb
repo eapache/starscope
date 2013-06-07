@@ -1,5 +1,3 @@
-require "starscope/location"
-
 require "parser/current"
 
 module StarScope::Lang
@@ -13,16 +11,15 @@ module StarScope::Lang
         ast = Parser::CurrentRuby.parse_file(file)
       rescue
       else
-        Extractor.new(ast, file).extract &block
+        Extractor.new(ast).extract &block
       end
     end
 
     private
 
     class Extractor
-      def initialize(ast, file)
+      def initialize(ast)
         @ast = ast
-        @file = file
         @scope = []
       end
       
@@ -49,8 +46,7 @@ module StarScope::Lang
 
       def extract_node(node)
         if node.type == :send
-          loc = StarScope::Location.new(@file, node.source_map.expression.line)
-          yield :calls, scoped_name(node), loc
+          yield :calls, scoped_name(node), node.source_map.expression.line
         end
       end
 
