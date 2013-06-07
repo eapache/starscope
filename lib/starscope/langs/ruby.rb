@@ -47,7 +47,7 @@ module StarScope::Lang
         if node.type == :send
           yield :calls, scoped_name(node), node.source_map.expression.line
 
-          if node.children[0].nil? and node.children[1] == :require
+          if node.children[0].nil? and node.children[1] == :require and node.children[2].type == :str
             yield :includes, node.children[2].children[0].split("/"), node.source_map.expression.line
           end
         end
