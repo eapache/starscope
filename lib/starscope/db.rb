@@ -8,6 +8,8 @@ class StarScope::DB
 
   DB_FORMAT = 1
 
+  class NoTableError < StandardError; end
+
   def initialize
     @dirs = []
     @files = {}
@@ -52,6 +54,7 @@ class StarScope::DB
   end
 
   def dump_table(table)
+    raise NoTableError if not @tables[table]
     puts "== Table: #{table} =="
     @tables[table].each do |val, data|
       puts "#{val}"
@@ -74,14 +77,12 @@ class StarScope::DB
 
   def query(table, value)
     fqn = value.split("::")
+    raise NoTableError if not @tables[table]
     results = @tables[table][fqn[-1].to_sym]
+    return [] if results.empty?
     results.sort! {|a,b| b.score_match(fqn) <=> a.score_match(fqn)}
     best_score = results[0].score_match(fqn)
-    results.each do |result|
-      # 4 is a guess at the best heuristic, not magic
-      return if best_score - result.score_match(fqn) > 4
-      puts result
-    end
+    results.select {|result| best_score - result.score_match(fqn) < 4}
   end
 
   private

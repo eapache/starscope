@@ -80,7 +80,11 @@ end
 
 if options[:query]
   table, value = options[:query].split(',', 2)
-  db.query(table.to_sym, value)
+  begin
+    puts db.query(table.to_sym, value)
+  rescue StarScope::DB::NoTableError
+    puts "Table '#{table}' doesn't exist."
+  end
 end
 
 if options[:summary]
@@ -121,7 +125,11 @@ END
       exit
     else
       table, value = input.split(' ', 2)
-      db.query(table.to_sym, value)
+      begin
+        puts db.query(table.to_sym, value)
+      rescue StarScope::DB::NoTableError
+        puts "Table '#{table}' doesn't exist."
+      end
     end
   end
 end
