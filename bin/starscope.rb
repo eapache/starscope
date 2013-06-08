@@ -70,6 +70,10 @@ rescue StarScope::DB::NoTableError
   puts "Table '#{table}' doesn't exist."
 end
 
+if options[:auto] and not options[:write]
+  options[:write] = DEFAULT_DB
+end
+
 # Load the database
 db = StarScope::DB.new
 new = true
@@ -91,9 +95,7 @@ end
 db.update if options[:auto] and not new
 
 # Write it
-if options[:auto] || options[:write]
-  db.save(options[:write] || DEFAULT_DB)
-end
+db.save(options[:write]) if options[:write]
 
 if options[:query]
   run_query(db, options[:query], ',')
@@ -130,9 +132,7 @@ END
       print_summary(db)
     when "!update"
       db.update
-      if options[:auto] || options[:write]
-        db.save(options[:write] || DEFAULT_DB)
-      end
+      db.save(options[:write]) if options[:write]
     when "!quit"
       exit
     else
