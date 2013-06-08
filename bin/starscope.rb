@@ -62,12 +62,12 @@ end
 def run_query(db, input, separator)
   table, value = input.split(separator, 2)
   if not value
-    puts "Invalid query - did you separate your table and query with '#{separator}'?"
+    $stderr.puts "Invalid query - did you separate your table and query with '#{separator}'?"
     return
   end
   puts db.query(table.to_sym, value)
 rescue StarScope::DB::NoTableError
-  puts "Table '#{table}' doesn't exist."
+  $stderr.puts "Table '#{table}' doesn't exist."
 end
 
 if options[:auto] and not options[:write]
@@ -78,7 +78,6 @@ if File.exists?(DEFAULT_DB) and not options[:read]
   options[:read] = DEFAULT_DB
 end
 
-# Load the database
 db = StarScope::DB.new
 
 if options[:read]
