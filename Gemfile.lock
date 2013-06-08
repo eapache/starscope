@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    starscope (0.0.4)
+    starscope (0.0.5)
       parser (~> 1.4)
 
 GEM
