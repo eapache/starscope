@@ -59,6 +59,17 @@ def print_summary(db)
   end
 end
 
+def run_query(db, input, separator)
+  table, value = input.split(separator, 2)
+  if not value
+    puts "Invalid query - did you separate your table and query with '#{separator}'?"
+    return
+  end
+  puts db.query(table.to_sym, value)
+rescue StarScope::DB::NoTableError
+  puts "Table '#{table}' doesn't exist."
+end
+
 # Load the database
 db = StarScope::DB.new
 new = true
@@ -85,12 +96,7 @@ if options[:auto] || options[:write]
 end
 
 if options[:query]
-  table, value = options[:query].split(',', 2)
-  begin
-    puts db.query(table.to_sym, value)
-  rescue StarScope::DB::NoTableError
-    puts "Table '#{table}' doesn't exist."
-  end
+  run_query(db, options[:query], ',')
 end
 
 if options[:summary]
@@ -130,12 +136,7 @@ END
     when "!quit"
       exit
     else
-      table, value = input.split(' ', 2)
-      begin
-        puts db.query(table.to_sym, value)
-      rescue StarScope::DB::NoTableError
-        puts "Table '#{table}' doesn't exist."
-      end
+      run_query(db, input, ' ')
     end
   end
 end

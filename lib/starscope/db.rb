@@ -83,7 +83,7 @@ class StarScope::DB
     fqn = value.split("::")
     raise NoTableError if not @tables[table]
     results = @tables[table][fqn[-1].to_sym]
-    return [] if results.empty?
+    return [] if results.nil? || results.empty?
     results.sort! {|a,b| b.score_match(fqn) <=> a.score_match(fqn)}
     best_score = results[0].score_match(fqn)
     results.select {|result| best_score - result.score_match(fqn) < 4}
