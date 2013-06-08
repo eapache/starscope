@@ -24,6 +24,9 @@ END
   opts.on("-d", "--dump [TABLE]", "Dumps the DB or specified table to stdout") do |tbl|
     options[:dump] = tbl || true
   end
+  opts.on("-l", "--line-mode", "Starts line-oriented interface") do
+    options[:linemode] = true
+  end
   opts.on("-q", "--query TABLE,QUERY", "Looks up QUERY in TABLE") do |query|
     options[:query] = query
   end
@@ -89,5 +92,36 @@ if options[:dump]
     db.dump_table(options[:dump].to_sym)
   else
     db.dump_all
+  end
+end
+
+if options[:linemode]
+  puts <<END
+Normal input is of the form
+  table query
+and returns the result of that query. The following special commands
+are also recognized:
+  !summary
+  !update
+  !quit
+
+END
+  while true
+    print "> "
+    input = gets.chomp
+    case input
+    when "!summary"
+      db.print_summary
+    when "!update"
+      db.update
+      if options[:auto] || options[:write]
+        db.save(options[:write] || DEFAULT_DB)
+      end
+    when "!quit"
+      exit
+    else
+      table, value = input.split(' ', 2)
+      db.query(table.to_sym, value)
+    end
   end
 end
