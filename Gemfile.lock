@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     starscope (0.0.3)
-      parser
+      parser (~> 1.4)
 
 GEM
   remote: https://rubygems.org/
