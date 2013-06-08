@@ -39,7 +39,7 @@ class StarScope::DB
   end
 
   def add_dirs(dirs)
-    @dirs << dirs
+    @dirs += dirs
     dirs.each do |dir|
       Dir["#{dir}/**/*"].each do |file|
         add_file(file)
