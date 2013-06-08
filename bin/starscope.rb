@@ -74,36 +74,29 @@ if options[:auto] and not options[:write]
   options[:write] = DEFAULT_DB
 end
 
-# Load the database
-db = StarScope::DB.new
-new = true
-if options[:read]
-  db.load(options[:read])
-  new = false
-elsif File.exists?(DEFAULT_DB)
-  db.load(DEFAULT_DB)
-  new = false
+if File.exists?(DEFAULT_DB) and not options[:read]
+  options[:read] = DEFAULT_DB
 end
 
-if ARGV.empty?
-  db.add_dirs(['.']) if new
+# Load the database
+db = StarScope::DB.new
+
+if options[:read]
+  db.load(options[:read])
+  db.add_dirs(ARGV)
+elsif ARGV.empty?
+  db.add_dirs(['.'])
 else
   db.add_dirs(ARGV)
 end
 
-# Update it
-db.update if options[:auto] and not new
+db.update if options[:read] and options[:auto]
 
-# Write it
 db.save(options[:write]) if options[:write]
 
-if options[:query]
-  run_query(db, options[:query], ',')
-end
+run_query(db, options[:query], ',') if options[:query]
 
-if options[:summary]
-  print_summary(db)
-end
+print_summary(db) if options[:summary]
 
 if options[:dump]
   if options[:dump].is_a? String
