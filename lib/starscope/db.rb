@@ -69,10 +69,14 @@ class StarScope::DB
     @tables.keys.each {|tbl| dump_table(tbl)}
   end
 
-  def print_summary
-    @tables.each do |name, tbl|
-      puts "#{name} - #{tbl.keys.count} entries"
+  def summary
+    ret = {}
+
+    @tables.each_key do |key|
+      ret[key] = @tables[key].keys.count
     end
+
+    ret
   end
 
   def query(table, value)

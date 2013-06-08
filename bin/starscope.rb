@@ -53,6 +53,12 @@ END
 
 end.parse!
 
+def print_summary(db)
+  db.summary.each do |name, count|
+    printf("%-8s %5d keys\n", name, count)
+  end
+end
+
 # Load the database
 db = StarScope::DB.new
 new = true
@@ -88,7 +94,7 @@ if options[:query]
 end
 
 if options[:summary]
-  db.print_summary
+  print_summary(db)
 end
 
 if options[:dump]
@@ -115,7 +121,7 @@ END
     input = gets.chomp
     case input
     when "!summary"
-      db.print_summary
+      print_summary(db)
     when "!update"
       db.update
       if options[:auto] || options[:write]
