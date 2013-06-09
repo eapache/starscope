@@ -4,7 +4,8 @@ lib = File.expand_path('../../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require 'optparse'
-require "starscope"
+require 'readline'
+require 'starscope'
 
 options = {auto: true}
 DEFAULT_DB=".starscope.db"
@@ -116,9 +117,7 @@ are also recognized:
   !quit
 
 END
-  while true
-    print "> "
-    input = gets.chomp
+  while input = Readline.readline("> ", true)
     case input
     when "!summary"
       print_summary(db)

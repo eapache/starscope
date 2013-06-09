@@ -4,7 +4,8 @@ Changelog
 v0.0.5 (trunk)
 -------------------
 
-No changes yet.
+Improvements:
+ * GNU Readline behaviour in line-mode
 
 v0.0.4 (2013-06-08)
 -------------------
