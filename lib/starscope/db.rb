@@ -9,6 +9,7 @@ class StarScope::DB
   DB_FORMAT = 1
 
   class NoTableError < StandardError; end
+  class UnknownDBFormatError < StandardError; end
 
   def initialize
     @dirs = []
@@ -19,10 +20,17 @@ class StarScope::DB
   def load(file)
     File.open(file, 'r') do |file|
       Zlib::GzipReader.wrap(file) do |file|
-        raise "Database format not recognized" if DB_FORMAT != file.gets.to_i
-        @dirs   = load_part(file)
-        @files  = load_part(file)
-        @tables = load_part(file)
+        format = file.gets.to_i
+        if format == DB_FORMAT
+          @dirs   = load_part(file)
+          @files  = load_part(file)
+          @tables = load_part(file)
+        elsif format < DB_FORMAT
+          # Old format, so read the directories segment then rebuild
+          add_dirs(load_part(file))
+        elsif format > DB_FORMAT
+          raise UnknownDBFormatError
+        end
       end
     end
   end
