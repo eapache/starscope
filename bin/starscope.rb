@@ -60,15 +60,28 @@ def print_summary(db)
   end
 end
 
-def run_query(db, input, separator)
-  table, value = input.split(separator, 2)
+def run_query(db, table, value)
   if not value
-    $stderr.puts "Invalid query - did you separate your table and query with '#{separator}'?"
+    $stderr.puts "Invalid input - no query found."
     return
   end
   puts db.query(table.to_sym, value)
+  return true
 rescue StarScope::DB::NoTableError
   $stderr.puts "Table '#{table}' doesn't exist."
+  return false
+end
+
+def dump(db, table)
+  if table
+    db.dump_table(table.to_sym)
+  else
+    db.dump_all
+  end
+  return true
+rescue StarScope::DB::NoTableError
+  $stderr.puts "Table '#{table}' doesn't exist."
+  return false
 end
 
 if options[:auto] and not options[:write]
@@ -94,44 +107,60 @@ db.update if options[:read] and options[:auto]
 
 db.save(options[:write]) if options[:write]
 
-run_query(db, options[:query], ',') if options[:query]
+if options[:query]
+  table, query = options[:query].split(',', 2)
+  run_query(db, table, query)
+end
 
 print_summary(db) if options[:summary]
 
 if options[:dump]
   if options[:dump].is_a? String
-    db.dump_table(options[:dump].to_sym)
+    dump(db, options[:dump])
   else
-    db.dump_all
+    dump(db, nil)
   end
 end
 
-if options[:linemode]
-  puts <<END
-Normal input is of the form
-  table query
-and returns the result of that query. The following special commands
-are also recognized:
+def linemode_help
+  <<END
+Input can be a query of the form 'TABLE QUERY' or a special command starting
+with a '!'. Recognized special commands are:
+  !dump [TABLE]
   !summary
   !update
-  !quit
 
+  !help
+  !version
+  !quit
 END
+end
+
+if options[:linemode]
+  puts "Run your query as 'TABLE QUERY' or run '!help' for more information."
   while input = Readline.readline("> ", true)
-    if input[0] == '!'
-      case input[1..-1]
+    cmd, param = input.split(' ', 2)
+    if cmd[0] == '!'
+      case cmd[1..-1]
+      when "dump"
+        dump(db, param)
       when "summary"
         print_summary(db)
       when "update"
         db.update
         db.save(options[:write]) if options[:write]
+      when "help"
+        puts linemode_help
+      when "version"
+        puts StarScope::VERSION
       when "quit"
         exit
       else
-        puts "Unknown command: #{input}"
+        puts "Unknown command: '#{input}', try '!help'."
       end
     else
-      run_query(db, input, ' ')
+      success = run_query(db, cmd, param)
+      puts "Try '!help'." unless success
     end
   end
 end
