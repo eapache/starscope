@@ -1,11 +1,12 @@
 class StarScope::Datum
-  attr_reader :key, :scope, :file, :line
+  attr_reader :key, :file
 
-  def initialize(fqn, file, line)
+  def initialize(fqn, file, line_no)
     @key = fqn[-1].to_sym
     @scope = fqn[0...-1].map {|x| x.to_sym}
     @file = file
-    @line = line
+    @line_no = line_no
+    @line = File.readlines(file)[line_no-1].strip
   end
 
   def score_match(fqn)
@@ -25,14 +26,13 @@ class StarScope::Datum
   end
 
   def location
-    "#{file}:#{line}"
+    "#{@file}:#{@line_no}"
   end
 
   def to_s
-    if @scope.empty?
-      "#{key} -- #{location}"
-    else
-      "#{@scope.join " "} #{@key} -- #{location}"
-    end
+    str = ""
+    str << "#{@scope.join " "} " unless @scope.empty?
+    str << "#{@key} -- #{location}"
+    str << " (#{@line})"
   end
 end

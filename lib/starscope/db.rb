@@ -6,7 +6,7 @@ LANGS = [StarScope::Lang::Ruby]
 
 class StarScope::DB
 
-  DB_FORMAT = 1
+  DB_FORMAT = 2
 
   class NoTableError < StandardError; end
   class UnknownDBFormatError < StandardError; end
