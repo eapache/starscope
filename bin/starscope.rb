@@ -118,14 +118,18 @@ are also recognized:
 
 END
   while input = Readline.readline("> ", true)
-    case input
-    when "!summary"
-      print_summary(db)
-    when "!update"
-      db.update
-      db.save(options[:write]) if options[:write]
-    when "!quit"
-      exit
+    if input[0] == '!'
+      case input[1..-1]
+      when "summary"
+        print_summary(db)
+      when "update"
+        db.update
+        db.save(options[:write]) if options[:write]
+      when "quit"
+        exit
+      else
+        puts "Unknown command: #{input}"
+      end
     else
       run_query(db, input, ' ')
     end
