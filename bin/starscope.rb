@@ -36,6 +36,9 @@ END
   end
 
   opts.separator "\nDatabase Management"
+  opts.on("-e", "--export FORMAT[,PATH]", "Export in FORMAT to PATH, see EXPORTING below") do |export|
+    options[:export] = export
+  end
   opts.on("-n", "--no-auto", "Don't automatically update/create the database") do
     options[:auto] = false
   end
@@ -51,6 +54,12 @@ END
     puts StarScope::VERSION
     exit
   end
+
+  opts.separator <<END
+\nEXPORTING
+    At the moment only one export format is supported: 'ctags'. If you don't
+    specify a path, the file is written to 'tags' in the current directory.
+END
 
 end.parse!
 
@@ -106,6 +115,16 @@ end
 db.update if options[:read] and options[:auto]
 
 db.save(options[:write]) if options[:write]
+
+if options[:export]
+  format, path = options[:export].split(',', 2)
+  case format
+  when 'ctags'
+    db.export_ctags(path || 'tags')
+  else
+    puts "Unrecognized export format"
+  end
+end
 
 if options[:query]
   table, query = options[:query].split(',', 2)

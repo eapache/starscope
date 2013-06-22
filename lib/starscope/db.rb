@@ -97,6 +97,25 @@ class StarScope::DB
     results.select {|result| best_score - result.score_match(fqn) < 4}
   end
 
+  def export_ctags(filename)
+    File.open(filename, 'w') do |file|
+      file.puts <<END
+!_TAG_FILE_FORMAT	2	//
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Evan Huus //
+!_TAG_PROGRAM_NAME	Starscope //
+!_TAG_PROGRAM_URL	https://github.com/eapache/starscope //
+!_TAG_PROGRAM_VERSION	#{StarScope::VERSION}	//
+END
+      defs = (@tables[:def] || []).sort {|a,b| a <=> b}
+      defs.each do |key, val|
+        val.each do |entry|
+          file.puts entry.ctag_line
+        end
+      end
+    end
+  end
+
   private
 
   def load_part(file)

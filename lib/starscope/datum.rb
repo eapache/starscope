@@ -6,7 +6,7 @@ class StarScope::Datum
     @scope = fqn[0...-1].map {|x| x.to_sym}
     @file = file
     @line_no = line_no
-    @line = File.readlines(file)[line_no-1].strip
+    @line = File.readlines(file)[line_no-1].chomp
   end
 
   def score_match(fqn)
@@ -33,6 +33,10 @@ class StarScope::Datum
     str = ""
     str << "#{@scope.join " "} " unless @scope.empty?
     str << "#{@key} -- #{location}"
-    str << " (#{@line})"
+    str << " (#{@line.strip})"
+  end
+
+  def ctag_line
+    "#{@key}\t#{@file}\t/^#{@line}$/;"
   end
 end

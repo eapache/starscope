@@ -25,4 +25,9 @@ Ask it things with `-q`
 $ starscope.rb -q calls,new # Lists all callers of new
 ```
 
+Export it for use with your editor
+```
+$ starscope.rb -e ctags
+```
+
 [1] http://cscope.sourceforge.net/
