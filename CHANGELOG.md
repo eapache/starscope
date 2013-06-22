@@ -10,6 +10,7 @@ New Features:
 Improvements:
  * GNU Readline behaviour in line-mode
  * Additional commands available in line-mode: !dump, !help, !version
+ * Prints the relevant line in query mode
 
 v0.0.4 (2013-06-08)
 -------------------
