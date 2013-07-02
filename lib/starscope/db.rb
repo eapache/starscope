@@ -136,11 +136,10 @@ END
 
     LANGS.each do |lang|
       next if not lang.match_file file
-      lang.extract file do |tblname, fqn, lineno|
-        datum = StarScope::Datum.new(fqn, file, lineno)
-        @tables[tblname] ||= {}
-        @tables[tblname][datum.key] ||= []
-        @tables[tblname][datum.key] << datum
+      lang.extract file do |tbl, key, args|
+        @tables[tbl] ||= {}
+        @tables[tbl][key] ||= []
+        @tables[tbl][key] << StarScope::Datum.build(key, file, args)
       end
     end
   end
@@ -149,7 +148,7 @@ END
     @files.delete(file)
     @tables.each do |name, tbl|
       tbl.each do |key, val|
-        val.delete_if {|dat| dat.file == file}
+        val.delete_if {|dat| dat[:file] == file}
       end
     end
   end

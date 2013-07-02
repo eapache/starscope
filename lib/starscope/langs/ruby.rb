@@ -22,7 +22,7 @@ module StarScope::Lang
         @ast = ast
         @scope = []
       end
-      
+
       def extract(&block)
         extract_tree(@ast, &block)
       end
@@ -45,23 +45,35 @@ module StarScope::Lang
 
       def extract_node(node)
         if node.type == :send
-          yield :calls, scoped_name(node), node.source_map.expression.line
+          fqn = scoped_name(node)
+          yield :calls, fqn.last, line_no: node.source_map.expression.line,
+            scope: fqn[0...-1]
 
           if node.children[0].nil? and node.children[1] == :require and node.children[2].type == :str
-            yield :requires, node.children[2].children[0].split("/"), node.source_map.expression.line
+            fqn = node.children[2].children[0].split("/")
+            yield :requires, fqn.last, line_no: node.source_map.expression.line,
+              scope: fqn[0...-1]
           end
         end
 
         if node.type == :def
-          yield :def, @scope + [node.children[0]], node.source_map.expression.line
+          yield :defs, node.children[0],
+            line_no: node.source_map.expression.line,
+            scope: @scope
         elsif [:module, :class].include? node.type
-          yield :def, @scope + scoped_name(node.children[0]), node.source_map.expression.line
+          fqn = @scope + scoped_name(node.children[0])
+          yield :defs, fqn.last, line_no: node.source_map.expression.line,
+            scope: fqn[0...-1]
         end
 
         if node.type == :cdecl
-          yield :assign, scoped_name(node), node.source_map.expression.line
+          fqn = scoped_name(node)
+          yield :assigns, fqn.last, line_no: node.source_map.expression.line,
+            scope: fqn[0...-1]
         elsif [:lvasgn, :ivasgn, :cvdecl, :cvasgn, :gvasgn].include? node.type
-          yield :assign, @scope + [node.children[0]], node.source_map.expression.line
+          yield :assigns, node.children[0],
+            line_no: node.source_map.expression.line,
+            scope: @scope
         end
       end
 
