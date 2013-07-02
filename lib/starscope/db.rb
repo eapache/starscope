@@ -96,11 +96,15 @@ class StarScope::DB
   def query(table, value)
     fqn = value.split("::")
     raise NoTableError if not @tables[table]
-    results = @tables[table][fqn[-1].to_sym]
+    results = @tables[table][fqn.last.to_sym]
     return [] if results.nil? || results.empty?
-    results.sort! {|a,b| b.score_match(fqn) <=> a.score_match(fqn)}
-    best_score = results[0].score_match(fqn)
-    results.select {|result| best_score - result.score_match(fqn) < 4}
+    results.sort! do |a,b|
+      StarScope::Datum.score_match(b, fqn) <=> StarScope::Datum.score_match(a, fqn)
+    end
+    best_score = StarScope::Datum.score_match(results[0], fqn)
+    results.select do |result|
+      best_score - StarScope::Datum.score_match(result, fqn) < 4
+    end
   end
 
   def export_ctags(filename)
@@ -113,10 +117,10 @@ class StarScope::DB
 !_TAG_PROGRAM_URL	https://github.com/eapache/starscope //
 !_TAG_PROGRAM_VERSION	#{StarScope::VERSION}	//
 END
-      defs = (@tables[:def] || []).sort {|a,b| a <=> b}
+      defs = (@tables[:defs] || []).sort {|a,b| a <=> b}
       defs.each do |key, val|
         val.each do |entry|
-          file.puts entry.ctag_line
+          file.puts StarScope::Datum.ctag_line(entry)
         end
       end
     end
