@@ -1,12 +1,14 @@
 require 'starscope/langs/ruby'
-require "starscope/datum"
+require 'starscope/datum'
+require 'date'
+require 'json'
 require 'zlib'
 
 LANGS = [StarScope::Lang::Ruby]
 
 class StarScope::DB
 
-  DB_FORMAT = 2
+  DB_FORMAT = 3
 
   class NoTableError < StandardError; end
   class UnknownDBFormatError < StandardError; end
@@ -22,12 +24,16 @@ class StarScope::DB
       Zlib::GzipReader.wrap(file) do |file|
         format = file.gets.to_i
         if format == DB_FORMAT
-          @dirs   = load_part(file)
-          @files  = load_part(file)
-          @tables = load_part(file)
+          @dirs   = JSON.parse(file.gets, symbolize_names: false)
+          @files  = JSON.parse(file.gets, symbolize_names: false)
+          @tables = JSON.parse(file.gets, symbolize_names: true)
+        elsif format <= 2
+          # Old format (pre-json), so read the directories segment then rebuild
+          len = file.gets.to_i
+          add_dirs(Marshal::load(file.read(len)))
         elsif format < DB_FORMAT
           # Old format, so read the directories segment then rebuild
-          add_dirs(load_part(file))
+          add_dirs(JSON.parse(file.gets, symbolize_names: false))
         elsif format > DB_FORMAT
           raise UnknownDBFormatError
         end
@@ -39,9 +45,9 @@ class StarScope::DB
     File.open(file, 'w') do |file|
       Zlib::GzipWriter.wrap(file) do |file|
         file.puts DB_FORMAT
-        save_part(file, @dirs)
-        save_part(file, @files)
-        save_part(file, @tables)
+        file.puts JSON.fast_generate @dirs
+        file.puts JSON.fast_generate @files
+        file.puts JSON.fast_generate @tables
       end
     end
   end
@@ -118,21 +124,10 @@ END
 
   private
 
-  def load_part(file)
-    len = file.gets.to_i
-    Marshal::load(file.read(len))
-  end
-
-  def save_part(file, val)
-    dat = Marshal.dump(val)
-    file.puts dat.length
-    file.write dat
-  end
-
   def add_file(file)
     return if not File.file? file
 
-    @files[file] = File.mtime(file)
+    @files[file] = File.mtime(file).to_s
 
     LANGS.each do |lang|
       next if not lang.match_file file
@@ -156,7 +151,7 @@ END
   def update_file(file)
     if not File.exists?(file)
       remove_file(file)
-    elsif @files[file] < File.mtime(file)
+    elsif DateTime.parse(@files[file]).to_time < File.mtime(file)
       remove_file(file)
       add_file(file)
     end
