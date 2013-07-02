@@ -4,7 +4,8 @@ Changelog
 v0.0.6 (trunk)
 -------------------
 
-None yet
+Internals:
+ * Database is now stored as gzipped JSON for better portability
 
 v0.0.5 (2013-06-22)
 -------------------
