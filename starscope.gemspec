@@ -8,6 +8,7 @@ Gem::Specification.new do |gem|
   gem.authors       = ["Evan Huus"]
   gem.homepage      = 'https://github.com/eapache/starscope'
   gem.email         = 'eapache@gmail.com'
+  gem.license       = 'MIT'
   gem.files         = `git ls-files`.split("\n")
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.require_paths = ["lib"]
