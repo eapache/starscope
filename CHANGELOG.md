@@ -4,7 +4,8 @@ Changelog
 v0.0.7 (trunk)
 -------------------
 
-None yet.
+Misc:
+ * Specify license in gemspec.
 
 v0.0.6 (2013-07-19)
 -------------------
