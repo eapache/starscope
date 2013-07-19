@@ -2,12 +2,12 @@ PATH
   remote: .
   specs:
     starscope (0.0.6)
-      parser (~> 1.4)
+      parser (= 2.0.0.pre2)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    ast (1.0.2)
+    ast (1.1.0)
     coderay (1.0.9)
     columnize (0.3.6)
     debugger (1.6.0)
@@ -17,9 +17,9 @@ GEM
     debugger-linecache (1.2.0)
     debugger-ruby_core_source (1.2.2)
     method_source (0.8.1)
-    parser (1.4.1)
-      ast (~> 1.0)
-      slop (~> 3.4)
+    parser (2.0.0.pre2)
+      ast (~> 1.1)
+      slop (~> 3.4, >= 3.4.5)
     pry (0.9.12.2)
       coderay (~> 1.0.5)
       method_source (~> 0.8)

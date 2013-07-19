@@ -6,9 +6,10 @@ v0.0.6 (trunk)
 
 Interface:
  * Table names are now consistently conjugated (def -> defs, assign -> assigns)
- * The 'starscope' binary no longer has an unnecessary .rb suffix.
+ * The `starscope` binary no longer has an unnecessary .rb suffix.
 
 Internals:
+ * Update to a new version of the ruby parser that is significantly faster.
  * Database is now stored as gzipped JSON for better portability
 
 v0.0.5 (2013-06-22)

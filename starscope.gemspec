@@ -12,7 +12,7 @@ Gem::Specification.new do |gem|
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.require_paths = ["lib"]
 
-  gem.add_dependency 'parser', '~> 1.4'
+  gem.add_dependency 'parser', '= 2.0.0.pre2'
   gem.add_development_dependency 'bundler', '~> 1.3'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'pry'

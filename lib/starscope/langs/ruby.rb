@@ -46,33 +46,33 @@ module StarScope::Lang
       def extract_node(node)
         if node.type == :send
           fqn = scoped_name(node)
-          yield :calls, fqn.last, line_no: node.source_map.expression.line,
+          yield :calls, fqn.last, line_no: node.location.expression.line,
             scope: fqn[0...-1]
 
           if node.children[0].nil? and node.children[1] == :require and node.children[2].type == :str
             fqn = node.children[2].children[0].split("/")
-            yield :requires, fqn.last, line_no: node.source_map.expression.line,
+            yield :requires, fqn.last, line_no: node.location.expression.line,
               scope: fqn[0...-1]
           end
         end
 
         if node.type == :def
           yield :defs, node.children[0],
-            line_no: node.source_map.expression.line,
+            line_no: node.location.expression.line,
             scope: @scope
         elsif [:module, :class].include? node.type
           fqn = @scope + scoped_name(node.children[0])
-          yield :defs, fqn.last, line_no: node.source_map.expression.line,
+          yield :defs, fqn.last, line_no: node.location.expression.line,
             scope: fqn[0...-1]
         end
 
-        if node.type == :cdecl
+        if node.type == :casgn
           fqn = scoped_name(node)
-          yield :assigns, fqn.last, line_no: node.source_map.expression.line,
+          yield :assigns, fqn.last, line_no: node.location.expression.line,
             scope: fqn[0...-1]
-        elsif [:lvasgn, :ivasgn, :cvdecl, :cvasgn, :gvasgn].include? node.type
+        elsif [:lvasgn, :ivasgn, :cvasgn, :gvasgn].include? node.type
           yield :assigns, node.children[0],
-            line_no: node.source_map.expression.line,
+            line_no: node.location.expression.line,
             scope: @scope
         end
       end
@@ -80,7 +80,7 @@ module StarScope::Lang
       def scoped_name(node)
         if node.type == :block
           scoped_name(node.children[0])
-        elsif [:lvar, :ivar, :cvar, :gvar, :const, :send, :cdecl].include? node.type
+        elsif [:lvar, :ivar, :cvar, :gvar, :const, :send, :casgn].include? node.type
           if node.children[0].is_a? Symbol
             [node.children[0]]
           elsif node.children[0].is_a? AST::Node
