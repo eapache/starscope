@@ -4,6 +4,10 @@ Changelog
 v0.0.6 (trunk)
 -------------------
 
+Interface:
+ * Table names are now consistently conjugated (def -> defs, assign -> assigns)
+ * The 'starscope' binary no longer has an unnecessary .rb suffix.
+
 Internals:
  * Database is now stored as gzipped JSON for better portability
 

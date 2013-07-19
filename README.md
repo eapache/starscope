@@ -17,17 +17,17 @@ $ gem install starscope
 Build your database, by just running it in the project directory:
 ```
 $ cd ~/my-project
-$ starscope.rb
+$ starscope
 ```
 
 Ask it things with `-q`
 ```
-$ starscope.rb -q calls,new # Lists all callers of new
+$ starscope -q calls,new # Lists all callers of new
 ```
 
 Export it for use with your editor
 ```
-$ starscope.rb -e ctags
+$ starscope -e ctags
 ```
 
 [1] http://cscope.sourceforge.net/
