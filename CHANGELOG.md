@@ -4,7 +4,8 @@ Changelog
 v0.0.8 (trunk)
 -------------------
 
-None yet.
+Bug Fixes:
+ * Correctly format table dumps.
 
 v0.0.7 (2013-07-19)
 -------------------

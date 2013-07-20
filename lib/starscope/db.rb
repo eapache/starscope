@@ -74,7 +74,7 @@ class StarScope::DB
       puts "#{val}"
       data.each do |datum|
         print "\t"
-        puts datum
+        puts StarScope::Datum.to_s(datum)
       end
     end
   end
