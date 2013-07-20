@@ -60,6 +60,10 @@ module StarScope::Lang
           yield :defs, node.children[0],
             line_no: node.location.expression.line,
             scope: @scope
+        elsif node.type == :defs
+          yield :defs, node.children[1],
+            line_no: node.location.expression.line,
+            scope: @scope
         elsif [:module, :class].include? node.type
           fqn = @scope + scoped_name(node.children[0])
           yield :defs, fqn.last, line_no: node.location.expression.line,

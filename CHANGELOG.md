@@ -6,6 +6,7 @@ v0.0.8 (trunk)
 
 Bug Fixes:
  * Correctly format table dumps.
+ * Correctly generate `defs` table entries for static methods (Bug #1)
 
 v0.0.7 (2013-07-19)
 -------------------
