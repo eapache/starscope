@@ -1,6 +1,8 @@
 StarScope
 =========
 
+https://rubygems.org/gems/starscope
+
 *Note to those users looking at the GitHub language statistics: there is no perl
 here, that is their bug to fix.*
 
