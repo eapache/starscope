@@ -44,37 +44,36 @@ module StarScope::Lang
       end
 
       def extract_node(node)
-        if node.type == :send
+        case node.type
+        when :send
           fqn = scoped_name(node)
-          yield :calls, fqn.last, line_no: node.location.expression.line,
+          yield :calls, fqn.last,
+            line_no: node.location.expression.line,
             scope: fqn[0...-1]
-
           if node.children[0].nil? and node.children[1] == :require and node.children[2].type == :str
             fqn = node.children[2].children[0].split("/")
-            yield :requires, fqn.last, line_no: node.location.expression.line,
+            yield :requires, fqn.last,
+              line_no: node.location.expression.line,
               scope: fqn[0...-1]
           end
-        end
-
-        if node.type == :def
+        when :def
           yield :defs, node.children[0],
             line_no: node.location.expression.line,
             scope: @scope
-        elsif node.type == :defs
+        when :defs
           yield :defs, node.children[1],
             line_no: node.location.expression.line,
             scope: @scope
-        elsif [:module, :class].include? node.type
+        when :module, :class
           fqn = @scope + scoped_name(node.children[0])
           yield :defs, fqn.last, line_no: node.location.expression.line,
             scope: fqn[0...-1]
-        end
-
-        if node.type == :casgn
+        when :casgn
           fqn = scoped_name(node)
-          yield :assigns, fqn.last, line_no: node.location.expression.line,
+          yield :assigns, fqn.last,
+            line_no: node.location.expression.line,
             scope: fqn[0...-1]
-        elsif [:lvasgn, :ivasgn, :cvasgn, :gvasgn].include? node.type
+        when :lvasgn, :ivasgn, :cvasgn, :gvasgn
           yield :assigns, node.children[0],
             line_no: node.location.expression.line,
             scope: @scope
