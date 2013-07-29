@@ -14,6 +14,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_dependency 'parser', '= 2.0.0.pre3'
+  gem.add_dependency 'ruby-progressbar', '~> 1.1'
   gem.add_development_dependency 'bundler', '~> 1.3'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'pry'

@@ -3,12 +3,14 @@ require 'starscope/datum'
 require 'date'
 require 'json'
 require 'zlib'
+require 'ruby-progressbar'
 
 LANGS = [StarScope::Lang::Ruby]
 
 class StarScope::DB
 
   DB_FORMAT = 3
+  PBAR_FORMAT = '%t: %c/%C %E ||%b>%i||'
 
   class NoTableError < StandardError; end
   class UnknownDBFormatError < StandardError; end
@@ -53,18 +55,28 @@ class StarScope::DB
   end
 
   def add_dirs(dirs)
+    return if dirs.empty?
     @dirs += dirs
-    dirs.each do |dir|
-      Dir["#{dir}/**/*"].each do |file|
-        add_file(file)
-      end
+    files = dirs.map {|d| Dir["#{d}/**/*"]}.flatten
+    return if files.empty?
+    pbar = ProgressBar.create(:title => "Building Database", :total => files.length, :format => PBAR_FORMAT)
+    files.each do |f|
+      add_file(f)
+      pbar.increment
     end
   end
 
   def update
-    @files.keys.each {|f| update_file(f)}
-    cur_files = @dirs.each {|d| Dir["#{d}/**/*"]}.flatten
-    (cur_files - @files.keys).each {|f| add_file(f)}
+    new_files = (@dirs.map {|d| Dir["#{d}/**/*"]}.flatten) - @files.keys
+    pbar = ProgressBar.create(:title => "Updating Database", :total => new_files.length + @files.length, :format => PBAR_FORMAT)
+    @files.keys.each do |f|
+      update_file(f)
+      pbar.increment
+    end
+    new_files.each do |f|
+      add_file(f)
+      pbar.increment
+    end
   end
 
   def dump_table(table)

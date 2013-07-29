@@ -4,6 +4,9 @@ Changelog
 v0.0.9 (trunk)
 -------------------
 
+New Features:
+ * Progress bar when building or updating database.
+
 Bug Fixes:
  * Handle the case when a ruby file produces a nil parse tree.
 
