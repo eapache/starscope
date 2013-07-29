@@ -4,6 +4,9 @@ Changelog
 v0.0.9 (trunk)
 -------------------
 
+Bug Fixes:
+ * Handle the case when a ruby file produces a nil parse tree.
+
 Internals:
  * Another new version of the ruby parser.
 
