@@ -4,7 +4,8 @@ Changelog
 v0.0.9 (trunk)
 -------------------
 
-None yet.
+Internals:
+ * Another new version of the ruby parser.
 
 v0.0.8 (2013-07-20)
 -------------------
