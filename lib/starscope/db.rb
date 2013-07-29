@@ -55,6 +55,7 @@ class StarScope::DB
   end
 
   def add_dirs(dirs)
+    dirs -= @dirs
     return if dirs.empty?
     @dirs += dirs
     files = dirs.map {|d| Dir["#{d}/**/*"]}.flatten
