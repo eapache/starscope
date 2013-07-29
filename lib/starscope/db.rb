@@ -1,7 +1,7 @@
 require 'starscope/langs/ruby'
 require 'starscope/datum'
 require 'date'
-require 'json'
+require 'oj'
 require 'zlib'
 require 'ruby-progressbar'
 
@@ -26,16 +26,16 @@ class StarScope::DB
       Zlib::GzipReader.wrap(file) do |file|
         format = file.gets.to_i
         if format == DB_FORMAT
-          @dirs   = JSON.parse(file.gets, symbolize_names: false)
-          @files  = JSON.parse(file.gets, symbolize_names: false)
-          @tables = JSON.parse(file.gets, symbolize_names: true)
+          @dirs   = Oj.load(file.gets)
+          @files  = Oj.load(file.gets)
+          @tables = Oj.load(file.gets, symbol_keys: true)
         elsif format <= 2
           # Old format (pre-json), so read the directories segment then rebuild
           len = file.gets.to_i
           add_dirs(Marshal::load(file.read(len)))
         elsif format < DB_FORMAT
           # Old format, so read the directories segment then rebuild
-          add_dirs(JSON.parse(file.gets, symbolize_names: false))
+          add_dirs(Oj.load(file.gets))
         elsif format > DB_FORMAT
           raise UnknownDBFormatError
         end
@@ -47,9 +47,9 @@ class StarScope::DB
     File.open(file, 'w') do |file|
       Zlib::GzipWriter.wrap(file) do |file|
         file.puts DB_FORMAT
-        file.puts JSON.fast_generate @dirs
-        file.puts JSON.fast_generate @files
-        file.puts JSON.fast_generate @tables
+        file.puts Oj.dump @dirs
+        file.puts Oj.dump @files
+        file.puts Oj.dump @tables
       end
     end
   end
