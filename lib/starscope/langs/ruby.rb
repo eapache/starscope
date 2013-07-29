@@ -24,7 +24,7 @@ module StarScope::Lang
       end
 
       def extract(&block)
-        extract_tree(@ast, &block)
+        extract_tree(@ast, &block) if not @ast.nil?
       end
 
       private
