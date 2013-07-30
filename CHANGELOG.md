@@ -14,6 +14,7 @@ Internals:
  * Another new version of the ruby parser.
  * Replace the default JSON module with Oj, which is more than twice as fast for
    large databases.
+ * Misc optimizations and improvements.
 
 v0.0.8 (2013-07-20)
 -------------------

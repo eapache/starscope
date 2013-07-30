@@ -95,6 +95,7 @@ end
 
 if options[:auto] and not options[:write]
   options[:write] = DEFAULT_DB
+  options[:auto_write] = true
 end
 
 if File.exists?(DEFAULT_DB) and not options[:read]
@@ -105,16 +106,21 @@ db = StarScope::DB.new
 
 if options[:read]
   db.load(options[:read])
-  db.add_dirs(ARGV)
+  if !ARGV.empty?
+    db.add_paths(ARGV)
+    new_data = true
+  end
 elsif ARGV.empty?
-  db.add_dirs(['.'])
+  db.add_paths(['.'])
+  new_data = true
 else
-  db.add_dirs(ARGV)
+  db.add_paths(ARGV)
+  new_data = true
 end
 
-db.update if options[:read] and options[:auto]
+changed = db.update if options[:read] and options[:auto]
 
-db.save(options[:write]) if options[:write]
+db.save(options[:write]) if options[:write] and (new_data or changed or not options[:auto_write])
 
 if options[:export]
   format, path = options[:export].split(',', 2)

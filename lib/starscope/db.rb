@@ -16,7 +16,7 @@ class StarScope::DB
   class UnknownDBFormatError < StandardError; end
 
   def initialize
-    @dirs = []
+    @paths = []
     @files = {}
     @tables = {}
   end
@@ -26,16 +26,16 @@ class StarScope::DB
       Zlib::GzipReader.wrap(file) do |file|
         format = file.gets.to_i
         if format == DB_FORMAT
-          @dirs   = Oj.load(file.gets)
+          @paths  = Oj.load(file.gets)
           @files  = Oj.load(file.gets)
           @tables = Oj.load(file.gets, symbol_keys: true)
         elsif format <= 2
           # Old format (pre-json), so read the directories segment then rebuild
           len = file.gets.to_i
-          add_dirs(Marshal::load(file.read(len)))
+          add_paths(Marshal::load(file.read(len)))
         elsif format < DB_FORMAT
           # Old format, so read the directories segment then rebuild
-          add_dirs(Oj.load(file.gets))
+          add_paths(Oj.load(file.gets))
         elsif format > DB_FORMAT
           raise UnknownDBFormatError
         end
@@ -47,18 +47,18 @@ class StarScope::DB
     File.open(file, 'w') do |file|
       Zlib::GzipWriter.wrap(file) do |file|
         file.puts DB_FORMAT
-        file.puts Oj.dump @dirs
+        file.puts Oj.dump @paths
         file.puts Oj.dump @files
         file.puts Oj.dump @tables
       end
     end
   end
 
-  def add_dirs(dirs)
-    dirs -= @dirs
-    return if dirs.empty?
-    @dirs += dirs
-    files = dirs.map {|d| Dir["#{d}/**/*"]}.flatten
+  def add_paths(paths)
+    paths -= @paths
+    return if paths.empty?
+    @paths += paths
+    files = paths.map {|p| self.class.files_from_path(p)}.flatten
     return if files.empty?
     pbar = ProgressBar.create(:title => "Building Database", :total => files.length, :format => PBAR_FORMAT)
     files.each do |f|
@@ -68,16 +68,18 @@ class StarScope::DB
   end
 
   def update
-    new_files = (@dirs.map {|d| Dir["#{d}/**/*"]}.flatten) - @files.keys
+    new_files = (@paths.map {|p| self.class.files_from_path(p)}.flatten) - @files.keys
     pbar = ProgressBar.create(:title => "Updating Database", :total => new_files.length + @files.length, :format => PBAR_FORMAT)
-    @files.keys.each do |f|
-      update_file(f)
+    changed = @files.keys.map do |f|
+      changed = update_file(f)
       pbar.increment
+      changed
     end
     new_files.each do |f|
       add_file(f)
       pbar.increment
     end
+    changed.any? || !new_files.empty?
   end
 
   def dump_table(table)
@@ -141,6 +143,16 @@ END
 
   private
 
+  def self.files_from_path(path)
+    if File.file?(path)
+      [path]
+    elsif File.directory?(path)
+      Dir[File.join(path, "**", "*")].select {|p| File.file?(p)}
+    else
+      []
+    end
+  end
+
   def add_file(file)
     return if not File.file? file
 
@@ -168,9 +180,13 @@ END
   def update_file(file)
     if not File.exists?(file)
       remove_file(file)
+      true
     elsif DateTime.parse(@files[file]).to_time < File.mtime(file)
       remove_file(file)
       add_file(file)
+      true
+    else
+      false
     end
   end
 
