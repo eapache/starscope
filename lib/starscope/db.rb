@@ -178,7 +178,7 @@ END
   end
 
   def update_file(file)
-    if not File.exists?(file)
+    if not File.exists?(file) or not File.file?(file)
       remove_file(file)
       true
     elsif DateTime.parse(@files[file]).to_time < File.mtime(file)
