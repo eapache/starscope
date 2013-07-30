@@ -60,7 +60,7 @@ class StarScope::DB
     @paths += paths
     files = paths.map {|p| self.class.files_from_path(p)}.flatten
     return if files.empty?
-    pbar = ProgressBar.create(:title => "Building Database", :total => files.length, :format => PBAR_FORMAT)
+    pbar = ProgressBar.create(title: "Building Database", total: files.length, format: PBAR_FORMAT, length: 80)
     files.each do |f|
       add_file(f)
       pbar.increment
@@ -69,7 +69,7 @@ class StarScope::DB
 
   def update
     new_files = (@paths.map {|p| self.class.files_from_path(p)}.flatten) - @files.keys
-    pbar = ProgressBar.create(:title => "Updating Database", :total => new_files.length + @files.length, :format => PBAR_FORMAT)
+    pbar = ProgressBar.create(title: "Updating Database", total: new_files.length + @files.length, format: PBAR_FORMAT, length: 80)
     changed = @files.keys.map do |f|
       changed = update_file(f)
       pbar.increment
