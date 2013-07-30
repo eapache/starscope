@@ -89,7 +89,7 @@ class StarScope::DB
       puts "#{val}"
       data.each do |datum|
         print "\t"
-        puts StarScope::Datum.to_s(datum)
+        puts StarScope::Datum.to_s(val, datum)
       end
     end
   end
@@ -111,15 +111,17 @@ class StarScope::DB
   def query(table, value)
     fqn = value.split("::")
     raise NoTableError if not @tables[table]
-    results = @tables[table][fqn.last.to_sym]
+    key = fqn.last.to_sym
+    results = @tables[table][key]
     return [] if results.nil? || results.empty?
     results.sort! do |a,b|
       StarScope::Datum.score_match(b, fqn) <=> StarScope::Datum.score_match(a, fqn)
     end
     best_score = StarScope::Datum.score_match(results[0], fqn)
-    results.select do |result|
+    results = results.select do |result|
       best_score - StarScope::Datum.score_match(result, fqn) < 4
     end
+    return key, results
   end
 
   def export_ctags(filename)
@@ -135,7 +137,7 @@ END
       defs = (@tables[:defs] || []).sort {|a,b| a <=> b}
       defs.each do |key, val|
         val.each do |entry|
-          file.puts StarScope::Datum.ctag_line(entry)
+          file.puts StarScope::Datum.ctag_line(key, entry)
         end
       end
     end
@@ -163,7 +165,7 @@ END
       lang.extract file do |tbl, key, args|
         @tables[tbl] ||= {}
         @tables[tbl][key] ||= []
-        @tables[tbl][key] << StarScope::Datum.build(key, file, args)
+        @tables[tbl][key] << StarScope::Datum.build(file, args)
       end
     end
   end

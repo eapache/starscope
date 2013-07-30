@@ -74,7 +74,8 @@ def run_query(db, table, value)
     $stderr.puts "Invalid input - no query found."
     return
   end
-  puts db.query(table.to_sym, value).map {|val| StarScope::Datum.to_s(val)}
+  key, results = db.query(table.to_sym, value)
+  puts results.map {|val| StarScope::Datum.to_s(key, val)}
   return true
 rescue StarScope::DB::NoTableError
   $stderr.puts "Table '#{table}' doesn't exist."

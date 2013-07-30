@@ -1,7 +1,6 @@
 class StarScope::Datum
 
-  def self.build(key, file, args)
-    args[:key]  = key
+  def self.build(file, args)
     args[:file] = file
 
     if args[:line_no]
@@ -35,14 +34,14 @@ class StarScope::Datum
     "#{dat[:file]}:#{dat[:line_no]}"
   end
 
-  def self.to_s(dat)
+  def self.to_s(key, dat)
     str = ""
     str << "#{dat[:scope].join " "} " unless dat[:scope].empty?
-    str << "#{dat[:key]} -- #{location dat}"
+    str << "#{key} -- #{location dat}"
     str << " (#{dat[:line].strip})"
   end
 
-  def self.ctag_line(dat)
-    "#{dat[:key]}\t#{dat[:file]}\t/^#{dat[:line]}$/;"
+  def self.ctag_line(key, dat)
+    "#{key}\t#{dat[:file]}\t/^#{dat[:line]}$/;"
   end
 end
