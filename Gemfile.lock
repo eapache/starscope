@@ -3,7 +3,7 @@ PATH
   specs:
     starscope (0.1.0)
       oj (~> 2.1)
-      parser (= 2.0.0.pre3)
+      parser (= 2.0.0.pre5)
       ruby-progressbar (~> 1.1)
 
 GEM
@@ -19,8 +19,8 @@ GEM
     debugger-linecache (1.2.0)
     debugger-ruby_core_source (1.2.2)
     method_source (0.8.1)
-    oj (2.1.2)
-    parser (2.0.0.pre3)
+    oj (2.1.4)
+    parser (2.0.0.pre5)
       ast (~> 1.1)
       slop (~> 3.4, >= 3.4.5)
     pry (0.9.12.2)
