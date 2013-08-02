@@ -3,7 +3,7 @@ require "parser/current"
 module StarScope::Lang
   module Ruby
     def self.match_file(name)
-      name =~ /.*\.rb/
+      name =~ /.*\.rb$/
     end
 
     def self.extract(file, &block)
