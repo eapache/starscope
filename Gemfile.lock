@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    starscope (0.1.0)
+    starscope (0.1.1)
       oj (~> 2.1)
       parser (= 2.0.0.pre6)
       ruby-progressbar (~> 1.1)
