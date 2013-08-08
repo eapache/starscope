@@ -1,3 +1,4 @@
+require 'starscope/langs/go'
 require 'starscope/langs/ruby'
 require 'starscope/datum'
 require 'date'
@@ -5,7 +6,10 @@ require 'oj'
 require 'zlib'
 require 'ruby-progressbar'
 
-LANGS = [StarScope::Lang::Ruby]
+LANGS = [
+  StarScope::Lang::Go,
+  StarScope::Lang::Ruby
+]
 
 class StarScope::DB
 
