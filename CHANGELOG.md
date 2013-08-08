@@ -4,7 +4,8 @@ Changelog
 v0.1.1 (trunk)
 -------------------
 
-No changes yet.
+New Features:
+ * Support for Google's go (AKA golang).
 
 v0.1.0 (2013-08-08)
 -------------------
