@@ -43,7 +43,7 @@ module StarScope::Lang
             stack.push(:struct)
           when /^type\s+(\w+)/
             yield :defs, $1, line_no: line_no+1
-          when /^import\s+(\w+)/
+          when /^import\s+"(\w+)"/
             name = $1.split('/')
             yield :imports, name[-1], line_no: line_no+1, scope: name[0...-1]
           when /^import\s+\(/
