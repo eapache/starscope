@@ -14,10 +14,6 @@ module StarScope::Lang
         end
         # poor-man's parser
         case stack[-1]
-        when :comment
-          if /\*\// =~ line
-            stack.pop
-          end
         when :struct
           if /}/ =~ line
             stack.pop
@@ -27,13 +23,19 @@ module StarScope::Lang
             stack.pop
           end
         when :import
-          if /\)/ =~ line
+          case line
+          when /"(\w+)"/
+            name = $1.split('/')
+            yield :imports, name[-1], line_no: line_no+1, scope: name[0...-1]
+          when /\)/
             stack.pop
           end
         else
           case line
           when /^func\s+(\w+)\(/
             yield :defs, $1, line_no: line_no+1
+          when /^func\s+\(\w+\s+\*?(\w+)\)\s*(\w+)\(/
+            yield :defs, $2, line_no: line_no+1, scope: [$1]
           when /^package\s+(\w+)/
             yield :defs, $1, line_no: line_no+1
           when /^type\s+(\w+)\s+struct\s*{/
@@ -42,7 +44,10 @@ module StarScope::Lang
           when /^type\s+(\w+)/
             yield :defs, $1, line_no: line_no+1
           when /^import\s+(\w+)/
-            yield :imports, $1, line_no: line_no+1
+            name = $1.split('/')
+            yield :imports, name[-1], line_no: line_no+1, scope: name[0...-1]
+          when /^import\s+\(/
+            stack.push(:import)
           when /^var/
           when /^const/
           end
