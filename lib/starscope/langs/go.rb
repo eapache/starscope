@@ -6,6 +6,7 @@ module StarScope::Lang
 
     def self.extract(file)
       stack = []
+      scope = []
       str = File.readlines(file).each_with_index do |line, line_no|
         # strip single-line comments like // foo
         match = /(.*)\/\//.match(line)
@@ -15,11 +16,18 @@ module StarScope::Lang
         # poor-man's parser
         case stack[-1]
         when :struct
-          if /}/ =~ line
+          case line
+          when /\s*(\w+)\s+\w+/
+            yield :defs, $1, line_no: line_no+1, scope:scope
+          when /}/
             stack.pop
+            scope.pop
           end
         when :def
-          if /\)/ =~ line
+          case line
+          when /\s*(\w+)\s+/
+            yield :defs, $1, line_no: line_no+1
+          when /\)/
             stack.pop
           end
         when :import
@@ -40,6 +48,7 @@ module StarScope::Lang
             yield :defs, $1, line_no: line_no+1
           when /^type\s+(\w+)\s+struct\s*{/
             yield :defs, $1, line_no: line_no+1
+            scope.push($1)
             stack.push(:struct)
           when /^type\s+(\w+)/
             yield :defs, $1, line_no: line_no+1
@@ -48,8 +57,14 @@ module StarScope::Lang
             yield :imports, name[-1], line_no: line_no+1, scope: name[0...-1]
           when /^import\s+\(/
             stack.push(:import)
-          when /^var/
-          when /^const/
+          when /^var\s+\(/
+            stack.push(:def)
+          when /^var\s+(\w+)\s+\w+/
+            yield :defs, $1, line_no: line_no+1
+          when /^const\s+\(/
+            stack.push(:def)
+          when /^const\s+(\w+)\s+\w+/
+            yield :defs, $1, line_no: line_no+1
           end
         end
       end
