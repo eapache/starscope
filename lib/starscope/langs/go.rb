@@ -1,5 +1,11 @@
 module StarScope::Lang
   module Go
+    FUNC_CALL = /([\w\.]+?)\(.*\)/
+    BUILTIN_FUNCS = ['new', 'make', 'len', 'close', 'copy', 'delete',
+                     'int', 'int8', 'int16', 'int32', 'int64',
+                     'uint', 'uint8', 'uint16', 'uint32', 'uint64',
+                     'string', 'byte']
+
     def self.match_file(name)
       name =~ /.*\.go$/
     end
@@ -26,11 +32,29 @@ module StarScope::Lang
         else
           ends_with_comment = false
         end
+        # if we're in a block comment, wait for it to end
+        if stack[-1] == :comment
+          match = /\*\/(.*)/.match(line)
+          if match
+            line = match[1]
+            stack.pop
+          else
+            next
+          end
+        end
         # poor-man's parser
         case stack[-1]
         when :struct
           case line
           when /\s*(\w+)\s+\w+/
+            yield :defs, $1, line_no: line_no+1, scope: scope
+          when /}/
+            stack.pop
+            scope.pop
+          end
+        when :interface
+          case line
+          when /\s*(\w+)\(.*\)\s+/
             yield :defs, $1, line_no: line_no+1, scope: scope
           when /}/
             stack.pop
@@ -45,7 +69,7 @@ module StarScope::Lang
           end
         when :import
           case line
-          when /"(\w+)"/
+          when /"(.+)"/
             name = $1.split('/')
             yield :imports, name[-1], line_no: line_no+1, scope: name[0...-1]
           when /\)/
@@ -69,9 +93,13 @@ module StarScope::Lang
             yield :defs, $1, line_no: line_no+1, scope: scope
             scope.push($1)
             stack.push(:struct)
+          when /^type\s+(\w+)\s+interface\s*{/
+            yield :defs, $1, line_no: line_no+1, scope: scope
+            scope.push($1)
+            stack.push(:interface)
           when /^type\s+(\w+)/
             yield :defs, $1, line_no: line_no+1, scope: scope
-          when /^import\s+"(\w+)"/
+          when /^import\s+"(.+)"/
             name = $1.split('/')
             yield :imports, name[-1], line_no: line_no+1, scope: name[0...-1]
           when /^import\s+\(/
@@ -96,13 +124,13 @@ module StarScope::Lang
               end
             end
             if $2
-              match = /([\w\.]+)\(.*\)/.match($2)
+              match = FUNC_CALL.match($2)
               if match
                 tmp = parse_call(match[1], line_no, scope)
                 yield tmp if tmp
               end
             end
-          when /([\w\.]+)\(.*\)/
+          when FUNC_CALL
             tmp = parse_call($1, line_no, scope)
             yield tmp if tmp
           end
@@ -116,11 +144,11 @@ module StarScope::Lang
     end
 
     def self.parse_call(line, line_no, scope)
-      name = line.split('.')
+      name = line.split('.').select {|chunk| not chunk.empty?}
       case name.length
       when 1
         return nil if name[0] == 'func'
-        if ['new', 'make', 'len', 'close', 'copy'].include?(name[0])
+        if BUILTIN_FUNCS.include?(name[0])
           return :calls, name[0], line_no: line_no+1
         else
           return :calls, name[0], line_no: line_no+1, scope: scope
