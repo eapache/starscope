@@ -8,13 +8,19 @@ class StarScope::Datum
     end
 
     if args[:scope]
-      args[:scope] = args[:scope].map {|x| x.to_sym}
+      if args[:scope].empty?
+        args.delete(:scope)
+      else
+        args[:scope] = args[:scope].map {|x| x.to_sym}
+      end
     end
 
     args
   end
 
   def self.score_match(dat, fqn)
+    return 0 if not dat[:scope]
+
     score = 0
 
     i = -1
@@ -36,7 +42,7 @@ class StarScope::Datum
 
   def self.to_s(key, dat)
     str = ""
-    str << "#{dat[:scope].join " "} " unless dat[:scope].empty?
+    str << "#{dat[:scope].join " "} " if dat[:scope]
     str << "#{key} -- #{location dat}"
     str << " (#{dat[:line].strip})"
   end
