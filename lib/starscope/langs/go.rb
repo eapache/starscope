@@ -11,17 +11,17 @@ module StarScope::Lang
         # strip single-line comments like // foo
         match = /(.*)\/\//.match(line)
         if match
-          line = match[0]
+          line = match[1]
         end
         # strip single-line comments like foo /* foo */ foo
         match = /(.*?)\/\*.*\*\/(.*)/.match(line)
         if match
-          line = match[0] + match[1]
+          line = match[1] + match[2]
         end
         # strip end-of-line comment starters like foo /* foo \n
         match = /(.*?)\/\*/.match(line)
         if match
-          line = match[0] + match[1]
+          line = match[1]
           ends_with_comment = true
         else
           ends_with_comment = false
@@ -84,7 +84,7 @@ module StarScope::Lang
             stack.push(:def)
           when /^const\s+(\w+)\s+\w+/
             yield :defs, $1, line_no: line_no+1, scope: scope
-          when /^\s+(.*?) :?= /
+          when /^\s+(.*?) :?= ((.*?)\(.*\))?/
             $1.split(',').each do |var|
               var = var.strip
               name = var.split('.')
@@ -92,9 +92,19 @@ module StarScope::Lang
               when 1
                 yield :assigns, name[0], line_no: line_no+1, scope: scope
               when 2
-                yield :assigns, name[1], line_no: line_no+1, scope: scope + [name[0]]
+                yield :assigns, name[1], line_no: line_no+1, scope: [name[0]]
               end
             end
+            if $2
+              match = /([\w\.]+)\(.*\)/.match($2)
+              if match
+                tmp = parse_call(match[1], line_no, scope)
+                yield tmp if tmp
+              end
+            end
+          when /([\w\.]+)\(.*\)/
+            tmp = parse_call($1, line_no, scope)
+            yield tmp if tmp
           end
         end
         # if the line looks like "foo /* foo" then we enter the comment state
@@ -102,6 +112,21 @@ module StarScope::Lang
         if ends_with_comment
           stack.push(:comment)
         end
+      end
+    end
+
+    def self.parse_call(line, line_no, scope)
+      name = line.split('.')
+      case name.length
+      when 1
+        return nil if name[0] == 'func'
+        if ['new', 'make', 'len', 'close', 'copy'].include?(name[0])
+          return :calls, name[0], line_no: line_no+1
+        else
+          return :calls, name[0], line_no: line_no+1, scope: scope
+        end
+      else
+        return :calls, name[-1], line_no: line_no+1, scope: name[0...-1]
       end
     end
   end
