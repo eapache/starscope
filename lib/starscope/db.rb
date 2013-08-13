@@ -167,6 +167,7 @@ END
     LANGS.each do |lang|
       next if not lang.match_file file
       lang.extract file do |tbl, key, args|
+        key = key.to_sym
         @tables[tbl] ||= {}
         @tables[tbl][key] ||= []
         @tables[tbl][key] << StarScope::Datum.build(file, args)

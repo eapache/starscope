@@ -4,7 +4,8 @@ Changelog
 v0.1.2 (trunk)
 -------------------
 
-No changes yet.
+Bug Fixes:
+ * Ensure key is always a symbol (fixes database updates for Go files).
 
 v0.1.1 (2013-08-12)
 -------------------
