@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    starscope (0.1.2)
+    starscope (0.1.3)
       oj (~> 2.1)
       parser (= 2.0.0.pre6)
       ruby-progressbar (~> 1.1)
@@ -31,7 +31,7 @@ GEM
       debugger (~> 1.3)
       pry (~> 0.9.10)
     rake (10.0.4)
-    ruby-progressbar (1.1.1)
+    ruby-progressbar (1.2.0)
     slop (3.4.5)
 
 PLATFORMS
