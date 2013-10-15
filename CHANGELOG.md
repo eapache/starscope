@@ -4,7 +4,8 @@ Changelog
 v0.1.3 (trunk)
 -------------------
 
-No changes yet.
+Misc:
+ * New upstream ruby parser release.
 
 v0.1.2 (2013-08-14)
 -------------------
