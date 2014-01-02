@@ -57,8 +57,9 @@ END
 
   opts.separator <<END
 \nEXPORTING
-    At the moment only one export format is supported: 'ctags'. If you don't
-    specify a path, the file is written to 'tags' in the current directory.
+    At the moment two export formats are supported: 'ctags' and 'cscope'. If you
+    don't specify a path, the output is written to the files 'tags' (for ctags)
+    or 'cscope.out' (for cscope) in the current directory.
 END
 
 end.parse!
@@ -128,6 +129,8 @@ if options[:export]
   case format
   when 'ctags'
     db.export_ctags(path || 'tags')
+  when 'cscope'
+    db.export_cscope(path || 'cscope.out')
   else
     puts "Unrecognized export format"
   end

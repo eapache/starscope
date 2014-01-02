@@ -147,6 +147,28 @@ END
     end
   end
 
+  # ftp://ftp.eeng.dcu.ie/pub/ee454/cygwin/usr/share/doc/mlcscope-14.1.8/html/cscope.html
+  def export_cscope(filename)
+    File.open(filename, 'w') do |file|
+      file.print("cscope 15 #{Dir.pwd} -c 0000000000\n")
+      # TODO proper trailer offset
+
+      @files.each do |key, val|
+        file.print("\t@#{key}\n\n")
+        # TODO export symbols for this file
+      end
+
+      file.print("\t@\n")
+      file.print("#{@paths.length}\n")
+      @paths.each {|p| file.print("#{p}\n")}
+      file.print("0\n")
+      file.print("#{@files.length}\n")
+      tmp = ""
+      @files.keys.each {|f| tmp += f + "\n"}
+      file.print("#{tmp.length}\n#{tmp}")
+    end
+  end
+
   private
 
   def self.files_from_path(path)
