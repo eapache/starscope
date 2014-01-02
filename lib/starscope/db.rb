@@ -150,14 +150,34 @@ END
   # ftp://ftp.eeng.dcu.ie/pub/ee454/cygwin/usr/share/doc/mlcscope-14.1.8/html/cscope.html
   def export_cscope(filename)
     buf = ""
-    db_by_location().each do |file, lines|
-      buf << "\t@#{file}\n" if not lines.empty?
-      lines.sort().each do |line_no, vals|
-        buf << "\n#{line_no} \n" if not vals.empty?
+    db_by_line().each do |file, lines|
+      buf << "\t@#{file}\n\n" if not lines.empty?
+      lines.sort.each do |line_no, vals|
+        line = vals.first[2][:line].strip.gsub(/\s+/, ' ')
+        toks = {}
+        types = {}
+
         vals.each do |val|
-          buf << StarScope::Datum.cscope_mark(val[0])
-          buf << val[1].to_s + "\n;\n"
+          types[val[1]] ||= []
+          types[val[1]] << val[0]
+          index = line.index(val[1].to_s)
+          while index
+            toks[index] = val[1]
+            index = line.index(val[1].to_s, index + 1)
+          end
         end
+
+        next if toks.empty?
+
+        prev = 0
+        buf << line_no.to_s << " "
+        toks.sort().each do |offset, val|
+          buf << line.slice(prev...offset) << "\n"
+          buf << StarScope::Datum.cscope_mark(types[val].shift)
+          buf << val.to_s << "\n"
+          prev = offset + val.to_s.length
+        end
+        buf << line.slice(prev..-1) << "\n\n"
       end
     end
 
@@ -193,7 +213,7 @@ END
     end
   end
 
-  def db_by_location()
+  def db_by_line()
     tmpdb = {}
     @tables.each do |tbl, vals|
       vals.each do |key, val|
