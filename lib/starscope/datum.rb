@@ -50,4 +50,12 @@ class StarScope::Datum
   def self.ctag_line(key, dat)
     "#{key}\t#{dat[:file]}\t/^#{dat[:line]}$/;"
   end
+
+  def self.cscope_line(tbl, key, dat)
+    return "" if not dat[:line_no]
+
+    buf = "#{dat[:line_no]} \n"
+
+    return buf
+  end
 end

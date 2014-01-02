@@ -150,22 +150,36 @@ END
   # ftp://ftp.eeng.dcu.ie/pub/ee454/cygwin/usr/share/doc/mlcscope-14.1.8/html/cscope.html
   def export_cscope(filename)
     File.open(filename, 'w') do |file|
-      file.print("cscope 15 #{Dir.pwd} -c 0000000000\n")
-      # TODO proper trailer offset
+      buf = ""
 
-      @files.each do |key, val|
-        file.print("\t@#{key}\n\n")
-        # TODO export symbols for this file
+      @files.each do |file, timestamp|
+        buf << "\t@#{file}\n\n"
+        @tables.each do |tbl, vals|
+          vals.each do |key, val|
+            val.each do |entry|
+              if entry[:file] == file
+                buf << StarScope::Datum.cscope_line(tbl, key, entry)
+              end
+            end
+          end
+        end
       end
 
-      file.print("\t@\n")
+      buf << "\t@\n"
+
+      header = "cscope 15 #{Dir.pwd} -c "
+      offset = "%010d\n" % (header.length + 11 + buf.length)
+      file.print(header)
+      file.print(offset)
+      file.print(buf)
+
       file.print("#{@paths.length}\n")
       @paths.each {|p| file.print("#{p}\n")}
       file.print("0\n")
       file.print("#{@files.length}\n")
-      tmp = ""
-      @files.keys.each {|f| tmp += f + "\n"}
-      file.print("#{tmp.length}\n#{tmp}")
+      buf = ""
+      @files.keys.each {|f| buf << f + "\n"}
+      file.print("#{buf.length}\n#{buf}")
     end
   end
 
