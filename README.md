@@ -3,9 +3,6 @@ StarScope
 
 https://rubygems.org/gems/starscope
 
-*Note to those users looking at the GitHub language statistics: there is no perl
-here, that is their bug to fix.*
-
 Anyone who has done much programming in C (or C++) on a unix-based OS has come
 across the fantastic Cscope tool [1]. Sadly, it only works for C (and sort of
 works for C++).
