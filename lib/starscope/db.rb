@@ -149,26 +149,24 @@ END
 
   # ftp://ftp.eeng.dcu.ie/pub/ee454/cygwin/usr/share/doc/mlcscope-14.1.8/html/cscope.html
   def export_cscope(filename)
-    File.open(filename, 'w') do |file|
-      buf = ""
-
-      @files.each do |file, timestamp|
-        buf << "\t@#{file}\n\n"
-        @tables.each do |tbl, vals|
-          vals.each do |key, val|
-            val.each do |entry|
-              if entry[:file] == file
-                buf << StarScope::Datum.cscope_line(tbl, key, entry)
-              end
-            end
-          end
+    buf = ""
+    db_by_location().each do |file, lines|
+      buf << "\t@#{file}\n" if not lines.empty?
+      lines.sort().each do |line_no, vals|
+        buf << "\n#{line_no} \n" if not vals.empty?
+        vals.each do |val|
+          buf << StarScope::Datum.cscope_mark(val[0])
+          buf << val[1].to_s + "\n;\n"
         end
       end
+    end
 
-      buf << "\t@\n"
+    buf << "\t@\n"
 
-      header = "cscope 15 #{Dir.pwd} -c "
-      offset = "%010d\n" % (header.length + 11 + buf.length)
+    header = "cscope 15 #{Dir.pwd} -c "
+    offset = "%010d\n" % (header.length + 11 + buf.length)
+
+    File.open(filename, 'w') do |file|
       file.print(header)
       file.print(offset)
       file.print(buf)
@@ -193,6 +191,22 @@ END
     else
       []
     end
+  end
+
+  def db_by_location()
+    tmpdb = {}
+    @tables.each do |tbl, vals|
+      vals.each do |key, val|
+        val.each do |entry|
+          if entry[:line_no]
+            tmpdb[entry[:file]] ||= {}
+            tmpdb[entry[:file]][entry[:line_no]] ||= []
+            tmpdb[entry[:file]][entry[:line_no]] << [tbl, key, entry]
+          end
+        end
+      end
+    end
+    return tmpdb
   end
 
   def add_file(file)

@@ -51,11 +51,22 @@ class StarScope::Datum
     "#{key}\t#{dat[:file]}\t/^#{dat[:line]}$/;"
   end
 
-  def self.cscope_line(tbl, key, dat)
-    return "" if not dat[:line_no]
-
-    buf = "#{dat[:line_no]} \n"
-
-    return buf
+  def self.cscope_mark(tbl)
+    case tbl
+    when :file
+      "\t@"
+    when :defs
+      "\t$"
+    when :calls
+      "\t`"
+    when :requires
+      "\t~\""
+    when :imports
+      "\t~<"
+    when :assigns
+      "\t="
+    else
+      ""
+    end
   end
 end
