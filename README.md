@@ -31,5 +31,9 @@ Export it for use with your editor
 ```
 $ starscope -e ctags
 ```
+or
+```
+$ starscope -e cscope
+```
 
 [1] http://cscope.sourceforge.net/
