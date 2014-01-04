@@ -53,6 +53,13 @@ class StarScope::Datum
 
   def self.cscope_mark(tbl, dat)
     case tbl
+    when :end
+      case dat[:type]
+      when :func
+        ret = "}"
+      else
+        return ""
+      end
     when :file
       ret = "@"
     when :defs

@@ -159,11 +159,8 @@ END
       lines.sort.each do |line_no, vals|
         line = vals.first[:entry][:line].strip.gsub(/\s+/, ' ')
         toks = {}
-        types = {}
 
         vals.each do |val|
-          types[val[:key]] ||= []
-          types[val[:key]] << val[:tbl]
           index = line.index(val[:key].to_s)
           while index
             toks[index] = val
@@ -177,7 +174,7 @@ END
         buf << line_no.to_s << " "
         toks.sort().each do |offset, val|
           buf << line.slice(prev...offset) << "\n"
-          buf << StarScope::Datum.cscope_mark(types[val[:key]].shift, val[:entry])
+          buf << StarScope::Datum.cscope_mark(val[:tbl], val[:entry])
           buf << val[:key].to_s << "\n"
           prev = offset + val[:key].to_s.length
         end
