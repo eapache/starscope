@@ -150,8 +150,12 @@ END
   # ftp://ftp.eeng.dcu.ie/pub/ee454/cygwin/usr/share/doc/mlcscope-14.1.8/html/cscope.html
   def export_cscope(filename)
     buf = ""
+    files = []
     db_by_line().each do |file, lines|
-      buf << "\t@#{file}\n\n" if not lines.empty?
+      if not lines.empty?
+        buf << "\t@#{file}\n\n"
+        files << file
+      end
       lines.sort.each do |line_no, vals|
         line = vals.first[:entry][:line].strip.gsub(/\s+/, ' ')
         toks = {}
@@ -194,9 +198,9 @@ END
       file.print("#{@paths.length}\n")
       @paths.each {|p| file.print("#{p}\n")}
       file.print("0\n")
-      file.print("#{@files.length}\n")
+      file.print("#{files.length}\n")
       buf = ""
-      @files.keys.each {|f| buf << f + "\n"}
+      files.each {|f| buf << f + "\n"}
       file.print("#{buf.length}\n#{buf}")
     end
   end
