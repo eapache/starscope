@@ -66,7 +66,7 @@ class StarScope::Datum
       case dat[:type]
       when :func
         ret = "$"
-      when :class
+      when :class, :module
         ret = "c"
       when :type
         ret = "t"
