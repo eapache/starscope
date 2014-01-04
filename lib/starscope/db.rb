@@ -13,7 +13,7 @@ LANGS = [
 
 class StarScope::DB
 
-  DB_FORMAT = 3
+  DB_FORMAT = 4
   PBAR_FORMAT = '%t: %c/%C %E ||%b>%i||'
 
   class NoTableError < StandardError; end
@@ -153,17 +153,17 @@ END
     db_by_line().each do |file, lines|
       buf << "\t@#{file}\n\n" if not lines.empty?
       lines.sort.each do |line_no, vals|
-        line = vals.first[2][:line].strip.gsub(/\s+/, ' ')
+        line = vals.first[:entry][:line].strip.gsub(/\s+/, ' ')
         toks = {}
         types = {}
 
         vals.each do |val|
-          types[val[1]] ||= []
-          types[val[1]] << val[0]
-          index = line.index(val[1].to_s)
+          types[val[:key]] ||= []
+          types[val[:key]] << val[:tbl]
+          index = line.index(val[:key].to_s)
           while index
-            toks[index] = val[1]
-            index = line.index(val[1].to_s, index + 1)
+            toks[index] = val
+            index = line.index(val[:key].to_s, index + 1)
           end
         end
 
@@ -173,9 +173,9 @@ END
         buf << line_no.to_s << " "
         toks.sort().each do |offset, val|
           buf << line.slice(prev...offset) << "\n"
-          buf << StarScope::Datum.cscope_mark(types[val].shift)
-          buf << val.to_s << "\n"
-          prev = offset + val.to_s.length
+          buf << StarScope::Datum.cscope_mark(types[val[:key]].shift, val[:entry])
+          buf << val[:key].to_s << "\n"
+          prev = offset + val[:key].to_s.length
         end
         buf << line.slice(prev..-1) << "\n\n"
       end
@@ -221,7 +221,7 @@ END
           if entry[:line_no]
             tmpdb[entry[:file]] ||= {}
             tmpdb[entry[:file]][entry[:line_no]] ||= []
-            tmpdb[entry[:file]][entry[:line_no]] << [tbl, key, entry]
+            tmpdb[entry[:file]][entry[:line_no]] << {tbl: tbl, key: key, entry: entry}
           end
         end
       end

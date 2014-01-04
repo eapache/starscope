@@ -81,24 +81,24 @@ module StarScope::Lang
           end
           case line
           when /^func\s+(\w+)\(/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no+1, scope: scope, type: :func
             stack.push(:func)
           when /^func\s+\(\w+\s+\*?(\w+)\)\s*(\w+)\(/
-            yield :defs, $2, line_no: line_no+1, scope: scope + [$1]
+            yield :defs, $2, line_no: line_no+1, scope: scope + [$1], type: :func
             stack.push(:func)
           when /^package\s+(\w+)/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no+1, scope: scope, type: :package
             scope.push($1)
           when /^type\s+(\w+)\s+struct\s*{/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no+1, scope: scope, type: :class
             scope.push($1)
             stack.push(:struct)
           when /^type\s+(\w+)\s+interface\s*{/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no+1, scope: scope, type: :class
             scope.push($1)
             stack.push(:interface)
           when /^type\s+(\w+)/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no+1, scope: scope, type: :type
           when /^import\s+"(.+)"/
             name = $1.split('/')
             yield :imports, name[-1], line_no: line_no+1, scope: name[0...-1]
