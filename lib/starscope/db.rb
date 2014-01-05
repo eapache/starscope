@@ -89,7 +89,7 @@ class StarScope::DB
   def dump_table(table)
     raise NoTableError if not @tables[table]
     puts "== Table: #{table} =="
-    @tables[table].each do |val, data|
+    @tables[table].sort_by{|k,v| k.downcase}.each do |val, data|
       puts "#{val}"
       data.each do |datum|
         print "\t"
