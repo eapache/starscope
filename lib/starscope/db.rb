@@ -93,7 +93,7 @@ class StarScope::DB
       puts "#{val}"
       data.each do |datum|
         print "\t"
-        puts StarScope::Datum.to_s(val, datum)
+        puts StarScope::Datum.to_s(datum)
       end
     end
   end
@@ -150,7 +150,7 @@ END
       defs = (@tables[:defs] || {}).sort
       defs.each do |key, val|
         val.each do |entry|
-          file.puts StarScope::Datum.ctag_line(key, entry)
+          file.puts StarScope::Datum.ctag_line(entry)
         end
       end
     end
