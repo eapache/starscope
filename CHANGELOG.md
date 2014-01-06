@@ -6,6 +6,7 @@ v0.1.4 (trunk)
 
 New Features:
  * Export to cscope databases.
+ * Regexes are now accepted in the last ('key') term of a query
 
 Misc:
  * Dumping tables now sorts by key.
