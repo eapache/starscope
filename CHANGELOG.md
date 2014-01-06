@@ -4,7 +4,8 @@ Changelog
 v0.1.4 (trunk)
 -------------------
 
-No changes yet.
+New Features:
+ * Export to cscope databases.
 
 v0.1.3 (2013-10-15)
 -------------------

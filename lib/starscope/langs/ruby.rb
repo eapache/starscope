@@ -59,15 +59,18 @@ module StarScope::Lang
         when :def
           yield :defs, node.children[0],
             line_no: node.location.expression.line,
-            scope: @scope
+            scope: @scope, type: :func
+          yield :end, :end, line_no: node.location.end.line, type: :func
         when :defs
           yield :defs, node.children[1],
             line_no: node.location.expression.line,
-            scope: @scope
+            scope: @scope, type: :func
+          yield :end, :end, line_no: node.location.end.line, type: :func
         when :module, :class
           fqn = @scope + scoped_name(node.children[0])
           yield :defs, fqn.last, line_no: node.location.expression.line,
-            scope: fqn[0...-1]
+            scope: fqn[0...-1], type: node.type
+          yield :end, :end, line_no: node.location.end.line, type: node.type
         when :casgn
           fqn = scoped_name(node)
           yield :assigns, fqn.last,

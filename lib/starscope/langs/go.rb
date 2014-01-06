@@ -14,6 +14,7 @@ module StarScope::Lang
       stack = []
       scope = []
       str = File.readlines(file).each_with_index do |line, line_no|
+        line_no += 1 # zero-index to one-index
         # strip single-line comments like // foo
         match = /(.*)\/\//.match(line)
         if match
@@ -47,23 +48,25 @@ module StarScope::Lang
         when :struct
           case line
           when /\s*(\w+)\s+\w+/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no, scope: scope
           when /}/
+            yield :end, "}", line_no: line_no, scope: scope, type: :class
             stack.pop
             scope.pop
           end
         when :interface
           case line
           when /\s*(\w+)\(.*\)\s+/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no, scope: scope
           when /}/
+            yield :end, "}", line_no: line_no, scope: scope, type: :class
             stack.pop
             scope.pop
           end
         when :def
           case line
           when /\s*(\w+)\s+/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no, scope: scope
           when /\)/
             stack.pop
           end
@@ -71,56 +74,57 @@ module StarScope::Lang
           case line
           when /"(.+)"/
             name = $1.split('/')
-            yield :imports, name[-1], line_no: line_no+1, scope: name[0...-1]
+            yield :imports, name[-1], line_no: line_no, scope: name[0...-1]
           when /\)/
             stack.pop
           end
         else
           if stack[-1] == :func and /^}/ =~ line
+            yield :end, "}", line_no: line_no, type: :func
             stack.pop
           end
           case line
           when /^func\s+(\w+)\(/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no, scope: scope, type: :func
             stack.push(:func)
           when /^func\s+\(\w+\s+\*?(\w+)\)\s*(\w+)\(/
-            yield :defs, $2, line_no: line_no+1, scope: scope + [$1]
+            yield :defs, $2, line_no: line_no, scope: scope + [$1], type: :func
             stack.push(:func)
           when /^package\s+(\w+)/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no, scope: scope, type: :package
             scope.push($1)
           when /^type\s+(\w+)\s+struct\s*{/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no, scope: scope, type: :class
             scope.push($1)
             stack.push(:struct)
           when /^type\s+(\w+)\s+interface\s*{/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no, scope: scope, type: :class
             scope.push($1)
             stack.push(:interface)
           when /^type\s+(\w+)/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no, scope: scope, type: :type
           when /^import\s+"(.+)"/
             name = $1.split('/')
-            yield :imports, name[-1], line_no: line_no+1, scope: name[0...-1]
+            yield :imports, name[-1], line_no: line_no, scope: name[0...-1]
           when /^import\s+\(/
             stack.push(:import)
           when /^var\s+\(/
             stack.push(:def)
           when /^var\s+(\w+)\s+\w+/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no, scope: scope
           when /^const\s+\(/
             stack.push(:def)
           when /^const\s+(\w+)\s+\w+/
-            yield :defs, $1, line_no: line_no+1, scope: scope
+            yield :defs, $1, line_no: line_no, scope: scope
           when /^\s+(.*?) :?= ((.*?)\(.*\))?/
             $1.split(',').each do |var|
               var = var.strip
               name = var.split('.')
               case name.length
               when 1
-                yield :assigns, name[0], line_no: line_no+1, scope: scope
+                yield :assigns, name[0], line_no: line_no, scope: scope
               when 2
-                yield :assigns, name[1], line_no: line_no+1, scope: [name[0]]
+                yield :assigns, name[1], line_no: line_no, scope: [name[0]]
               end
             end
             if $2
@@ -149,12 +153,12 @@ module StarScope::Lang
       when 1
         return nil if name[0] == 'func'
         if BUILTIN_FUNCS.include?(name[0])
-          return :calls, name[0], line_no: line_no+1
+          return :calls, name[0], line_no: line_no
         else
-          return :calls, name[0], line_no: line_no+1, scope: scope
+          return :calls, name[0], line_no: line_no, scope: scope
         end
       else
-        return :calls, name[-1], line_no: line_no+1, scope: name[0...-1]
+        return :calls, name[-1], line_no: line_no, scope: name[0...-1]
       end
     end
   end

@@ -13,7 +13,7 @@ LANGS = [
 
 class StarScope::DB
 
-  DB_FORMAT = 3
+  DB_FORMAT = 4
   PBAR_FORMAT = '%t: %c/%C %E ||%b>%i||'
 
   class NoTableError < StandardError; end
@@ -89,7 +89,7 @@ class StarScope::DB
   def dump_table(table)
     raise NoTableError if not @tables[table]
     puts "== Table: #{table} =="
-    @tables[table].each do |val, data|
+    @tables[table].sort_by{|k,v| k.downcase}.each do |val, data|
       puts "#{val}"
       data.each do |datum|
         print "\t"
@@ -147,6 +147,61 @@ END
     end
   end
 
+  # ftp://ftp.eeng.dcu.ie/pub/ee454/cygwin/usr/share/doc/mlcscope-14.1.8/html/cscope.html
+  def export_cscope(filename)
+    buf = ""
+    files = []
+    db_by_line().each do |file, lines|
+      if not lines.empty?
+        buf << "\t@#{file}\n\n"
+        files << file
+      end
+      lines.sort.each do |line_no, vals|
+        line = vals.first[:entry][:line].strip.gsub(/\s+/, ' ')
+        toks = {}
+
+        vals.each do |val|
+          index = line.index(val[:key].to_s)
+          while index
+            toks[index] = val
+            index = line.index(val[:key].to_s, index + 1)
+          end
+        end
+
+        next if toks.empty?
+
+        prev = 0
+        buf << line_no.to_s << " "
+        toks.sort().each do |offset, val|
+          buf << line.slice(prev...offset) << "\n"
+          buf << StarScope::Datum.cscope_mark(val[:tbl], val[:entry])
+          buf << val[:key].to_s << "\n"
+          prev = offset + val[:key].to_s.length
+        end
+        buf << line.slice(prev..-1) << "\n\n"
+      end
+    end
+
+    buf << "\t@\n"
+
+    header = "cscope 15 #{Dir.pwd} -c "
+    offset = "%010d\n" % (header.length + 11 + buf.length)
+
+    File.open(filename, 'w') do |file|
+      file.print(header)
+      file.print(offset)
+      file.print(buf)
+
+      file.print("#{@paths.length}\n")
+      @paths.each {|p| file.print("#{p}\n")}
+      file.print("0\n")
+      file.print("#{files.length}\n")
+      buf = ""
+      files.each {|f| buf << f + "\n"}
+      file.print("#{buf.length}\n#{buf}")
+    end
+  end
+
   private
 
   def self.files_from_path(path)
@@ -157,6 +212,22 @@ END
     else
       []
     end
+  end
+
+  def db_by_line()
+    tmpdb = {}
+    @tables.each do |tbl, vals|
+      vals.each do |key, val|
+        val.each do |entry|
+          if entry[:line_no]
+            tmpdb[entry[:file]] ||= {}
+            tmpdb[entry[:file]][entry[:line_no]] ||= []
+            tmpdb[entry[:file]][entry[:line_no]] << {tbl: tbl, key: key, entry: entry}
+          end
+        end
+      end
+    end
+    return tmpdb
   end
 
   def add_file(file)

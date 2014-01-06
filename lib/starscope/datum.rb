@@ -50,4 +50,41 @@ class StarScope::Datum
   def self.ctag_line(key, dat)
     "#{key}\t#{dat[:file]}\t/^#{dat[:line]}$/;"
   end
+
+  def self.cscope_mark(tbl, dat)
+    case tbl
+    when :end
+      case dat[:type]
+      when :func
+        ret = "}"
+      else
+        return ""
+      end
+    when :file
+      ret = "@"
+    when :defs
+      case dat[:type]
+      when :func
+        ret = "$"
+      when :class, :module
+        ret = "c"
+      when :type
+        ret = "t"
+      else
+        ret = "g"
+      end
+    when :calls
+      ret = "`"
+    when :requires
+      ret = "~\""
+    when :imports
+      ret = "~<"
+    when :assigns
+      ret = "="
+    else
+      return ""
+    end
+
+    return "\t" + ret
+  end
 end
