@@ -3,7 +3,10 @@ require "parser/current"
 module StarScope::Lang
   module Ruby
     def self.match_file(name)
-      name =~ /.*\.rb$/
+      return true if name =~ /.*\.rb$/
+      return File.open(name) {|f| f.readline} =~ /^#!.*ruby/
+    rescue ArgumentError # may occur if file is binary (invalid UTF)
+      false
     end
 
     def self.extract(file, &block)
