@@ -115,9 +115,18 @@ class StarScope::DB
   def query(table, value)
     fqn = value.split("::")
     raise NoTableError if not @tables[table]
-    key = fqn.last.to_sym
-    results = @tables[table][key]
-    return [] if results.nil? || results.empty?
+    key = fqn.last
+    results = @tables[table][key.to_sym] || []
+    if results.empty?
+      matcher = Regexp.new(key, Regexp::IGNORECASE)
+      @tables[table].each do |k,v|
+        if matcher.match(k)
+          results << v
+        end
+      end
+      results.flatten!
+    end
+    return results if results.empty?
     results.sort! do |a,b|
       StarScope::Datum.score_match(b, fqn) <=> StarScope::Datum.score_match(a, fqn)
     end
@@ -125,7 +134,7 @@ class StarScope::DB
     results = results.select do |result|
       best_score - StarScope::Datum.score_match(result, fqn) < 4
     end
-    return key, results
+    return fqn.last.to_sym, results
   end
 
   def export_ctags(filename)
@@ -241,7 +250,7 @@ END
         key = key.to_sym
         @tables[tbl] ||= {}
         @tables[tbl][key] ||= []
-        @tables[tbl][key] << StarScope::Datum.build(file, args)
+        @tables[tbl][key] << StarScope::Datum.build(file, key, args)
       end
     end
   end

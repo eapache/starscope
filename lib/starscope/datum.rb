@@ -1,7 +1,8 @@
 class StarScope::Datum
 
-  def self.build(file, args)
+  def self.build(file, key, args)
     args[:file] = file
+    args[:key] = key
 
     if args[:line_no]
       args[:line] = File.readlines(file)[args[:line_no]-1].chomp
@@ -40,15 +41,15 @@ class StarScope::Datum
     "#{dat[:file]}:#{dat[:line_no]}"
   end
 
-  def self.to_s(key, dat)
+  def self.to_s(dat)
     str = ""
     str << "#{dat[:scope].join " "} " if dat[:scope]
-    str << "#{key} -- #{location dat}"
+    str << "#{dat[:key]} -- #{location dat}"
     str << " (#{dat[:line].strip})"
   end
 
-  def self.ctag_line(key, dat)
-    "#{key}\t#{dat[:file]}\t/^#{dat[:line]}$/;"
+  def self.ctag_line(dat)
+    "#{dat[:key]}\t#{dat[:file]}\t/^#{dat[:line]}$/;"
   end
 
   def self.cscope_mark(tbl, dat)
