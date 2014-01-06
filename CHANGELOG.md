@@ -4,7 +4,8 @@ Changelog
 v0.1.5 (trunk)
 -------------------
 
-No changes yet.
+Misc:
+ * Explicitly print "No results found" to avoid mysterious empty output.
 
 v0.1.4 (2014-01-05)
 -------------------
