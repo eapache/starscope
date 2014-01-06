@@ -13,7 +13,7 @@ DEFAULT_DB=".starscope.db"
 # Options Parsing
 OptionParser.new do |opts|
   opts.banner = <<END
-Usage: starscope.rb [options] [PATHS]
+Usage: starscope [options] [PATHS]
 
 If you don't pass any of -n, -r, -w or PATHS the default behaviour is to recurse
 in the current directory and build or update the database `#{DEFAULT_DB}`.
