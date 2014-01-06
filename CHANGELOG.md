@@ -8,6 +8,9 @@ New Features:
  * Export to cscope databases.
  * Regexes are now accepted in the last ('key') term of a query
 
+Bug Fixes:
+ * Don't match Golang function names ending with a dot.
+
 Misc:
  * Dumping tables now sorts by key.
  * Various bugfixes and improvements via updated dependencies.

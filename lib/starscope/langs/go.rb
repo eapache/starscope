@@ -1,6 +1,6 @@
 module StarScope::Lang
   module Go
-    FUNC_CALL = /([\w\.]+?)\(.*\)/
+    FUNC_CALL = /([\w\.]*?\w)\(.*\)/
     BUILTIN_FUNCS = ['new', 'make', 'len', 'close', 'copy', 'delete',
                      'int', 'int8', 'int16', 'int32', 'int64',
                      'uint', 'uint8', 'uint16', 'uint32', 'uint64',
