@@ -19,7 +19,8 @@ class StarScope::DB
   class NoTableError < StandardError; end
   class UnknownDBFormatError < StandardError; end
 
-  def initialize
+  def initialize(progress)
+    @progress = progress
     @paths = []
     @files = {}
     @tables = {}
@@ -64,24 +65,28 @@ class StarScope::DB
     @paths += paths
     files = paths.map {|p| self.class.files_from_path(p)}.flatten
     return if files.empty?
-    pbar = ProgressBar.create(title: "Building", total: files.length, format: PBAR_FORMAT, length: 80)
+    if @progress
+      pbar = ProgressBar.create(title: "Building", total: files.length, format: PBAR_FORMAT, length: 80)
+    end
     files.each do |f|
       add_file(f)
-      pbar.increment
+      pbar.increment if @progress
     end
   end
 
   def update
     new_files = (@paths.map {|p| self.class.files_from_path(p)}.flatten) - @files.keys
-    pbar = ProgressBar.create(title: "Updating", total: new_files.length + @files.length, format: PBAR_FORMAT, length: 80)
+    if @progress
+      pbar = ProgressBar.create(title: "Updating", total: new_files.length + @files.length, format: PBAR_FORMAT, length: 80)
+    end
     changed = @files.keys.map do |f|
       changed = update_file(f)
-      pbar.increment
+      pbar.increment if @progress
       changed
     end
     new_files.each do |f|
       add_file(f)
-      pbar.increment
+      pbar.increment if @progress
     end
     changed.any? || !new_files.empty?
   end

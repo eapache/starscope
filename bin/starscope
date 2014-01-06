@@ -7,7 +7,7 @@ require 'optparse'
 require 'readline'
 require 'starscope'
 
-options = {auto: true}
+options = {auto: true, progress: true}
 DEFAULT_DB=".starscope.db"
 
 # Options Parsing
@@ -53,6 +53,9 @@ END
   opts.on("-v", "--version", "Print the version number") do
     puts StarScope::VERSION
     exit
+  end
+  opts.on("--no-progress", "Don't show progress-bar when updating DB") do
+    options[:progress] = false
   end
 
   opts.separator <<END
@@ -108,7 +111,7 @@ if File.exists?(DEFAULT_DB) and not options[:read]
   options[:read] = DEFAULT_DB
 end
 
-db = StarScope::DB.new
+db = StarScope::DB.new(options[:progress])
 
 if options[:read]
   db.load(options[:read])

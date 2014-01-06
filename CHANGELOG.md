@@ -4,6 +4,9 @@ Changelog
 v0.1.5 (trunk)
 -------------------
 
+New Features:
+ * Add --no-progress option to hide progress-bar.
+
 Misc:
  * Explicitly print "No results found" to avoid mysterious empty output.
  * Recognize ruby files with a #!ruby line but no .rb suffix.
