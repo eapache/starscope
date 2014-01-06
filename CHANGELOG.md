@@ -7,6 +7,9 @@ v0.1.4 (trunk)
 New Features:
  * Export to cscope databases.
 
+Misc:
+ * Dumping tables now sorts by key.
+
 v0.1.3 (2013-10-15)
 -------------------
 
