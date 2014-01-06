@@ -4,12 +4,13 @@ StarScope
 [![Gem Version](https://badge.fury.io/rb/starscope.png)](http://badge.fury.io/rb/starscope)
 
 Anyone who has done much programming in C (or C++) on a unix-based OS has come
-across the fantastic Cscope tool [1]. Sadly, it only works for C (and sort of
-works for C++).
+across the fantastic [Cscope](http://cscope.sourceforge.net/) tool. Sadly, it
+only works for C (and sort of works for C++).
 
-StarScope is a similar tool for Ruby and Go, with a design intended to make it
-easy to add support for other languages at some point within the same framework
-(thus the name StarScope, ie \*scope).
+StarScope is a similar tool for [Ruby](https://www.ruby-lang.org/) and
+[Golang](http://golang.org/), with a design intended to make it easy to add
+support for other languages at some point within the same framework (thus the
+name StarScope, ie \*scope).
 
 Install it as a gem:
 ```
@@ -35,5 +36,3 @@ or
 ```
 $ starscope -e cscope
 ```
-
-[1] http://cscope.sourceforge.net/
