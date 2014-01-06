@@ -7,6 +7,7 @@ v0.1.5 (trunk)
 Misc:
  * Explicitly print "No results found" to avoid mysterious empty output.
  * Recognize ruby files with a #!ruby line but no .rb suffix.
+ * Help output now fits in 80-column terminal.
 
 v0.1.4 (2014-01-05)
 -------------------
