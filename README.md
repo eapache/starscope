@@ -1,7 +1,7 @@
 StarScope
 =========
 
-https://rubygems.org/gems/starscope
+[![Gem Version](https://badge.fury.io/rb/starscope.png)](http://badge.fury.io/rb/starscope)
 
 Anyone who has done much programming in C (or C++) on a unix-based OS has come
 across the fantastic Cscope tool [1]. Sadly, it only works for C (and sort of
