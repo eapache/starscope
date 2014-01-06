@@ -9,6 +9,7 @@ New Features:
 
 Misc:
  * Dumping tables now sorts by key.
+ * Various bugfixes and improvements via updated dependencies.
 
 v0.1.3 (2013-10-15)
 -------------------
