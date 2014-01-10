@@ -142,7 +142,6 @@ module StarScope::Lang
 
     def self.parse_call(line, line_no, scope)
       line.scan(FUNC_CALL) do |match|
-        p match
         name = match[0].split('.').select {|chunk| not chunk.empty?}
         if name.length == 1
           next if name[0] == 'func'
