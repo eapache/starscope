@@ -1,6 +1,6 @@
 module StarScope::Lang
   module Go
-    FUNC_CALL = /([\w\.]*?\w)\(.*\)/
+    FUNC_CALL = /([\w\.]*?\w)\(/
     BUILTIN_FUNCS = ['new', 'make', 'len', 'close', 'copy', 'delete',
                      'int', 'int8', 'int16', 'int32', 'int64',
                      'uint', 'uint8', 'uint16', 'uint32', 'uint64',
@@ -10,7 +10,7 @@ module StarScope::Lang
       name =~ /.*\.go$/
     end
 
-    def self.extract(file)
+    def self.extract(file, &block)
       stack = []
       scope = []
       str = File.readlines(file).each_with_index do |line, line_no|
@@ -116,7 +116,7 @@ module StarScope::Lang
             stack.push(:def)
           when /^const\s+(\w+)\s+\w+/
             yield :defs, $1, line_no: line_no, scope: scope
-          when /^\s+(.*?) :?= ((.*?)\(.*\))?/
+          when /^\s+(.*?) :?=.*/
             $1.split(',').each do |var|
               var = var.strip
               name = var.split('.')
@@ -127,16 +127,9 @@ module StarScope::Lang
                 yield :assigns, name[1], line_no: line_no, scope: [name[0]]
               end
             end
-            if $2
-              match = FUNC_CALL.match($2)
-              if match
-                tmp = parse_call(match[1], line_no, scope)
-                yield tmp if tmp
-              end
-            end
-          when FUNC_CALL
-            tmp = parse_call($1, line_no, scope)
-            yield tmp if tmp
+            parse_call(line, line_no, scope, &block)
+          else
+            parse_call(line, line_no, scope, &block)
           end
         end
         # if the line looks like "foo /* foo" then we enter the comment state
@@ -148,17 +141,19 @@ module StarScope::Lang
     end
 
     def self.parse_call(line, line_no, scope)
-      name = line.split('.').select {|chunk| not chunk.empty?}
-      case name.length
-      when 1
-        return nil if name[0] == 'func'
-        if BUILTIN_FUNCS.include?(name[0])
-          return :calls, name[0], line_no: line_no
+      line.scan(FUNC_CALL) do |match|
+        p match
+        name = match[0].split('.').select {|chunk| not chunk.empty?}
+        if name.length == 1
+          next if name[0] == 'func'
+          if BUILTIN_FUNCS.include?(name[0])
+            yield :calls, name[0], line_no: line_no
+          else
+            yield :calls, name[0], line_no: line_no, scope: scope
+          end
         else
-          return :calls, name[0], line_no: line_no, scope: scope
+          yield :calls, name[-1], line_no: line_no, scope: name[0...-1]
         end
-      else
-        return :calls, name[-1], line_no: line_no, scope: name[0...-1]
       end
     end
   end
