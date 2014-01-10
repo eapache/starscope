@@ -12,7 +12,7 @@ StarScope is a similar tool for [Ruby](https://www.ruby-lang.org/) and
 support for other languages at some point within the same framework (thus the
 name StarScope, ie \*scope).
 
-Install it as a gem:
+Install it as a gem (requires at least Ruby 1.9.3):
 ```
 $ gem install starscope
 ```
