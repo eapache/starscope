@@ -12,6 +12,7 @@ Gem::Specification.new do |gem|
   gem.files         = `git ls-files`.split("\n")
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.require_paths = ["lib"]
+  gem.required_ruby_version = '>= 1.9.3'
 
   gem.add_dependency 'oj', '~> 2.5'
   gem.add_dependency 'parser', '~> 2.1'
