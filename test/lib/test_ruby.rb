@@ -1,12 +1,9 @@
 require_relative '../test_helper'
 
 class TestRuby < MiniTest::Unit::TestCase
-
-  TEST_FILE = 'test/files/sample_ruby.rb'
-
   def setup
     @db = {}
-    StarScope::Lang::Ruby.extract(TEST_FILE) do |tbl, key, args|
+    StarScope::Lang::Ruby.extract(RUBY_SAMPLE) do |tbl, key, args|
       key = key.to_sym
       @db[tbl] ||= {}
       @db[tbl][key] ||= []
@@ -15,7 +12,7 @@ class TestRuby < MiniTest::Unit::TestCase
   end
 
   def test_recognition
-    assert StarScope::Lang::Ruby.match_file(TEST_FILE)
+    assert StarScope::Lang::Ruby.match_file(RUBY_SAMPLE)
     assert StarScope::Lang::Ruby.match_file('bin/starscope')
     refute StarScope::Lang::Ruby.match_file('test/files/sample_golang.go')
   end

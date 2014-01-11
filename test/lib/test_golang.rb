@@ -1,12 +1,9 @@
 require_relative '../test_helper'
 
 class TestGolang < MiniTest::Unit::TestCase
-
-  TEST_FILE = 'test/files/sample_golang.go'
-
   def setup
     @db = {}
-    StarScope::Lang::Go.extract(TEST_FILE) do |tbl, key, args|
+    StarScope::Lang::Go.extract(GOLANG_SAMPLE) do |tbl, key, args|
       key = key.to_sym
       @db[tbl] ||= {}
       @db[tbl][key] ||= []
@@ -15,7 +12,7 @@ class TestGolang < MiniTest::Unit::TestCase
   end
 
   def test_recognition
-    assert StarScope::Lang::Go.match_file(TEST_FILE)
+    assert StarScope::Lang::Go.match_file(GOLANG_SAMPLE)
     refute StarScope::Lang::Go.match_file('something_else')
   end
 
