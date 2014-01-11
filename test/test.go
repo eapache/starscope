@@ -12,6 +12,10 @@ func c(a, b int) int {
 	return 1
 }
 
+func ttt() (int, int) {
+	return 1, 2
+}
+
 func main() {
 	var (
 		q int
@@ -20,6 +24,8 @@ func main() {
 	x := a(1)
 	y := b()
 	z := c(a(q), b())
+	n, m := ttt()
+	m, x = ttt()
 
 	a(c(b(), b()))
 }
