@@ -1,7 +1,9 @@
 require_relative '../test_helper'
 
 class TestGolang < MiniTest::Unit::TestCase
+
   TEST_FILE = 'test/files/sample_golang.go'
+
   def setup
     @db = {}
     StarScope::Lang::Go.extract(TEST_FILE) do |tbl, key, args|
