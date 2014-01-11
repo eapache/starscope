@@ -5,6 +5,7 @@ module StarScope::Lang
                      'int', 'int8', 'int16', 'int32', 'int64',
                      'uint', 'uint8', 'uint16', 'uint32', 'uint64',
                      'string', 'byte']
+    CONTROL_KEYS = ['if', 'for', 'switch', 'case']
 
     def self.match_file(name)
       name =~ /.*\.go$/
@@ -116,15 +117,15 @@ module StarScope::Lang
             stack.push(:def)
           when /^const\s+(\w+)\s+\w+/
             yield :defs, $1, line_no: line_no, scope: scope
-          when /^\s+(.*?) :?=.*/
-            $1.split(',').each do |var|
-              var = var.strip
-              name = var.split('.')
-              case name.length
-              when 1
+          when /^\s+(.*?) :?=/
+            $1.split(' ').each do |var|
+              next if CONTROL_KEYS.include?(var)
+              name = var.delete(',').split('.')
+              next if name[0] == "_" # assigning to _ is a discard in golang
+              if name.length == 1
                 yield :assigns, name[0], line_no: line_no, scope: scope
-              when 2
-                yield :assigns, name[1], line_no: line_no, scope: [name[0]]
+              else
+                yield :assigns, name[1], line_no: line_no, scope: name[0..-1]
               end
             end
             parse_call(line, line_no, scope, &block)

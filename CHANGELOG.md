@@ -4,13 +4,14 @@ Changelog
 v0.1.7 (trunk)
 -------------------
 
-No changes yet.
+Improvements:
+ * Better recognition and parsing of golang variable assignments.
 
 v0.1.6 (2014-01-10)
 -------------------
 
-Bug Fixes:
- * Much improved recognition of golang function calls.
+Improvements:
+ * Better recognition of golang function calls.
 
 v0.1.5 (2014-01-06)
 -------------------
