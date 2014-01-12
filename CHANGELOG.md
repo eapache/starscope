@@ -5,7 +5,8 @@ v0.1.7 (trunk)
 -------------------
 
 Improvements:
- * Better recognition and parsing of golang variable assignments.
+ * Much better recognition and parsing of definitions and assignments to
+   variables and constants in golang code.
 
 Infrastructure:
  * Test suite and continuous integration (via Minitest and Travis-CI).

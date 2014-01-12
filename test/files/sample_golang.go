@@ -1,5 +1,14 @@
 package main
 
+var (
+	v1, v2 int = 3, 4
+)
+
+const (
+	Sunday = iota
+	Monday
+)
+
 func a(c int) int {
 	return 3
 }
@@ -26,6 +35,10 @@ func main() {
 	z := c(a(q), b())
 	n, m := ttt()
 	m, x = ttt()
+
+	if m == x {
+		v1 = v2
+	}
 
 	a(c(b(), b()))
 }

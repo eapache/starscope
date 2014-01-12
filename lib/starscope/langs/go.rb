@@ -1,6 +1,8 @@
 module StarScope::Lang
   module Go
     FUNC_CALL = /([\w\.]*?\w)\(/
+    END_OF_BLOCK = /^\s*}\s*$/
+    END_OF_GROUP = /^\s*\)\s*$/
     BUILTIN_FUNCS = ['new', 'make', 'len', 'close', 'copy', 'delete',
                      'int', 'int8', 'int16', 'int32', 'int64',
                      'uint', 'uint8', 'uint16', 'uint32', 'uint64',
@@ -48,36 +50,38 @@ module StarScope::Lang
         case stack[-1]
         when :struct
           case line
-          when /\s*(\w+)\s+\w+/
-            yield :defs, $1, line_no: line_no, scope: scope
-          when /}/
+          when END_OF_BLOCK
             yield :end, "}", line_no: line_no, scope: scope, type: :class
             stack.pop
             scope.pop
+          when /(.+)\s+\w+/
+            parse_def($1, line_no, scope, &block)
           end
         when :interface
           case line
-          when /\s*(\w+)\(.*\)\s+/
-            yield :defs, $1, line_no: line_no, scope: scope
-          when /}/
+          when END_OF_BLOCK
             yield :end, "}", line_no: line_no, scope: scope, type: :class
             stack.pop
             scope.pop
+          when /(\w+)\(.*\)\s+/
+            yield :defs, $1, line_no: line_no, scope: scope
           end
         when :def
           case line
-          when /\s*(\w+)\s+/
-            yield :defs, $1, line_no: line_no, scope: scope
-          when /\)/
+          when END_OF_GROUP
             stack.pop
+          when /(.+)\s*=.*/
+            parse_def($1, line_no, scope, &block)
+          else
+            parse_def(line, line_no, scope, &block)
           end
         when :import
           case line
+          when END_OF_GROUP
+            stack.pop
           when /"(.+)"/
             name = $1.split('/')
             yield :imports, name[-1], line_no: line_no, scope: name[0...-1]
-          when /\)/
-            stack.pop
           end
         else
           if stack[-1] == :func and /^}/ =~ line
@@ -117,7 +121,7 @@ module StarScope::Lang
             stack.push(:def)
           when /^const\s+(\w+)\s+\w+/
             yield :defs, $1, line_no: line_no, scope: scope
-          when /^\s+(.*?) :?=/
+          when /^\s+(.*?) :?=[^=]/
             $1.split(' ').each do |var|
               next if CONTROL_KEYS.include?(var)
               name = var.delete(',').split('.')
@@ -154,6 +158,13 @@ module StarScope::Lang
         else
           yield :calls, name[-1], line_no: line_no, scope: name[0...-1]
         end
+      end
+    end
+
+    def self.parse_def(line, line_no, scope)
+      line.split.each do |var|
+        yield :defs, var.delete(','), line_no: line_no, scope: scope
+        break if not var.end_with?(',')
       end
     end
   end

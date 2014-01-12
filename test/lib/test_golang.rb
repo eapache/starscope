@@ -16,7 +16,7 @@ class TestGolang < MiniTest::Unit::TestCase
     refute StarScope::Lang::Go.match_file('something_else')
   end
 
-  def test_function_defs
+  def test_defs
     assert @db.keys.include? :defs
     defs = @db[:defs].keys
     assert defs.include? :a
@@ -24,6 +24,10 @@ class TestGolang < MiniTest::Unit::TestCase
     assert defs.include? :c
     assert defs.include? :ttt
     assert defs.include? :main
+    assert defs.include? :v1
+    assert defs.include? :v2
+    assert defs.include? :Sunday
+    assert defs.include? :Monday
   end
 
   def test_function_ends
