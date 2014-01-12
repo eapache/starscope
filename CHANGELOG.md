@@ -6,7 +6,7 @@ v0.1.7 (trunk)
 
 Improvements:
  * Much better recognition and parsing of definitions and assignments to
-   variables and constants in golang code (#11 and others).
+   variables and constants in golang code (fixes #11 among others).
 
 Infrastructure:
  * Test suite and continuous integration (via Minitest and Travis-CI).
