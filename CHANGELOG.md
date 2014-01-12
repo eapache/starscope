@@ -7,6 +7,10 @@ v0.1.7 (trunk)
 Improvements:
  * Better recognition and parsing of golang variable assignments.
 
+Infrastructure:
+ * Test suite and continuous integration (via Minitest and Travis-CI).
+ * Use github's tickets instead of a TODO file.
+
 v0.1.6 (2014-01-10)
 -------------------
 
