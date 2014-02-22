@@ -4,7 +4,8 @@ Changelog
 v0.1.8 (trunk)
 -------------------
 
-No changes yet.
+Bug Fixes:
+ * Correctly handle empty files in ruby parser (#12)
 
 v0.1.7 (2014-01-14)
 -------------------
