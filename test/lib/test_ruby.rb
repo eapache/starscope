@@ -14,7 +14,8 @@ class TestRuby < MiniTest::Unit::TestCase
   def test_recognition
     assert StarScope::Lang::Ruby.match_file(RUBY_SAMPLE)
     assert StarScope::Lang::Ruby.match_file('bin/starscope')
-    refute StarScope::Lang::Ruby.match_file('test/files/sample_golang.go')
+    refute StarScope::Lang::Ruby.match_file(GOLANG_SAMPLE)
+    refute StarScope::Lang::Ruby.match_file(EMPTY_FILE)
   end
 
   def test_function_defs

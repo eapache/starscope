@@ -7,6 +7,8 @@ module StarScope::Lang
       return File.open(name) {|f| f.readline} =~ /^#!.*ruby/
     rescue ArgumentError # may occur if file is binary (invalid UTF)
       false
+    rescue EOFError # occurs when file is empty
+      false
     end
 
     def self.extract(file, &block)

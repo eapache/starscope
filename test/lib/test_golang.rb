@@ -13,7 +13,8 @@ class TestGolang < MiniTest::Unit::TestCase
 
   def test_recognition
     assert StarScope::Lang::Go.match_file(GOLANG_SAMPLE)
-    refute StarScope::Lang::Go.match_file('something_else')
+    refute StarScope::Lang::Go.match_file(RUBY_SAMPLE)
+    refute StarScope::Lang::Go.match_file(EMPTY_FILE)
   end
 
   def test_defs
