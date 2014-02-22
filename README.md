@@ -37,3 +37,9 @@ or
 ```
 $ starscope -e cscope
 ```
+
+Other Uses
+----------
+
+StarScope is a supported backend for
+[CodeQuery](https://github.com/ruben2020/codequery).
