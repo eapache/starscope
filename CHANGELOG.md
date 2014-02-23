@@ -4,7 +4,10 @@ Changelog
 v0.1.9 (trunk)
 -------------------
 
-No changes yet.
+Bug Fixes:
+ * Work around what appears to be a bug in time comparison in certain Ruby
+   version by casting times to ints before comparing them. Fixes cases where
+   files were being rescanned even when they hadn't changed.
 
 v0.1.8 (2014-02-22)
 -------------------

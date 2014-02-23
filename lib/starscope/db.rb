@@ -273,7 +273,7 @@ END
     if not File.exists?(file) or not File.file?(file)
       remove_file(file)
       true
-    elsif DateTime.parse(@files[file]).to_time < File.mtime(file)
+    elsif DateTime.parse(@files[file]).to_time.to_i < File.mtime(file).to_i
       remove_file(file)
       add_file(file)
       true
