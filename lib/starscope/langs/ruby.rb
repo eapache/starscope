@@ -53,38 +53,38 @@ module StarScope::Lang
         when :send
           fqn = scoped_name(node)
           yield :calls, fqn.last,
-            line_no: node.location.expression.line,
-            scope: fqn[0...-1]
+            :line_no => node.location.expression.line,
+            :scope => fqn[0...-1]
           if node.children[0].nil? and node.children[1] == :require and node.children[2].type == :str
             fqn = node.children[2].children[0].split("/")
             yield :requires, fqn.last,
-              line_no: node.location.expression.line,
-              scope: fqn[0...-1]
+              :line_no => node.location.expression.line,
+              :scope => fqn[0...-1]
           end
         when :def
           yield :defs, node.children[0],
-            line_no: node.location.expression.line,
-            scope: @scope, type: :func
-          yield :end, :end, line_no: node.location.end.line, type: :func
+            :line_no => node.location.expression.line,
+            :scope => @scope, :type => :func
+          yield :end, :end, :line_no => node.location.end.line, :type => :func
         when :defs
           yield :defs, node.children[1],
-            line_no: node.location.expression.line,
-            scope: @scope, type: :func
-          yield :end, :end, line_no: node.location.end.line, type: :func
+            :line_no => node.location.expression.line,
+            :scope => @scope, :type => :func
+          yield :end, :end, :line_no => node.location.end.line, :type => :func
         when :module, :class
           fqn = @scope + scoped_name(node.children[0])
-          yield :defs, fqn.last, line_no: node.location.expression.line,
-            scope: fqn[0...-1], type: node.type
-          yield :end, :end, line_no: node.location.end.line, type: node.type
+          yield :defs, fqn.last, :line_no => node.location.expression.line,
+            :scope => fqn[0...-1], :type => node.type
+          yield :end, :end, :line_no => node.location.end.line, :type => node.type
         when :casgn
           fqn = scoped_name(node)
           yield :assigns, fqn.last,
-            line_no: node.location.expression.line,
-            scope: fqn[0...-1]
+            :line_no => node.location.expression.line,
+            :scope => fqn[0...-1]
         when :lvasgn, :ivasgn, :cvasgn, :gvasgn
           yield :assigns, node.children[0],
-            line_no: node.location.expression.line,
-            scope: @scope
+            :line_no => node.location.expression.line,
+            :scope => @scope
         end
       end
 

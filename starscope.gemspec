@@ -21,5 +21,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'bundler', '~> 1.5'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'pry'
-  gem.add_development_dependency 'pry-debugger'
+  gem.add_development_dependency 'minitest'
 end
