@@ -4,7 +4,8 @@ Changelog
 v0.1.10 (trunk)
 -------------------
 
-No changes yet.
+Bug Fixes:
+ * Import new ruby parser version that works with Ruby 1.8.
 
 v0.1.9 (2014-02-22)
 -------------------
