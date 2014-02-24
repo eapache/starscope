@@ -1,8 +1,13 @@
 Changelog
 =========
 
-v0.1.10 (trunk)
--------------------
+v0.1.11 (trunk)
+--------------------
+
+No changes yet.
+
+v0.1.10 (2014-02-24)
+--------------------
 
 Improvements:
  * Import new ruby parser version and make necessary changes so that StarScope
