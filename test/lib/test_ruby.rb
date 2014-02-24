@@ -1,6 +1,6 @@
 require File.expand_path('../../test_helper', __FILE__)
 
-class TestRuby < MiniTest::Unit::TestCase
+class TestRuby < Minitest::Test
   def setup
     @db = {}
     StarScope::Lang::Ruby.extract(RUBY_SAMPLE) do |tbl, key, args|

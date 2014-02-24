@@ -1,6 +1,6 @@
 require File.expand_path('../../test_helper', __FILE__)
 
-class TestGolang < MiniTest::Unit::TestCase
+class TestGolang < Minitest::Test
   def setup
     @db = {}
     StarScope::Lang::Go.extract(GOLANG_SAMPLE) do |tbl, key, args|
