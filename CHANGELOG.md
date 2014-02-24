@@ -4,8 +4,9 @@ Changelog
 v0.1.10 (trunk)
 -------------------
 
-Bug Fixes:
- * Import new ruby parser version that works with Ruby 1.8.
+Improvements:
+ * Import new ruby parser version and make necessary changes so that StarScope
+   now runs on older Ruby versions (1.9.2 and 1.8.7)
 
 v0.1.9 (2014-02-22)
 -------------------
