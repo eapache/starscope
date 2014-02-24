@@ -1,7 +1,7 @@
 module StarScope::Lang
   module Go
     FUNC_CALL = /([\w\.]*?\w)\(/
-    END_OF_BLOCK = /^\s*}\s*$/
+    END_OF_BLOCK = /^\s*\}\s*$/
     END_OF_GROUP = /^\s*\)\s*$/
     BUILTIN_FUNCS = ['new', 'make', 'len', 'close', 'copy', 'delete',
                      'int', 'int8', 'int16', 'int32', 'int64',
@@ -84,7 +84,7 @@ module StarScope::Lang
             yield :imports, name[-1], :line_no => line_no, :scope => name[0...-1]
           end
         else
-          if stack[-1] == :func and /^}/ =~ line
+          if stack[-1] == :func and /^\}/ =~ line
             yield :end, "}", :line_no => line_no, :type => :func
             stack.pop
           end
@@ -98,11 +98,11 @@ module StarScope::Lang
           when /^package\s+(\w+)/
             yield :defs, $1, :line_no => line_no, :scope => scope, :type => :package
             scope.push($1)
-          when /^type\s+(\w+)\s+struct\s*{/
+          when /^type\s+(\w+)\s+struct\s*\{/
             yield :defs, $1, :line_no => line_no, :scope => scope, :type => :class
             scope.push($1)
             stack.push(:struct)
-          when /^type\s+(\w+)\s+interface\s*{/
+          when /^type\s+(\w+)\s+interface\s*\{/
             yield :defs, $1, :line_no => line_no, :scope => scope, :type => :class
             scope.push($1)
             stack.push(:interface)
