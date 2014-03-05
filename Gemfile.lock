@@ -14,7 +14,7 @@ GEM
     method_source (0.8.2)
     minitest (5.3.0)
     oj (2.5.5)
-    parser (2.1.6)
+    parser (2.1.7)
       ast (~> 1.1)
       slop (~> 3.4, >= 3.4.5)
     pry (0.9.12.6)
