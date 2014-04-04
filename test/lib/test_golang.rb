@@ -3,11 +3,9 @@ require File.expand_path('../../test_helper', __FILE__)
 class TestGolang < Minitest::Test
   def setup
     @db = {}
-    StarScope::Lang::Go.extract(GOLANG_SAMPLE) do |tbl, key, args|
-      key = key.to_sym
-      @db[tbl] ||= {}
-      @db[tbl][key] ||= []
-      @db[tbl][key] << args
+    StarScope::Lang::Go.extract(GOLANG_SAMPLE) do |tbl, name, args|
+      @db[tbl] ||= []
+      @db[tbl] << StarScope::Datum.build(GOLANG_SAMPLE, name, args)
     end
   end
 
@@ -19,7 +17,7 @@ class TestGolang < Minitest::Test
 
   def test_defs
     assert @db.keys.include? :defs
-    defs = @db[:defs].keys
+    defs = @db[:defs].map {|x| x[:name][-1]}
     assert defs.include? :a
     assert defs.include? :b
     assert defs.include? :c
@@ -33,14 +31,12 @@ class TestGolang < Minitest::Test
 
   def test_function_ends
     assert @db.keys.include? :end
-    ends = @db[:end]
-    assert ends.keys.count == 1
-    assert ends.values.first.count == 5
+    assert @db[:end].count == 5
   end
 
   def test_function_calls
     assert @db.keys.include? :calls
-    calls = @db[:calls]
+    calls = @db[:calls].group_by {|x| x[:name][-1]}
     assert calls.keys.include? :a
     assert calls.keys.include? :b
     assert calls.keys.include? :c
@@ -53,7 +49,7 @@ class TestGolang < Minitest::Test
 
   def test_variable_assigns
     assert @db.keys.include? :assigns
-    assigns = @db[:assigns]
+    assigns = @db[:assigns].group_by {|x| x[:name][-1]}
     assert assigns.keys.include? :x
     assert assigns.keys.include? :y
     assert assigns.keys.include? :z

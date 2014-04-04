@@ -3,11 +3,9 @@ require File.expand_path('../../test_helper', __FILE__)
 class TestRuby < Minitest::Test
   def setup
     @db = {}
-    StarScope::Lang::Ruby.extract(RUBY_SAMPLE) do |tbl, key, args|
-      key = key.to_sym
-      @db[tbl] ||= {}
-      @db[tbl][key] ||= []
-      @db[tbl][key] << args
+    StarScope::Lang::Ruby.extract(RUBY_SAMPLE) do |tbl, name, args|
+      @db[tbl] ||= []
+      @db[tbl] << StarScope::Datum.build(RUBY_SAMPLE, name, args)
     end
   end
 
@@ -20,7 +18,7 @@ class TestRuby < Minitest::Test
 
   def test_function_defs
     assert @db.keys.include? :defs
-    defs = @db[:defs].keys
+    defs = @db[:defs].map {|x| x[:name][-1]}
     assert defs.include? :DB
     assert defs.include? :NoTableError
     assert defs.include? :load
@@ -30,14 +28,12 @@ class TestRuby < Minitest::Test
 
   def test_function_ends
     assert @db.keys.include? :end
-    ends = @db[:end]
-    assert ends.keys.count == 1
-    assert ends.values.first.count == 13
+    assert @db[:end].count == 13
   end
 
   def test_function_calls
     assert @db.keys.include? :calls
-    calls = @db[:calls]
+    calls = @db[:calls].group_by {|x| x[:name][-1]}
     assert calls.keys.include? :add_file
     assert calls.keys.include? :each
     assert calls[:add_file].count == 3
@@ -46,7 +42,7 @@ class TestRuby < Minitest::Test
 
   def test_variable_assigns
     assert @db.keys.include? :assigns
-    assigns = @db[:assigns]
+    assigns = @db[:assigns].group_by {|x| x[:name][-1]}
     assert assigns.keys.include? :pbar
     assert assigns.keys.include? :PBAR_FORMAT
     assert assigns[:pbar].count == 2
