@@ -51,7 +51,7 @@ module StarScope::Lang
         when :struct
           case line
           when END_OF_BLOCK
-            yield :end, "}", :line_no => line_no, :scope => scope, :type => :class
+            yield :end, scope + ["}"], :line_no => line_no, :type => :class
             stack.pop
             scope.pop
           when /(.+)\s+\w+/
@@ -60,11 +60,11 @@ module StarScope::Lang
         when :interface
           case line
           when END_OF_BLOCK
-            yield :end, "}", :line_no => line_no, :scope => scope, :type => :class
+            yield :end, scope + ["}"], :line_no => line_no, :type => :class
             stack.pop
             scope.pop
           when /(\w+)\(.*\)\s+/
-            yield :defs, $1, :line_no => line_no, :scope => scope
+            yield :defs, scope + $1, :line_no => line_no
           end
         when :def
           case line
@@ -81,7 +81,7 @@ module StarScope::Lang
             stack.pop
           when /"(.+)"/
             name = $1.split('/')
-            yield :imports, name[-1], :line_no => line_no, :scope => name[0...-1]
+            yield :imports, name, :line_no => line_no
           end
         else
           if stack[-1] == :func and /^\}/ =~ line
@@ -90,46 +90,46 @@ module StarScope::Lang
           end
           case line
           when /^func\s+(\w+)\(/
-            yield :defs, $1, :line_no => line_no, :scope => scope, :type => :func
+            yield :defs, scope + [$1], :line_no => line_no, :type => :func
             stack.push(:func)
           when /^func\s+\(\w+\s+\*?(\w+)\)\s*(\w+)\(/
-            yield :defs, $2, :line_no => line_no, :scope => scope + [$1], :type => :func
+            yield :defs, scope + [$1, $2], :line_no => line_no, :type => :func
             stack.push(:func)
           when /^package\s+(\w+)/
-            yield :defs, $1, :line_no => line_no, :scope => scope, :type => :package
             scope.push($1)
+            yield :defs, scope, :line_no => line_no, :type => :package
           when /^type\s+(\w+)\s+struct\s*\{/
-            yield :defs, $1, :line_no => line_no, :scope => scope, :type => :class
             scope.push($1)
             stack.push(:struct)
+            yield :defs, scope, :line_no => line_no, :type => :class
           when /^type\s+(\w+)\s+interface\s*\{/
-            yield :defs, $1, :line_no => line_no, :scope => scope, :type => :class
             scope.push($1)
             stack.push(:interface)
+            yield :defs, scope, :line_no => line_no, :type => :class
           when /^type\s+(\w+)/
-            yield :defs, $1, :line_no => line_no, :scope => scope, :type => :type
+            yield :defs, scope + [$1], :line_no => line_no, :type => :type
           when /^import\s+"(.+)"/
             name = $1.split('/')
-            yield :imports, name[-1], :line_no => line_no, :scope => name[0...-1]
+            yield :imports, name, :line_no => line_no
           when /^import\s+\(/
             stack.push(:import)
           when /^var\s+\(/
             stack.push(:def)
           when /^var\s+(\w+)\s+\w+/
-            yield :defs, $1, :line_no => line_no, :scope => scope
+            yield :defs, scope + [$1], :line_no => line_no
           when /^const\s+\(/
             stack.push(:def)
           when /^const\s+(\w+)\s+\w+/
-            yield :defs, $1, :line_no => line_no, :scope => scope
+            yield :defs, scope + [$1], :line_no => line_no
           when /^\s+(.*?) :?=[^=]/
             $1.split(' ').each do |var|
               next if CONTROL_KEYS.include?(var)
               name = var.delete(',').split('.')
               next if name[0] == "_" # assigning to _ is a discard in golang
               if name.length == 1
-                yield :assigns, name[0], :line_no => line_no, :scope => scope
+                yield :assigns, scope + [name[0]], :line_no => line_no
               else
-                yield :assigns, name[1], :line_no => line_no, :scope => name[0..-1]
+                yield :assigns, name, :line_no => line_no
               end
             end
             parse_call(line, line_no, scope, &block)
@@ -153,17 +153,17 @@ module StarScope::Lang
           if BUILTIN_FUNCS.include?(name[0])
             yield :calls, name[0], :line_no => line_no
           else
-            yield :calls, name[0], :line_no => line_no, :scope => scope
+            yield :calls, scope + [name[0]], :line_no => line_no
           end
         else
-          yield :calls, name[-1], :line_no => line_no, :scope => name[0...-1]
+          yield :calls, name, :line_no => line_no
         end
       end
     end
 
     def self.parse_def(line, line_no, scope)
       line.split.each do |var|
-        yield :defs, var.delete(','), :line_no => line_no, :scope => scope
+        yield :defs, scope + [var.delete(',')], :line_no => line_no
         break if not var.end_with?(',')
       end
     end

@@ -1,40 +1,29 @@
 class StarScope::Datum
 
-  def self.build(file, key, args)
+  def self.build(file, name, args)
     args[:file] = file
-    args[:key] = key
+
+    if name.is_a? Array
+      args[:name] = name.map {|x| x.to_sym}
+    else
+      args[:name] = [name.to_sym]
+    end
 
     if args[:line_no]
       args[:line] = File.readlines(file)[args[:line_no]-1].chomp
     end
 
-    if args[:scope]
-      if args[:scope].empty?
-        args.delete(:scope)
-      else
-        args[:scope] = args[:scope].map {|x| x.to_sym}
-      end
-    end
-
     args
   end
 
-  def self.score_match(dat, fqn)
-    return 0 if not dat[:scope]
-
-    score = 0
-
-    i = -1
-    fqn[0...-1].reverse.each do |test|
-      if test.to_sym == dat[:scope][i]
-        score += 5
-      elsif Regexp.new(test, Regexp::IGNORECASE).match(dat[:scope][i])
-        score += 2
-      end
-      i -= 1
+  def self.score_match(dat, test)
+    if dat[:name][-1] == test
+      5
+    elsif Regexp.new(test, Regexp::IGNORECASE).match(dat[:name].join("::"))
+      2
+    else
+      0
     end
-
-    score - dat[:scope].count - i + 1
   end
 
   def self.location(dat)
@@ -43,13 +32,12 @@ class StarScope::Datum
 
   def self.to_s(dat)
     str = ""
-    str << "#{dat[:scope].join " "} " if dat[:scope]
-    str << "#{dat[:key]} -- #{location dat}"
+    str << "#{dat[:name].join " "} -- #{location dat}"
     str << " (#{dat[:line].strip})"
   end
 
   def self.ctag_line(dat)
-    "#{dat[:key]}\t#{dat[:file]}\t/^#{dat[:line]}$/;"
+    "#{dat[:name][-1]}\t#{dat[:file]}\t/^#{dat[:line]}$/;"
   end
 
   def self.cscope_mark(tbl, dat)
