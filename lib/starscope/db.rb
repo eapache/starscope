@@ -136,9 +136,9 @@ class StarScope::DB
 !_TAG_PROGRAM_URL	https://github.com/eapache/starscope //
 !_TAG_PROGRAM_VERSION	#{StarScope::VERSION}	//
 END
-      defs = (@tables[:defs] || {}).sort
+      defs = (@tables[:defs] || {}).sort_by {|x| x[:name][-1]}
       defs.each do |val|
-        file.puts StarScope::Datum.ctag_line(entry)
+        file.puts StarScope::Datum.ctag_line(val)
       end
     end
   end

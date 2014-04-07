@@ -37,7 +37,19 @@ class StarScope::Datum
   end
 
   def self.ctag_line(dat)
-    "#{dat[:name][-1]}\t#{dat[:file]}\t/^#{dat[:line]}$/;"
+    "#{dat[:name][-1]}\t#{dat[:file]}\t/^#{dat[:line]}$/" + self.ctag_ext(dat)
+  end
+
+  def self.ctag_ext(dat)
+    s = ";\"\t"
+    case dat[:type]
+    when :func
+      s << "kind:f"
+    when :class
+      s << "kind:c"
+    else
+      ""
+    end
   end
 
   def self.cscope_mark(tbl, dat)
