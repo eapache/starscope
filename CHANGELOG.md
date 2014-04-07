@@ -1,10 +1,14 @@
 Changelog
 =========
 
-v0.1.11 (trunk)
+v0.2.0 (trunk)
 --------------------
 
-No changes yet.
+New Features:
+ * Export of some advanced ctags annotations
+
+Improvements:
+ * New, more flexible metadata layout
 
 v0.1.10 (2014-02-24)
 --------------------
