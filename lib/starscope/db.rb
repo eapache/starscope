@@ -1,7 +1,7 @@
 require 'starscope/langs/go'
 require 'starscope/langs/ruby'
 require 'starscope/datum'
-require 'starscope/scorer'
+require 'starscope/matcher'
 require 'date'
 require 'oj'
 require 'zlib'
@@ -117,14 +117,8 @@ class StarScope::DB
 
   def query(table, value)
     raise NoTableError if not @tables[table]
-    results = @tables[table]
-    return results if results.empty?
-    scorer = StarScope::Scorer.new(value)
-    results.sort! {|a, b| scorer.score(a) <=> scorer.score(b)}
-    best_score = scorer.score(results[-1])
-    results.select do |result|
-      best_score == scorer.score(result)
-    end
+    input = @tables[table]
+    StarScope::Matcher.new(value, input).query()
   end
 
   def export_ctags(filename)
