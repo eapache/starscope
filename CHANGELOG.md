@@ -9,6 +9,7 @@ New Features:
 
 Improvements:
  * New, more flexible database layout
+ * Substantially improved searching/matching logic
  * Miscellanious others via updated dependencies
 
 v0.1.10 (2014-02-24)
