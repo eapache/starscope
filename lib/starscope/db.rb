@@ -21,7 +21,7 @@ class StarScope::DB
 
   def initialize(progress)
     @progress = progress
-    @meta = {:paths => [], :files => {}}
+    @meta = {:paths => [], :files => []}
     @tables = {}
   end
 
@@ -72,20 +72,22 @@ class StarScope::DB
   end
 
   def update
-    new_files = (@meta[:paths].map {|p| self.class.files_from_path(p)}.flatten) - @meta[:files].keys
+    new_files = (@meta[:paths].map {|p| self.class.files_from_path(p)}.flatten) - @meta[:files].map {|f| f[:name]}
     if @progress
       pbar = ProgressBar.create(:title => "Updating", :total => new_files.length + @meta[:files].length, :format => PBAR_FORMAT, :length => 80)
     end
-    changed = @meta[:files].keys.map do |f|
-      changed = update_file(f)
+    changed = false
+    @meta[:files].delete_if do |f|
+      ret = update_file(f)
       pbar.increment if @progress
-      changed
+      changed = true if ret == :update
+      ret == :delete
     end
     new_files.each do |f|
       add_file(f)
       pbar.increment if @progress
     end
-    changed.any? || !new_files.empty?
+    changed || !new_files.empty?
   end
 
   def dump_table(table)
@@ -191,7 +193,7 @@ END
       file.print("0\n")
       file.print("#{files.length}\n")
       buf = ""
-      files.each {|f| buf << f + "\n"}
+      files.each {|f| buf << f[:name] + "\n"}
       file.print("#{buf.length}\n#{buf}")
     end
   end
@@ -224,37 +226,42 @@ END
   end
 
   def add_file(file)
-    file = file.to_s
     return if not File.file? file
 
-    @meta[:files][file] = File.mtime(file).to_i
+    record = {:name => file}
+
+    parse_file(record)
+
+    @meta[:files] << record
+  end
+
+  def parse_file(file)
+    file[:last_updated] = File.mtime(file[:name]).to_i
 
     LANGS.each do |lang|
-      next if not lang.match_file file
-      lang.extract file do |tbl, name, args|
+      next if not lang.match_file file[:name]
+      lang.extract file[:name] do |tbl, name, args|
         @tables[tbl] ||= []
-        @tables[tbl] << StarScope::Datum.build(file, name, args)
+        @tables[tbl] << StarScope::Datum.build(file[:name], name, args)
       end
+      file[:lang] = lang.name.split('::').last.to_sym
     end
   end
 
   def remove_file(file)
-    @meta[:files].delete(file)
     @tables.each do |name, tbl|
-      tbl.delete_if {|val| val[:file] == file}
+      tbl.delete_if {|val| val[:file] == file[:name]}
     end
   end
 
   def update_file(file)
-    if not File.exists?(file.to_s) or not File.file?(file.to_s)
+    if not File.exists?(file[:name]) or not File.file?(file[:name])
       remove_file(file)
-      true
-    elsif @meta[:files][file] < File.mtime(file.to_s).to_i
+      :delete
+    elsif file[:last_updated] < File.mtime(file[:name]).to_i
       remove_file(file)
-      add_file(file)
-      true
-    else
-      false
+      parse_file(file)
+      :update
     end
   end
 

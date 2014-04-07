@@ -15,31 +15,33 @@ describe StarScope::DB do
     paths = [GOLANG_SAMPLE, 'test/files']
     @db.add_paths(paths)
     @db.instance_eval('@meta[:paths]').must_equal paths
-    @db.instance_eval('@meta[:files]').keys.must_include GOLANG_SAMPLE
-    @db.instance_eval('@meta[:files]').keys.must_include RUBY_SAMPLE
+    files = @db.instance_eval('@meta[:files]').map{|x|x[:name]}
+    files.must_include GOLANG_SAMPLE
+    files.must_include RUBY_SAMPLE
   end
 
   it "must correctly pick up new files in old paths" do
     @db.instance_eval('@meta[:paths] = ["test/files"]')
     @db.update
-    files = @db.instance_eval('@meta[:files]').keys
+    files = @db.instance_eval('@meta[:files]').map{|x|x[:name]}
     files.must_include GOLANG_SAMPLE
     files.must_include RUBY_SAMPLE
   end
 
   it "must correctly remove old files in existing paths" do
     @db.instance_eval('@meta[:paths] = ["test/files"]')
-    @db.instance_eval('@meta[:files] = {"test/files/foo"=>"2012-01-01"}')
-    @db.instance_eval('@meta[:files]').keys.must_include 'test/files/foo'
+    @db.instance_eval('@meta[:files] = [{:name=>"test/files/foo", :last_update=>1}]')
+    @db.instance_eval('@meta[:files]').map{|x|x[:name]}.must_include 'test/files/foo'
     @db.update
-    @db.instance_eval('@meta[:files]').keys.wont_include 'test/files/foo'
+    @db.instance_eval('@meta[:files]').map{|x|x[:name]}.wont_include 'test/files/foo'
   end
 
   it "must correctly load an old DB file" do
     @db.load('test/files/db_old.json.gz')
     @db.instance_eval('@meta[:paths]').must_equal ['test/files']
-    @db.instance_eval('@meta[:files]').keys.must_include GOLANG_SAMPLE
-    @db.instance_eval('@meta[:files]').keys.must_include RUBY_SAMPLE
+    files = @db.instance_eval('@meta[:files]').map{|x|x[:name]}
+    files.must_include GOLANG_SAMPLE
+    files.must_include RUBY_SAMPLE
   end
 
   it "must correctly round-trip a database" do
