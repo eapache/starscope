@@ -20,7 +20,7 @@ class StarScope::Scorer
     else
       if name[-1].to_s == @query
         return 100
-      elsif @regexp.match(name[-1]) != nil
+      elsif @regexp.match(name[-1].to_s) != nil
         return 80
       elsif @regexp.match(fullname) != nil
         return 20
