@@ -94,7 +94,9 @@ class StarScope::DB
   def dump_table(table)
     raise NoTableError if not @tables[table]
     puts "== Table: #{table} =="
-    @tables[table].sort_by{|x| x[:name][-1].downcase}.each do |data|
+    @tables[table].sort {|a,b|
+      a[:name][-1].downcase <=> b[:name][-1].downcase
+    }.each do |datum|
       puts StarScope::Datum.to_s(datum)
     end
   end
@@ -118,7 +120,7 @@ class StarScope::DB
     results = @tables[table]
     return results if results.empty?
     scorer = StarScope::Scorer.new(value)
-    results.sort_by! {|x| scorer.score(x)}
+    results.sort! {|a, b| scorer.score(a) <=> scorer.score(b)}
     best_score = scorer.score(results[-1])
     results.select do |result|
       best_score == scorer.score(result)

@@ -69,7 +69,7 @@ end.parse!
 
 def print_summary(db)
   db.summary.each do |name, count|
-    printf("%-8s %5d keys\n", name, count)
+    printf("%-8s %5d records\n", name, count)
   end
 end
 
