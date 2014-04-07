@@ -152,7 +152,7 @@ END
         files << file
       end
       lines.sort.each do |line_no, vals|
-        line = vals.first[:entry][:line].strip.gsub(/\s+/, ' ')
+        line = vals.first[:line].strip.gsub(/\s+/, ' ')
         toks = {}
 
         vals.each do |val|
@@ -169,9 +169,9 @@ END
         buf << line_no.to_s << " "
         toks.sort().each do |offset, val|
           buf << line.slice(prev...offset) << "\n"
-          buf << StarScope::Datum.cscope_mark(val)
-          buf << val[:name].to_s << "\n"
-          prev = offset + val[:name].to_s.length
+          buf << StarScope::Datum.cscope_mark(val[:tbl], val)
+          buf << val[:name][-1].to_s << "\n"
+          prev = offset + val[:name][-1].to_s.length
         end
         buf << line.slice(prev..-1) << "\n\n"
       end
@@ -192,7 +192,7 @@ END
       file.print("0\n")
       file.print("#{files.length}\n")
       buf = ""
-      files.each {|f| buf << f[:name] + "\n"}
+      files.each {|f| buf << f + "\n"}
       file.print("#{buf.length}\n#{buf}")
     end
   end
@@ -214,9 +214,9 @@ END
     @tables.each do |tbl, vals|
       vals.each do |val|
         if val[:line_no]
+          val[:tbl] = tbl
           tmpdb[val[:file]] ||= {}
           tmpdb[val[:file]][val[:line_no]] ||= []
-          val[:tbl] = tbl
           tmpdb[val[:file]][val[:line_no]] << val
         end
       end
