@@ -15,7 +15,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.required_ruby_version = '>= 1.9.3'
 
-  gem.add_dependency 'oj', '~> 2.5'
+  gem.add_dependency 'oj', '~> 2.7'
   gem.add_dependency 'parser', '~> 2.1'
   gem.add_dependency 'ruby-progressbar', '~> 1.4'
   gem.add_development_dependency 'bundler', '~> 1.5'

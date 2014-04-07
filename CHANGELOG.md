@@ -8,7 +8,8 @@ New Features:
  * Export of some advanced ctags annotations
 
 Improvements:
- * New, more flexible metadata layout
+ * New, more flexible database layout
+ * Miscellanious others via updated dependencies
 
 v0.1.10 (2014-02-24)
 --------------------
