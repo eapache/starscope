@@ -32,6 +32,8 @@ class StarScope::Datum
 
   def self.ctag_ext(dat)
     s = ";\"\t"
+    #TODO implement the many more extensions documented at
+    #http://ctags.sourceforge.net/FORMAT
     case dat[:type]
     when :func
       s << "kind:f"
