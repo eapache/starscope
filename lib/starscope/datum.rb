@@ -16,20 +16,14 @@ class StarScope::Datum
     args
   end
 
-  def self.score_match(dat, name)
-    score = 0
-
-    i = -1
-    name[0...-1].reverse.each do |test|
-      if test.to_sym == dat[:name][i]
-        score += 5
-      elsif Regexp.new(test, Regexp::IGNORECASE).match(dat[:name][i])
-        score += 2
-      end
-      i -= 1
+  def self.score_match(dat, test)
+    if dat[:name][-1] == test
+      5
+    elsif Regexp.new(test, Regexp::IGNORECASE).match(dat[:name].join("::"))
+      2
+    else
+      0
     end
-
-    score - dat[:name].count - i + 1
   end
 
   def self.location(dat)

@@ -117,9 +117,9 @@ class StarScope::DB
     results.sort! do |a,b|
       StarScope::Datum.score_match(b, value) <=> StarScope::Datum.score_match(a, value)
     end
-    best_score = StarScope::Datum.score_match(results[0], fqn)
+    best_score = StarScope::Datum.score_match(results[0], value)
     results = results.select do |result|
-      best_score - StarScope::Datum.score_match(result, fqn) < 4
+      best_score - StarScope::Datum.score_match(result, value) < 4
     end
     return results
   end
@@ -224,6 +224,7 @@ END
   end
 
   def add_file(file)
+    file = file.to_s
     return if not File.file? file
 
     @meta[:files][file] = File.mtime(file).to_i
@@ -245,10 +246,10 @@ END
   end
 
   def update_file(file)
-    if not File.exists?(file) or not File.file?(file)
+    if not File.exists?(file.to_s) or not File.file?(file.to_s)
       remove_file(file)
       true
-    elsif @meta[:files][file] < File.mtime(file).to_i
+    elsif @meta[:files][file] < File.mtime(file.to_s).to_i
       remove_file(file)
       add_file(file)
       true

@@ -1,4 +1,5 @@
 require File.expand_path('../../test_helper', __FILE__)
+require 'tempfile'
 
 describe StarScope::DB do
 
@@ -39,6 +40,24 @@ describe StarScope::DB do
     @db.instance_eval('@meta[:paths]').must_equal ['test/files']
     @db.instance_eval('@meta[:files]').keys.must_include GOLANG_SAMPLE
     @db.instance_eval('@meta[:files]').keys.must_include RUBY_SAMPLE
+  end
+
+  it "must correctly round-trip a database" do
+    file = Tempfile.new('starscope_test')
+    begin
+      @db.add_paths(['test/files'])
+      @db.save(file.path)
+      StarScope::DB.new(false).load(file.path)
+    ensure
+      file.close
+      file.unlink
+    end
+  end
+
+  it "must correctly run queries" do
+    @db.add_paths(['test/files'])
+    @db.query(:calls, "abc")
+    @db.query(:defs, "xyz")
   end
 
 end
