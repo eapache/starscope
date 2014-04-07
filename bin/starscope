@@ -114,7 +114,7 @@ end
 db = StarScope::DB.new(options[:progress])
 
 if options[:read]
-  db.load(options[:read])
+  new_data = db.load(options[:read])
   if !ARGV.empty?
     db.add_paths(ARGV)
     new_data = true

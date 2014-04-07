@@ -26,6 +26,7 @@ class StarScope::DB
     @tables = {}
   end
 
+  # returns true if the database had to be up-converted from an old format
   def load(file)
     File.open(file, 'r') do |file|
       Zlib::GzipReader.wrap(file) do |file|
@@ -33,13 +34,16 @@ class StarScope::DB
         if format == DB_FORMAT
           @meta   = Oj.load(file.gets, :symbol_keys => true)
           @tables = Oj.load(file.gets, :symbol_keys => true)
+          return false
         elsif format <= 2
           # Old format (pre-json), so read the directories segment then rebuild
           len = file.gets.to_i
           add_paths(Marshal::load(file.read(len)))
+          return true
         elsif format <= 4
           # Old format, so read the directories segment then rebuild
           add_paths(Oj.load(file.gets))
+          return true
         else
           raise UnknownDBFormatError
         end
