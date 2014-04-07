@@ -78,7 +78,7 @@ def run_query(db, table, value)
     $stderr.puts "Invalid input - no query found."
     return false
   end
-  key, results = db.query(table.to_sym, value)
+  results = db.query(table.to_sym, value)
   if results
     puts results.map {|val| StarScope::Datum.to_s(val)}
   else

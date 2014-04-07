@@ -16,16 +16,6 @@ class StarScope::Datum
     args
   end
 
-  def self.score_match(dat, test)
-    if dat[:name][-1] == test
-      5
-    elsif Regexp.new(test, Regexp::IGNORECASE).match(dat[:name].join("::"))
-      2
-    else
-      0
-    end
-  end
-
   def self.location(dat)
     "#{dat[:file]}:#{dat[:line_no]}"
   end
@@ -88,4 +78,5 @@ class StarScope::Datum
 
     return "\t" + ret
   end
+
 end
