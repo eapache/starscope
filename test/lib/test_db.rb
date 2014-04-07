@@ -50,6 +50,31 @@ describe StarScope::DB do
       @db.add_paths(['test/files'])
       @db.save(file.path)
       StarScope::DB.new(false).load(file.path)
+      #TODO verify
+    ensure
+      file.close
+      file.unlink
+    end
+  end
+
+  it "must correctly export to ctags" do
+    file = Tempfile.new('starscope_test')
+    begin
+      @db.add_paths(['test/files'])
+      @db.export_ctags(file.path)
+      #TODO verify output
+    ensure
+      file.close
+      file.unlink
+    end
+  end
+
+  it "must correctly export to cscope" do
+    file = Tempfile.new('starscope_test')
+    begin
+      @db.add_paths(['test/files'])
+      @db.export_cscope(file.path)
+      #TODO verify output
     ensure
       file.close
       file.unlink
