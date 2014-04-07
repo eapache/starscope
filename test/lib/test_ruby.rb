@@ -26,7 +26,7 @@ class TestRuby < Minitest::Test
     assert defs.include? :files_from_path
   end
 
-  def test_function_ends
+  def test_ends
     assert @db.keys.include? :end
     assert @db[:end].count == 13
   end

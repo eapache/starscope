@@ -9,6 +9,10 @@ const (
 	Monday
 )
 
+type foo interface {
+	bar() int
+}
+
 func a(c int) int {
 	return 3
 }

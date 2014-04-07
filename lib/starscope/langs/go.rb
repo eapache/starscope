@@ -64,7 +64,7 @@ module StarScope::Lang
             stack.pop
             scope.pop
           when /(\w+)\(.*\)\s+/
-            yield :defs, scope + $1, :line_no => line_no
+            yield :defs, scope + [$1], :line_no => line_no
           end
         when :def
           case line

@@ -29,9 +29,9 @@ class TestGolang < Minitest::Test
     assert defs.include? :Monday
   end
 
-  def test_function_ends
+  def test_ends
     assert @db.keys.include? :end
-    assert @db[:end].count == 5
+    assert @db[:end].count == 6
   end
 
   def test_function_calls
