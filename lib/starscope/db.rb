@@ -61,12 +61,12 @@ class StarScope::DB
     end
   end
 
-  def exclude(patterns)
+  def add_excludes(patterns)
     patterns -= @meta[:exclude]
     return if patterns.empty?
     @meta[:exclude] += patterns
     @meta[:files].delete_if do |f|
-      if exclude_file(f[:name])
+      if matches_exclude(f[:name])
         remove_file(f)
         true
       else
@@ -80,6 +80,7 @@ class StarScope::DB
     return if paths.empty?
     @meta[:paths] += paths
     files = paths.map {|p| self.class.files_from_path(p)}.flatten
+    files.delete_if {|f| matches_exclude(f)}
     return if files.empty?
     if @progress
       pbar = ProgressBar.create(:title => "Building", :total => files.length, :format => PBAR_FORMAT, :length => 80)
@@ -92,6 +93,7 @@ class StarScope::DB
 
   def update
     new_files = (@meta[:paths].map {|p| self.class.files_from_path(p)}.flatten) - @meta[:files].map {|f| f[:name]}
+    new_files.delete_if {|f| matches_exclude(f)}
     if @progress
       pbar = ProgressBar.create(:title => "Updating", :total => new_files.length + @meta[:files].length, :format => PBAR_FORMAT, :length => 80)
     end
@@ -217,7 +219,12 @@ END
     if File.file?(path)
       [path]
     elsif File.directory?(path)
-      Dir[File.join(path, "**", "*")].select {|p| File.file?(p)}
+      if path == "."
+        path = File.join("**", "*")
+      else
+        path = File.join(path, "**", "*")
+      end
+      Dir[path].select {|p| File.file?(p)}
     else
       []
     end
@@ -238,12 +245,12 @@ END
     return tmpdb
   end
 
-  def exclude_file(file)
+  def matches_exclude(file)
     @meta[:exclude].map {|p| File.fnmatch(p, file)}.any?
   end
 
   def add_file(file)
-    return if exclude_file(file) or not File.file? file
+    return if not File.file? file
 
     record = {:name => file}
 
