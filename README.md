@@ -10,21 +10,21 @@ only works for C (and sort of works for C++).
 
 StarScope is a similar tool for [Ruby](https://www.ruby-lang.org/) and
 [Golang](http://golang.org/), with a design intended to make it easy to add
-support for other languages at some point within the same framework (thus the
-name StarScope, ie \*scope).
+support for other languages within the same framework (thus the name StarScope,
+i.e. \*scope).
 
 Install it as a gem:
 ```
 $ gem install starscope
 ```
 
-Build your database, by just running it in the project directory:
+Build your database by just running it in the project directory:
 ```
 $ cd ~/my-project
 $ starscope
 ```
 
-Ask it things with the `-q` flag:
+Ask it things directly:
 ```
 $ starscope -q calls,new # Lists all callers of new
 ```
