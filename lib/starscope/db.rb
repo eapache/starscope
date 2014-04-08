@@ -61,12 +61,13 @@ class StarScope::DB
     end
   end
 
-  def add_excludes(patterns)
-    @meta[:paths]   -= patterns
-    @meta[:exclude] += patterns
+  def add_excludes(paths)
+    @meta[:paths] -= paths.map {|p| normalize_glob(p)}
+    paths = paths.map {|p| normalize_fnmatch(p)}
+    @meta[:exclude] += paths
     @meta[:exclude].uniq!
     @meta[:files].delete_if do |f|
-      if matches_exclude(patterns, f[:name])
+      if matches_exclude(paths, f[:name])
         remove_file(f)
         true
       else
@@ -76,10 +77,11 @@ class StarScope::DB
   end
 
   def add_paths(paths)
-    @meta[:exclude] -= paths
-    @meta[:paths]   += paths
+    @meta[:exclude] -= paths.map {|p| normalize_fnmatch(p)}
+    paths = paths.map {|p| normalize_glob(p)}
+    @meta[:paths] += paths
     @meta[:paths].uniq!
-    files = paths.map {|p| self.class.files_from_path(p)}.flatten
+    files = Dir.glob(paths).select {|f| File.file? f}
     files.delete_if {|f| matches_exclude(@meta[:exclude], f)}
     return if files.empty?
     if @progress
@@ -92,7 +94,7 @@ class StarScope::DB
   end
 
   def update
-    new_files = (@meta[:paths].map {|p| self.class.files_from_path(p)}.flatten) - @meta[:files].map {|f| f[:name]}
+    new_files = (Dir.glob(@meta[:paths]).select {|f| File.file? f}) - @meta[:files].map {|f| f[:name]}
     new_files.delete_if {|f| matches_exclude(@meta[:exclude], f)}
     if @progress
       pbar = ProgressBar.create(:title => "Updating", :total => new_files.length + @meta[:files].length, :format => PBAR_FORMAT, :length => 80)
@@ -215,18 +217,26 @@ END
 
   private
 
-  def self.files_from_path(path)
-    if File.file?(path)
-      [path]
+  # File.fnmatch treats a "**" to match files and directories recursively
+  def normalize_fnmatch(path)
+    if path == "."
+      "**"
     elsif File.directory?(path)
-      if path == "."
-        path = File.join("**", "*")
-      else
-        path = File.join(path, "**", "*")
-      end
-      Dir[path].select {|p| File.file?(p)}
+      File.join(path, "**")
     else
-      []
+      path
+    end
+  end
+
+  # Dir.glob treats a "**" to only match directories recursively; you need
+  # "**/*" to match all files recursively
+  def normalize_glob(path)
+    if path == "."
+      File.join("**", "*")
+    elsif File.directory?(path)
+      File.join(path, "**", "*")
+    else
+      path
     end
   end
 

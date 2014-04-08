@@ -142,7 +142,8 @@ elsif not db_exists
   options[:update] = false
 end
 
-new_data ||= db.update if options[:update]
+updated = db.update() if options[:update]
+new_data ||= updated
 
 db.save(options[:db]) if options[:write] and (new_data or not db_exists)
 

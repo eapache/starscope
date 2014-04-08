@@ -12,7 +12,7 @@ describe StarScope::DB do
   end
 
   it "must correctly add paths" do
-    paths = [GOLANG_SAMPLE, 'test/files']
+    paths = [GOLANG_SAMPLE, 'test/files/**/*']
     @db.add_paths(paths)
     @db.instance_eval('@meta[:paths]').must_equal paths
     files = @db.instance_eval('@meta[:files]').map{|x|x[:name]}
@@ -21,7 +21,7 @@ describe StarScope::DB do
   end
 
   it "must correctly pick up new files in old paths" do
-    @db.instance_eval('@meta[:paths] = ["test/files"]')
+    @db.instance_eval('@meta[:paths] = ["test/files/**/*"]')
     @db.update
     files = @db.instance_eval('@meta[:files]').map{|x|x[:name]}
     files.must_include GOLANG_SAMPLE
@@ -38,7 +38,7 @@ describe StarScope::DB do
 
   it "must correctly load an old DB file" do
     @db.load('test/files/db_old.json.gz')
-    @db.instance_eval('@meta[:paths]').must_equal ['test/files']
+    @db.instance_eval('@meta[:paths]').must_equal ['test/files/**/*']
     files = @db.instance_eval('@meta[:files]').map{|x|x[:name]}
     files.must_include GOLANG_SAMPLE
     files.must_include RUBY_SAMPLE
