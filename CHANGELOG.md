@@ -6,6 +6,7 @@ v0.2.0 (trunk)
 
 New Features:
  * Export of some advanced ctags annotations
+ * New -x flag to exclude files from scan (such as compiled .o files)
 
 Improvements:
  * New, more flexible database layout
