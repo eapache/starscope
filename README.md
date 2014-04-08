@@ -24,17 +24,14 @@ $ cd ~/my-project
 $ starscope
 ```
 
-Ask it things with `-q`
+Ask it things with the `-q` flag:
 ```
 $ starscope -q calls,new # Lists all callers of new
 ```
 
-Export it for use with your editor
+Export it to various formats for use with your editor:
 ```
 $ starscope -e ctags
-```
-or
-```
 $ starscope -e cscope
 ```
 
