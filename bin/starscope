@@ -7,18 +7,27 @@ require 'optparse'
 require 'readline'
 require 'starscope'
 
-options = {:auto => true, :progress => true, :manual_write => true}
 DEFAULT_DB=".starscope.db"
+
+options = {:show_progress => true,
+           :read => true,
+           :write => true,
+           :update => true,
+           :db => DEFAULT_DB
+}
 
 # Options Parsing
 OptionParser.new do |opts|
   opts.banner = <<END
 Usage: starscope [options] [PATHS]
 
-If you don't pass any of -n, -r, -w or PATHS, default behaviour is to recurse
-in the current directory and build or update the database `#{DEFAULT_DB}`.
+The default database is `#{DEFAULT_DB}` if you don't specify one with -f.
+The default behaviour is to read the database, update it, and write it back out.
+If no database exists and no PATHS are specified, StarScope builds a new
+database by recursing in the current directory.
 
-Query scopes must be specified with `::`, for example -q calls,File::mtime.
+Scoped queries must use `::` as the scope separator, even for languages which
+have their own scope syntax.
 END
 
   opts.separator "\nQueries"
@@ -39,18 +48,21 @@ END
   opts.on("-e", "--export FORMAT[,PATH]", "Export in FORMAT to PATH, (see EXPORTING)") do |export|
     options[:export] = export
   end
-  opts.on("-n", "--no-auto", "Don't automatically update/create the DB") do
-    options[:auto] = false
-  end
-  opts.on("-r", "--read-db PATH", "Reads the DB from PATH instead of default") do |path|
-    options[:read] = path
-  end
-  opts.on("-w", "--write-db PATH", "Writes the DB to PATH instead of default") do |path|
-    options[:write] = path
+  opts.on("-f", "--file FILE", "Use FILE instead of `#{DEFAULT_DB}`") do |path|
+    options[:db] = path
   end
   opts.on("-x", "--exclude PATTERN", "Skip files matching PATTERN") do |pattern|
     options[:exclude] ||= []
     options[:exclude] << pattern
+  end
+  opts.on("--no-read", "Don't read the DB from a file") do
+    options[:read] = false
+  end
+  opts.on("--no-write", "Don't write the DB to a file") do
+    options[:write] = false
+  end
+  opts.on("--no-update", "Don't update the DB") do
+    options[:update] = false
   end
 
   opts.separator "\nMisc"
@@ -59,7 +71,7 @@ END
     exit
   end
   opts.on("--no-progress", "Don't show progress-bar when updating DB") do
-    options[:progress] = false
+    options[:show_progress] = false
   end
 
   opts.separator <<END
@@ -106,42 +118,33 @@ rescue StarScope::DB::NoTableError
   return false
 end
 
-db = StarScope::DB.new(options[:progress])
+db = StarScope::DB.new(options[:show_progress])
 
-# user passed neither -n nor -w flags
-if options[:auto] and not options[:write]
-  options[:write] = DEFAULT_DB
-  options[:manual_write] = false
-end
+db_exists = File.exists?(options[:db])
 
-if File.exists?(DEFAULT_DB) and not options[:read]
-  options[:read] = DEFAULT_DB
-end
-
-if options[:read]
-  new_data = db.load(options[:read])
-end
+new_data = db.load(options[:db]) if options[:read] and db_exists
 
 if options[:exclude]
   db.add_excludes(options[:exclude])
+  new_data = true
 end
 
 if not ARGV.empty?
+  # paths specified, add them
   db.add_paths(ARGV)
   new_data = true
-elsif not options[:read]
-  # ARGV is empty (no paths specified) and options[:read] is nil (no specific DB
-  # file specified) so build a new db defaulting to the current directory
+elsif not db_exists
+  # no paths were specified and the database did not exist; default to building
+  # a new DB in the current directory
   db.add_paths(['.'])
   new_data = true
+  # no need to run an update in this case since we've got no old data to refresh
+  options[:update] = false
 end
 
-new_data ||= db.update if options[:read] and options[:auto]
+new_data ||= db.update if options[:update]
 
-# write if we have somewhere to write to, and either:
-# - we have new data to save OR
-# - we have an explicitly requested write to a specific path
-db.save(options[:write]) if options[:write] and (new_data or options[:manual_write])
+db.save(options[:db]) if options[:write] and (new_data or not db_exists)
 
 if options[:export]
   format, path = options[:export].split(',', 2)

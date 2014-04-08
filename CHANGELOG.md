@@ -9,7 +9,10 @@ New Features:
  * New -x flag to exclude files from scan (such as compiled .o files)
 
 Improvements:
- * New, more flexible database layout
+ * Reworked option flags:
+   * Merged -r and -w into -f
+   * Split -n into --no-read, --no-write, --no-update
+ * New, more flexible database format
  * Substantially improved searching/matching logic
  * Miscellanious others via updated dependencies
 
