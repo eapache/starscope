@@ -22,8 +22,11 @@ class StarScope::DB
 
   def initialize(progress)
     @progress = progress
-    @meta = {:paths => [], :files => []}
+    @meta = {:paths => [], :files => [], :exclude => []}
     @tables = {}
+  end
+
+  def exclude(paths)
   end
 
   # returns true if the database had to be up-converted from an old format

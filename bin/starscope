@@ -7,7 +7,7 @@ require 'optparse'
 require 'readline'
 require 'starscope'
 
-options = {auto: true, progress: true}
+options = {:auto => true, :progress => true, :manual_write => true}
 DEFAULT_DB=".starscope.db"
 
 # Options Parsing
@@ -47,6 +47,10 @@ END
   end
   opts.on("-w", "--write-db PATH", "Writes the DB to PATH instead of default") do |path|
     options[:write] = path
+  end
+  opts.on("-x", "--exclude PATTERN", "Skip files matching PATTERN") do |pattern|
+    options[:exclude] ||= []
+    options[:exclude] << pattern
   end
 
   opts.separator "\nMisc"
@@ -102,34 +106,42 @@ rescue StarScope::DB::NoTableError
   return false
 end
 
+db = StarScope::DB.new(options[:progress])
+
+# user passed neither -n nor -w flags
 if options[:auto] and not options[:write]
   options[:write] = DEFAULT_DB
-  options[:auto_write] = true
+  options[:manual_write] = false
 end
 
 if File.exists?(DEFAULT_DB) and not options[:read]
   options[:read] = DEFAULT_DB
 end
 
-db = StarScope::DB.new(options[:progress])
-
 if options[:read]
   new_data = db.load(options[:read])
-  if !ARGV.empty?
-    db.add_paths(ARGV)
-    new_data = true
-  end
-elsif ARGV.empty?
-  db.add_paths(['.'])
-  new_data = true
-else
+end
+
+if not ARGV.empty?
   db.add_paths(ARGV)
+  new_data = true
+elsif not options[:read]
+  # ARGV is empty (no paths specified) and options[:read] is nil (no specific DB
+  # file specified) so build a new db defaulting to the current directory
+  db.add_paths(['.'])
   new_data = true
 end
 
-changed = db.update if options[:read] and options[:auto]
+if options[:exclude]
+  db.exclude(options[:exclude])
+end
 
-db.save(options[:write]) if options[:write] and (new_data or changed or not options[:auto_write])
+new_data ||= db.update if options[:read] and options[:auto]
+
+# write if we have somewhere to write to, and either:
+# - we have new data to save OR
+# - we have an explicitly requested write to a specific path
+db.save(options[:write]) if options[:write] and (new_data or options[:manual_write])
 
 if options[:export]
   format, path = options[:export].split(',', 2)
