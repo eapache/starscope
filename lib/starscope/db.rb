@@ -22,7 +22,7 @@ class StarScope::DB
 
   def initialize(progress)
     @progress = progress
-    @meta = {:paths => [], :files => []}
+    @meta = {:paths => [], :files => [], :exclude => []}
     @tables = {}
   end
 
@@ -61,11 +61,26 @@ class StarScope::DB
     end
   end
 
+  def add_excludes(patterns)
+    @meta[:paths]   -= patterns
+    @meta[:exclude] += patterns
+    @meta[:exclude].uniq!
+    @meta[:files].delete_if do |f|
+      if matches_exclude(patterns, f[:name])
+        remove_file(f)
+        true
+      else
+        false
+      end
+    end
+  end
+
   def add_paths(paths)
-    paths -= @meta[:paths]
-    return if paths.empty?
-    @meta[:paths] += paths
+    @meta[:exclude] -= paths
+    @meta[:paths]   += paths
+    @meta[:paths].uniq!
     files = paths.map {|p| self.class.files_from_path(p)}.flatten
+    files.delete_if {|f| matches_exclude(@meta[:exclude], f)}
     return if files.empty?
     if @progress
       pbar = ProgressBar.create(:title => "Building", :total => files.length, :format => PBAR_FORMAT, :length => 80)
@@ -78,6 +93,7 @@ class StarScope::DB
 
   def update
     new_files = (@meta[:paths].map {|p| self.class.files_from_path(p)}.flatten) - @meta[:files].map {|f| f[:name]}
+    new_files.delete_if {|f| matches_exclude(@meta[:exclude], f)}
     if @progress
       pbar = ProgressBar.create(:title => "Updating", :total => new_files.length + @meta[:files].length, :format => PBAR_FORMAT, :length => 80)
     end
@@ -203,7 +219,12 @@ END
     if File.file?(path)
       [path]
     elsif File.directory?(path)
-      Dir[File.join(path, "**", "*")].select {|p| File.file?(p)}
+      if path == "."
+        path = File.join("**", "*")
+      else
+        path = File.join(path, "**", "*")
+      end
+      Dir[path].select {|p| File.file?(p)}
     else
       []
     end
@@ -222,6 +243,10 @@ END
       end
     end
     return tmpdb
+  end
+
+  def matches_exclude(patterns, file)
+    patterns.map {|p| File.fnmatch(p, file)}.any?
   end
 
   def add_file(file)
