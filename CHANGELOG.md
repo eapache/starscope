@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v0.2.0 (trunk)
+v1.0.0 (trunk)
 --------------------
 
 New Features:
