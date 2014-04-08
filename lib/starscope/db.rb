@@ -26,9 +26,6 @@ class StarScope::DB
     @tables = {}
   end
 
-  def exclude(paths)
-  end
-
   # returns true if the database had to be up-converted from an old format
   def load(file)
     File.open(file, 'r') do |file|
@@ -60,6 +57,20 @@ class StarScope::DB
         file.puts DB_FORMAT
         file.puts Oj.dump @meta
         file.puts Oj.dump @tables
+      end
+    end
+  end
+
+  def exclude(patterns)
+    patterns -= @meta[:exclude]
+    return if patterns.empty?
+    @meta[:exclude] += patterns
+    @meta[:files].delete_if do |f|
+      if exclude_file(f[:name])
+        remove_file(f)
+        true
+      else
+        false
       end
     end
   end
@@ -227,8 +238,12 @@ END
     return tmpdb
   end
 
+  def exclude_file(file)
+    @meta[:exclude].map {|p| File.fnmatch(p, file)}.any?
+  end
+
   def add_file(file)
-    return if not File.file? file
+    return if exclude_file(file) or not File.file? file
 
     record = {:name => file}
 
