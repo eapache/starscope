@@ -9,6 +9,10 @@ New Features:
  * New -x flag to exclude files from scan (such as compiled .o files)
  * New --verbose flag for additional output
 
+Bug Fixes:
+ * Correctly write out migrated databases
+ * Be compatible with ruby 1.8 everywhere
+
 Improvements:
  * Reworked option flags:
    * Merged -r and -w into -f
