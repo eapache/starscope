@@ -1,14 +1,20 @@
-require 'starscope/langs/go'
-require 'starscope/langs/ruby'
-require 'starscope/datum'
-require 'starscope/matcher'
-require 'starscope/output'
 require 'date'
 require 'oj'
 require 'zlib'
 
+require 'starscope/datum'
+require 'starscope/matcher'
+require 'starscope/output'
+
+require 'starscope/langs/coffeescript'
+require 'starscope/langs/go'
+require 'starscope/langs/lua'
+require 'starscope/langs/ruby'
+
 LANGS = [
+  StarScope::Lang::CoffeeScript,
   StarScope::Lang::Go,
+  StarScope::Lang::Lua,
   StarScope::Lang::Ruby
 ]
 
