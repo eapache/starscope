@@ -86,11 +86,7 @@ class StarScope::DB
     files.delete_if {|f| matches_exclude(@meta[:excludes], f)}
     return if files.empty?
     @output.new_pbar("Building", files.length)
-    files.each do |f|
-      @output.log("Adding `#{f}`")
-      add_file(f)
-      @output.inc_pbar
-    end
+    add_new_files(files)
     @output.finish_pbar
   end
 
@@ -106,11 +102,7 @@ class StarScope::DB
       changed = true if ret == :update
       ret == :delete
     end
-    new_files.each do |f|
-      @output.log("Adding `#{f}`")
-      add_file(f)
-      @output.inc_pbar
-    end
+    add_new_files(new_files)
     @output.finish_pbar
     changed || !new_files.empty?
   end
@@ -232,6 +224,16 @@ END
 
   private
 
+  def add_new_files(files)
+    files.each do |file|
+      @output.log("Adding `#{file}`")
+      record = {:name => file}
+      parse_file(record)
+      @meta[:files] << record
+      @output.inc_pbar
+    end
+  end
+
   # File.fnmatch treats a "**" to match files and directories recursively
   def normalize_fnmatch(path)
     if path == "."
@@ -272,16 +274,6 @@ END
 
   def matches_exclude(patterns, file)
     patterns.map {|p| File.fnmatch(p, file)}.any?
-  end
-
-  def add_file(file)
-    return if not File.file? file
-
-    record = {:name => file}
-
-    parse_file(record)
-
-    @meta[:files] << record
   end
 
   def parse_file(file)
