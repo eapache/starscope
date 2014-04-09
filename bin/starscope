@@ -128,7 +128,12 @@ db = StarScope::DB.new(options[:show_progress], options[:verbose])
 
 db_exists = File.exists?(options[:db])
 
-new_data = db.load(options[:db]) if options[:read] and db_exists
+if options[:read] and db_exists
+  new_data = db.load(options[:db])
+else
+  # no need to run an update if we didn't read any old data
+  options[:update] = false
+end
 
 if options[:exclude]
   db.add_excludes(options[:exclude])
@@ -144,8 +149,6 @@ elsif not db_exists
   # a new DB in the current directory
   db.add_paths(['.'])
   new_data = true
-  # no need to run an update in this case since we've got no old data to refresh
-  options[:update] = false
 end
 
 updated = db.update() if options[:update]
