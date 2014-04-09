@@ -1,8 +1,15 @@
 package main
 
+import "fmt"
+
 var (
 	v1, v2 int = 3, 4
 )
+
+var raw = []byte{
+	0x00, 0x01,
+	0x02, 0x03,
+}
 
 const (
 	Sunday = iota
@@ -45,4 +52,9 @@ func main() {
 	}
 
 	a(c(b(), b()))
+
+	fmt.Println(n)
+	fmt.Println(t)
+	fmt.Println(y)
+	fmt.Println(z)
 }
