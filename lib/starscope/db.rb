@@ -23,7 +23,7 @@ class StarScope::DB
   def initialize(progress, verbose)
     @progress = progress
     @verbose = verbose
-    @meta = {:paths => [], :files => [], :exclude => []}
+    @meta = {:paths => [], :files => [], :excludes => []}
     @tables = {}
   end
 
@@ -71,8 +71,8 @@ class StarScope::DB
   def add_excludes(paths)
     @meta[:paths] -= paths.map {|p| normalize_glob(p)}
     paths = paths.map {|p| normalize_fnmatch(p)}
-    @meta[:exclude] += paths
-    @meta[:exclude].uniq!
+    @meta[:excludes] += paths
+    @meta[:excludes].uniq!
     @meta[:files].delete_if do |f|
       if matches_exclude(paths, f[:name])
         remove_file(f)
@@ -84,12 +84,12 @@ class StarScope::DB
   end
 
   def add_paths(paths)
-    @meta[:exclude] -= paths.map {|p| normalize_fnmatch(p)}
+    @meta[:excludes] -= paths.map {|p| normalize_fnmatch(p)}
     paths = paths.map {|p| normalize_glob(p)}
     @meta[:paths] += paths
     @meta[:paths].uniq!
     files = Dir.glob(paths).select {|f| File.file? f}
-    files.delete_if {|f| matches_exclude(@meta[:exclude], f)}
+    files.delete_if {|f| matches_exclude(@meta[:excludes], f)}
     return if files.empty?
     logger = STDOUT
     logfunc = :puts
@@ -107,7 +107,7 @@ class StarScope::DB
 
   def update
     new_files = (Dir.glob(@meta[:paths]).select {|f| File.file? f}) - @meta[:files].map {|f| f[:name]}
-    new_files.delete_if {|f| matches_exclude(@meta[:exclude], f)}
+    new_files.delete_if {|f| matches_exclude(@meta[:excludes], f)}
     logger = STDOUT
     logfunc = :puts
     if @progress
@@ -139,6 +139,19 @@ class StarScope::DB
     }.each do |datum|
       puts StarScope::Datum.to_s(datum)
     end
+  end
+
+  def dump_meta(key)
+    if key == :meta
+      puts "== Metadata Summary =="
+      @meta.each do |k, v|
+        puts "#{k}: #{v.count}"
+      end
+      return
+    end
+    raise NoTableError if not @meta[key]
+    puts "== Metadata: #{key} =="
+    @meta[key].each {|x| puts x}
   end
 
   def dump_all

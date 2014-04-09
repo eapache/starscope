@@ -111,10 +111,12 @@ rescue StarScope::DB::NoTableError
 end
 
 def dump(db, table)
-  if table
-    db.dump_table(table.to_sym)
-  else
+  if table.nil?
     db.dump_all
+  elsif table.start_with?('_')
+    db.dump_meta(table[1..-1].to_sym)
+  else
+    db.dump_table(table.to_sym)
   end
   return true
 rescue StarScope::DB::NoTableError
