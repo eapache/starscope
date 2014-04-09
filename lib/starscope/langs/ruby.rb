@@ -7,7 +7,7 @@ module StarScope::Lang
       File.open(name) do |f|
         head = f.read(2)
         return false if head.nil? or not head.start_with?("#!")
-        return f.readline =~ /ruby/
+        return f.readline.include?("ruby")
       end
     rescue ArgumentError # may occur if file is binary (invalid UTF)
       false
