@@ -4,12 +4,15 @@ import "fmt"
 
 var (
 	v1, v2 int = 3, 4
+	raw        = []byte{
+		0x00, 0x01,
+		0x02, 0x03,
+	}
 )
 
-var raw = []byte{
-	0x00, 0x01,
-	0x02, 0x03,
-}
+var single_var = 3
+
+const single_const = 4
 
 const (
 	Sunday = iota
@@ -52,9 +55,9 @@ func main() {
 	}
 
 	a(c(b(), b()))
+	c(y, z)
+	c(single_var, single_const)
 
 	fmt.Println(n)
 	fmt.Println(t)
-	fmt.Println(y)
-	fmt.Println(z)
 }

@@ -12,6 +12,8 @@ New Features:
 Bug Fixes:
  * Correctly write out migrated databases
  * Be compatible with ruby 1.8 everywhere
+ * Fix golang parsing untyped "var" declarations
+ * Fix golang parsing multi-line literals
 
 Improvements:
  * Faster file-type matching

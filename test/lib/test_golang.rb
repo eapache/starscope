@@ -27,6 +27,13 @@ class TestGolang < Minitest::Test
     assert defs.include? :v2
     assert defs.include? :Sunday
     assert defs.include? :Monday
+    assert defs.include? :single_var
+    assert defs.include? :single_const
+
+    refute defs.include? :"0x00"
+    refute defs.include? :"0x01"
+    refute defs.include? :"0x02"
+    refute defs.include? :"0x03"
   end
 
   def test_ends
@@ -43,7 +50,7 @@ class TestGolang < Minitest::Test
     assert calls.keys.include? :ttt
     assert calls[:a].count == 3
     assert calls[:b].count == 4
-    assert calls[:c].count == 2
+    assert calls[:c].count == 4
     assert calls[:ttt].count == 2
   end
 

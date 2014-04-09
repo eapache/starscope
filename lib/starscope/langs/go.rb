@@ -115,11 +115,11 @@ module StarScope::Lang
             stack.push(:import)
           when /^var\s+\(/
             stack.push(:def)
-          when /^var\s+(\w+)\s+\w+/
+          when /^var\s+(\w+)\s/
             yield :defs, scope + [$1], :line_no => line_no
           when /^const\s+\(/
             stack.push(:def)
-          when /^const\s+(\w+)\s+\w+/
+          when /^const\s+(\w+)\s/
             yield :defs, scope + [$1], :line_no => line_no
           when /^\s+(.*?) :?=[^=]/
             $1.split(' ').each do |var|
@@ -162,6 +162,10 @@ module StarScope::Lang
     end
 
     def self.parse_def(line, line_no, scope)
+      # if it doesn't start with a valid identifier character, it's probably
+      # part of a multi-line literal and we should skip it
+      return if not line =~ /^\s*[[:alpha:]_]/
+
       line.split.each do |var|
         yield :defs, scope + [var.delete(',')], :line_no => line_no
         break if not var.end_with?(',')
