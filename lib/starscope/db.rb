@@ -20,29 +20,34 @@ class StarScope::DB
   class NoTableError < StandardError; end
   class UnknownDBFormatError < StandardError; end
 
-  def initialize(progress)
+  def initialize(progress, verbose)
     @progress = progress
+    @verbose = verbose
     @meta = {:paths => [], :files => [], :exclude => []}
     @tables = {}
   end
 
   # returns true if the database had to be up-converted from an old format
   def load(file)
+    print "Reading database from `#{file}`... " if @verbose
     File.open(file, 'r') do |file|
       Zlib::GzipReader.wrap(file) do |file|
         format = file.gets.to_i
         if format == DB_FORMAT
           @meta   = Oj.load(file.gets, :symbol_keys => true)
           @tables = Oj.load(file.gets, :symbol_keys => true)
+          print "OK\n" if @verbose
           return false
         elsif format <= 2
           # Old format (pre-json), so read the directories segment then rebuild
           len = file.gets.to_i
           add_paths(Marshal::load(file.read(len)))
+          print "OK [old format]\n" if @verbose
           return true
         elsif format <= 4
           # Old format, so read the directories segment then rebuild
           add_paths(Oj.load(file.gets))
+          print "OK [old format]\n" if @verbose
           return true
         else
           raise UnknownDBFormatError
@@ -52,6 +57,7 @@ class StarScope::DB
   end
 
   def save(file)
+    print "Writing database to `#{file}`... " if @verbose
     File.open(file, 'w') do |file|
       Zlib::GzipWriter.wrap(file) do |file|
         file.puts DB_FORMAT
@@ -59,6 +65,7 @@ class StarScope::DB
         file.puts Oj.dump @tables
       end
     end
+    print "OK\n" if @verbose
   end
 
   def add_excludes(paths)
@@ -84,10 +91,15 @@ class StarScope::DB
     files = Dir.glob(paths).select {|f| File.file? f}
     files.delete_if {|f| matches_exclude(@meta[:exclude], f)}
     return if files.empty?
+    logger = STDOUT
+    logfunc = :puts
     if @progress
       pbar = ProgressBar.create(:title => "Building", :total => files.length, :format => PBAR_FORMAT, :length => 80)
+      logger = pbar
+      logfunc = :log
     end
     files.each do |f|
+      logger.send(logfunc, "Adding `#{f}`") if @verbose
       add_file(f)
       pbar.increment if @progress
     end
@@ -96,17 +108,23 @@ class StarScope::DB
   def update
     new_files = (Dir.glob(@meta[:paths]).select {|f| File.file? f}) - @meta[:files].map {|f| f[:name]}
     new_files.delete_if {|f| matches_exclude(@meta[:exclude], f)}
+    logger = STDOUT
+    logfunc = :puts
     if @progress
       pbar = ProgressBar.create(:title => "Updating", :total => new_files.length + @meta[:files].length, :format => PBAR_FORMAT, :length => 80)
+      logger = pbar
+      logfunc = :log
     end
     changed = false
     @meta[:files].delete_if do |f|
+      logger.send(logfunc, "Updating `#{f[:name]}`") if @verbose
       ret = update_file(f)
       pbar.increment if @progress
       changed = true if ret == :update
       ret == :delete
     end
     new_files.each do |f|
+      logger.send(logfunc, "Adding `#{f}`") if @verbose
       add_file(f)
       pbar.increment if @progress
     end

@@ -13,6 +13,7 @@ options = {:show_progress => true,
            :read => true,
            :write => true,
            :update => true,
+           :verbose => false,
            :db => DEFAULT_DB
 }
 
@@ -70,6 +71,9 @@ END
     puts StarScope::VERSION
     exit
   end
+  opts.on("--verbose", "Print extra details") do
+    options[:verbose] = true
+  end
   opts.on("--no-progress", "Don't show progress-bar when updating DB") do
     options[:show_progress] = false
   end
@@ -118,7 +122,7 @@ rescue StarScope::DB::NoTableError
   return false
 end
 
-db = StarScope::DB.new(options[:show_progress])
+db = StarScope::DB.new(options[:show_progress], options[:verbose])
 
 db_exists = File.exists?(options[:db])
 

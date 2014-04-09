@@ -4,7 +4,7 @@ require 'tempfile'
 describe StarScope::DB do
 
   before do
-    @db = StarScope::DB.new(false)
+    @db = StarScope::DB.new(false, false)
   end
 
   it "must raise on invalid tables" do
@@ -49,7 +49,7 @@ describe StarScope::DB do
     begin
       @db.add_paths(['test/files'])
       @db.save(file.path)
-      StarScope::DB.new(false).load(file.path)
+      StarScope::DB.new(false, false).load(file.path)
       #TODO verify
     ensure
       file.close
