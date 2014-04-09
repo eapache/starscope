@@ -10,7 +10,7 @@ module StarScope::Lang
     CONTROL_KEYS = ['if', 'for', 'switch', 'case']
 
     def self.match_file(name)
-      name =~ /.*\.go$/
+      name.end_with?(".go")
     end
 
     def self.extract(file, &block)

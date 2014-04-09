@@ -14,6 +14,7 @@ Bug Fixes:
  * Be compatible with ruby 1.8 everywhere
 
 Improvements:
+ * Faster file-type matching
  * Reworked option flags:
    * Merged -r and -w into -f
    * Split -n into --no-read, --no-write, --no-update

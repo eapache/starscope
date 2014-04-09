@@ -3,11 +3,13 @@ require "parser/current"
 module StarScope::Lang
   module Ruby
     def self.match_file(name)
-      return true if name =~ /.*\.rb$/
-      return File.open(name) {|f| f.readline} =~ /^#!.*ruby/
+      return true if name.end_with?(".rb")
+      File.open(name) do |f|
+        head = f.read(2)
+        return false if head.nil? or not head.start_with?("#!")
+        return f.readline =~ /ruby/
+      end
     rescue ArgumentError # may occur if file is binary (invalid UTF)
-      false
-    rescue EOFError # occurs when file is empty
       false
     end
 
