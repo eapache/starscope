@@ -5,7 +5,7 @@ v1.0.0 (trunk)
 --------------------
 
 New Features:
- * Export of some advanced ctags annotations
+ * Preliminary export of a few advanced ctags annotations
  * New -x flag to exclude files from scan (such as compiled .o files)
  * New --verbose flag for additional output
 
