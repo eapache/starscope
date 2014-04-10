@@ -5,7 +5,7 @@ class TestGolang < Minitest::Test
     @db = {}
     StarScope::Lang::Go.extract(GOLANG_SAMPLE) do |tbl, name, args|
       @db[tbl] ||= []
-      @db[tbl] << StarScope::Datum.build(GOLANG_SAMPLE, name, args)
+      @db[tbl] << StarScope::Record.build(GOLANG_SAMPLE, name, args)
     end
   end
 

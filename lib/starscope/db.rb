@@ -2,9 +2,9 @@ require 'date'
 require 'oj'
 require 'zlib'
 
-require 'starscope/datum'
 require 'starscope/matcher'
 require 'starscope/output'
+require 'starscope/record'
 
 require 'starscope/langs/coffeescript'
 require 'starscope/langs/go'
@@ -118,8 +118,8 @@ class StarScope::DB
     puts "== Table: #{table} =="
     @tables[table].sort {|a,b|
       a[:name][-1].downcase <=> b[:name][-1].downcase
-    }.each do |datum|
-      puts StarScope::Datum.to_s(datum)
+    }.each do |record|
+      puts StarScope::Record.to_s(record)
     end
   end
 
@@ -167,8 +167,8 @@ class StarScope::DB
 !_TAG_PROGRAM_VERSION	#{StarScope::VERSION}	//
 END
       defs = (@tables[:defs] || {}).sort_by {|x| x[:name][-1].to_s}
-      defs.each do |val|
-        file.puts StarScope::Datum.ctag_line(val)
+      defs.each do |record|
+        file.puts StarScope::Record.ctag_line(record)
       end
     end
   end
@@ -182,15 +182,15 @@ END
         buf << "\t@#{file}\n\n"
         files << file
       end
-      lines.sort.each do |line_no, vals|
-        line = vals.first[:line].strip.gsub(/\s+/, ' ')
+      lines.sort.each do |line_no, records|
+        line = records.first[:line].strip.gsub(/\s+/, ' ')
         toks = {}
 
-        vals.each do |val|
-          index = line.index(val[:name][-1].to_s)
+        records.each do |record|
+          index = line.index(record[:name][-1].to_s)
           while index
-            toks[index] = val
-            index = line.index(val[:name][-1].to_s, index + 1)
+            toks[index] = record
+            index = line.index(record[:name][-1].to_s, index + 1)
           end
         end
 
@@ -198,11 +198,11 @@ END
 
         prev = 0
         buf << line_no.to_s << " "
-        toks.sort().each do |offset, val|
+        toks.sort().each do |offset, record|
           buf << line.slice(prev...offset) << "\n"
-          buf << StarScope::Datum.cscope_mark(val[:tbl], val)
-          buf << val[:name][-1].to_s << "\n"
-          prev = offset + val[:name][-1].to_s.length
+          buf << StarScope::Record.cscope_mark(record[:tbl], record)
+          buf << record[:name][-1].to_s << "\n"
+          prev = offset + record[:name][-1].to_s.length
         end
         buf << line.slice(prev..-1) << "\n\n"
       end
@@ -264,18 +264,17 @@ END
   end
 
   def db_by_line()
-    tmpdb = {}
-    @tables.each do |tbl, vals|
-      vals.each do |val|
-        if val[:line_no]
-          val[:tbl] = tbl
-          tmpdb[val[:file]] ||= {}
-          tmpdb[val[:file]][val[:line_no]] ||= []
-          tmpdb[val[:file]][val[:line_no]] << val
-        end
+    db = {}
+    @tables.each do |tbl, records|
+      records.each do |record|
+        next if not record[:line_no]
+        record[:tbl] = tbl
+        db[record[:file]] ||= {}
+        db[record[:file]][record[:line_no]] ||= []
+        db[record[:file]][record[:line_no]] << record
       end
     end
-    return tmpdb
+    return db
   end
 
   def matches_exclude(patterns, file)
@@ -289,7 +288,7 @@ END
       next if not lang.match_file file[:name]
       lang.extract file[:name] do |tbl, name, args|
         @tables[tbl] ||= []
-        @tables[tbl] << StarScope::Datum.build(file[:name], name, args)
+        @tables[tbl] << StarScope::Record.build(file[:name], name, args)
       end
       file[:lang] = lang.name.split('::').last.to_sym
     end

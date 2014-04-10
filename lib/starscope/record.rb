@@ -1,4 +1,4 @@
-class StarScope::Datum
+class StarScope::Record
 
   def self.build(file, name, args)
     args[:file] = file
@@ -16,25 +16,25 @@ class StarScope::Datum
     args
   end
 
-  def self.location(dat)
-    "#{dat[:file]}:#{dat[:line_no]}"
+  def self.location(rec)
+    "#{rec[:file]}:#{rec[:line_no]}"
   end
 
-  def self.to_s(dat)
+  def self.to_s(rec)
     str = ""
-    str << "#{dat[:name].join " "} -- #{location dat}"
-    str << " (#{dat[:line].strip})"
+    str << "#{rec[:name].join " "} -- #{location rec}"
+    str << " (#{rec[:line].strip})"
   end
 
-  def self.ctag_line(dat)
-    "#{dat[:name][-1]}\t#{dat[:file]}\t/^#{dat[:line]}$/" + self.ctag_ext(dat)
+  def self.ctag_line(rec)
+    "#{rec[:name][-1]}\t#{rec[:file]}\t/^#{rec[:line]}$/" + self.ctag_ext(rec)
   end
 
-  def self.ctag_ext(dat)
+  def self.ctag_ext(rec)
     s = ";\"\t"
     #TODO implement the many more extensions documented at
     #http://ctags.sourceforge.net/FORMAT
-    case dat[:type]
+    case rec[:type]
     when :func
       s << "kind:f"
     when :class
@@ -44,10 +44,10 @@ class StarScope::Datum
     end
   end
 
-  def self.cscope_mark(tbl, dat)
+  def self.cscope_mark(tbl, rec)
     case tbl
     when :end
-      case dat[:type]
+      case rec[:type]
       when :func
         ret = "}"
       else
@@ -56,7 +56,7 @@ class StarScope::Datum
     when :file
       ret = "@"
     when :defs
-      case dat[:type]
+      case rec[:type]
       when :func
         ret = "$"
       when :class, :module

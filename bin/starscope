@@ -100,7 +100,7 @@ def run_query(db, table, value)
   end
   results = db.query(table.to_sym, value)
   if results
-    puts results.map {|val| StarScope::Datum.to_s(val)}
+    puts results.map {|rec| StarScope::Record.to_s(rec)}
   else
     puts "No results found."
   end
