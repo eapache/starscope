@@ -43,12 +43,11 @@ class StarScope::Record
   def self.ctag_ext_tags(rec)
     tag = {}
 
-    #TODO implement the many more extensions documented at
-    #http://ctags.sourceforge.net/FORMAT
+    # these extensions are documented at http://ctags.sourceforge.net/FORMAT
     case rec[:type]
     when :func
       tag["kind"] = "f"
-    when :class
+    when :module, :class
       tag["kind"] = "c"
     end
 
