@@ -27,21 +27,32 @@ class StarScope::Record
   end
 
   def self.ctag_line(rec)
-    "#{rec[:name][-1]}\t#{rec[:file]}\t/^#{rec[:line]}$/" + self.ctag_ext(rec)
+    ret = "#{rec[:name][-1]}\t#{rec[:file]}\t/^#{rec[:line]}$/"
+
+    ext = self.ctag_ext_tags(rec)
+    if not ext.empty?
+      ret << ";\""
+      ext.each do |k, v|
+        ret << "\t#{k}:#{v}"
+      end
+    end
+
+    ret
   end
 
-  def self.ctag_ext(rec)
-    s = ";\"\t"
+  def self.ctag_ext_tags(rec)
+    tag = {}
+
     #TODO implement the many more extensions documented at
     #http://ctags.sourceforge.net/FORMAT
     case rec[:type]
     when :func
-      s << "kind:f"
+      tag["kind"] = "f"
     when :class
-      s << "kind:c"
-    else
-      ""
+      tag["kind"] = "c"
     end
+
+    tag
   end
 
   def self.cscope_mark(tbl, rec)
