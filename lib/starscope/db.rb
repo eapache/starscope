@@ -119,7 +119,7 @@ class StarScope::DB
     @tables[table].sort {|a,b|
       a[:name][-1].downcase <=> b[:name][-1].downcase
     }.each do |record|
-      puts StarScope::Record.to_s(record)
+      puts StarScope::Record.format(record)
     end
   end
 
