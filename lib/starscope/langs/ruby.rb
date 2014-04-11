@@ -74,6 +74,7 @@ module StarScope::Lang
         when :casgn
           fqn = scoped_name(node)
           yield :assigns, fqn, :line_no => node.location.expression.line
+          yield :defs, fqn, :line_no => node.location.expression.line
         when :lvasgn, :ivasgn, :cvasgn, :gvasgn
           yield :assigns, @scope + [node.children[0]], :line_no => node.location.expression.line
         end

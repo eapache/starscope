@@ -14,6 +14,7 @@ Bug Fixes:
  * Be compatible with ruby 1.8 everywhere
  * Fix golang parsing untyped "var" declarations
  * Fix golang parsing multi-line literals
+ * Record assignments to ruby constants as definitions
 
 Improvements:
  * Faster file-type matching
