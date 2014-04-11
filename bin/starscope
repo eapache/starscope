@@ -144,9 +144,9 @@ if not ARGV.empty?
   # paths specified, add them
   db.add_paths(ARGV)
   new_data = true
-elsif not db_exists
-  # no paths were specified and the database did not exist; default to building
-  # a new DB in the current directory
+elsif not (options[:read] and db_exists)
+  # no paths were specified and the database was not read or did not exist;
+  # default to building a new DB in the current directory
   db.add_paths(['.'])
   new_data = true
 end
