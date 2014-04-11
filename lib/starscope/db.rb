@@ -159,10 +159,10 @@ class StarScope::DB
   def export_ctags(filename)
     File.open(filename, 'w') do |file|
       file.puts <<END
-!_TAG_FILE_FORMAT	2	//
+!_TAG_FILE_FORMAT	2	/extended format/
 !_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
-!_TAG_PROGRAM_AUTHOR	Evan Huus //
-!_TAG_PROGRAM_NAME	Starscope //
+!_TAG_PROGRAM_AUTHOR	Evan Huus /eapache@gmail.com/
+!_TAG_PROGRAM_NAME	StarScope //
 !_TAG_PROGRAM_URL	https://github.com/eapache/starscope //
 !_TAG_PROGRAM_VERSION	#{StarScope::VERSION}	//
 END
