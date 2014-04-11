@@ -6,6 +6,8 @@ class StarScope::Matcher
     @query  = query
     @input  = input
     @regexp = Regexp.new(query, Regexp::IGNORECASE)
+  rescue RegexpError
+    # not a regex, oh well
   end
 
   def match(record)
@@ -17,10 +19,12 @@ class StarScope::Matcher
       :full_match
     when name[-1] == @query
       :simple_match
-    when @regexp.match(name[-1])
-      :simple_regexp
-    when @regexp.match(fullname)
-      :full_regexp
+    when @regexp
+      if @regexp.match(name[-1])
+        :simple_regexp
+      elsif @regexp.match(fullname)
+        :full_regexp
+      end
     end
   end
 
