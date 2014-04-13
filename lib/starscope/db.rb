@@ -179,10 +179,10 @@ END
   def export_cscope(file)
     buf = ""
     files = []
-    db_by_line().each do |file, lines|
+    db_by_line().each do |filename, lines|
       if not lines.empty?
-        buf << "\t@#{file}\n\n"
-        files << file
+        buf << "\t@#{filename}\n\n"
+        files << filename
       end
       lines.sort.each do |line_no, records|
         line = records.first[:line].strip.gsub(/\s+/, ' ')
