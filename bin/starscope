@@ -7,7 +7,9 @@ require 'optparse'
 require 'readline'
 require 'starscope'
 
-DEFAULT_DB=".starscope.db"
+DEFAULT_DB='.starscope.db'
+DEFAULT_CTAGS='tags'
+DEFAULT_CSCOPE='cscope.out'
 
 options = {:show_progress => true,
            :read => true,
@@ -81,8 +83,8 @@ END
   opts.separator <<END
 \nEXPORTING
     At the moment two export formats are supported: 'ctags' and 'cscope'. If
-    you don't specify a path, the output is written to the files 'tags' (for
-    ctags) or 'cscope.out' (for cscope) in the current directory.
+    you don't specify a path, the output is written to the files '#{DEFAULT_CTAGS}' (for
+    ctags) or '#{DEFAULT_CSCOPE}' (for cscope) in the current directory.
 END
 
 end.parse!
@@ -160,11 +162,11 @@ if options[:export]
   format, path = options[:export].split(',', 2)
   case format
   when 'ctags'
-    File.open(path || 'tags', 'w') do |file|
+    File.open(path || DEFAULT_CTAGS, 'w') do |file|
       db.export_ctags(file)
     end
   when 'cscope'
-    File.open(path || 'cscope.out', 'w') do |file|
+    File.open(path || DEFAULT_CSCOPE, 'w') do |file|
       db.export_cscope(file)
     end
   else
