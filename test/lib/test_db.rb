@@ -49,12 +49,27 @@ describe StarScope::DB do
     begin
       @db.add_paths(['test/files'])
       @db.save(file.path)
-      StarScope::DB.new(false, false).load(file.path)
-      #TODO verify
+      tmp = StarScope::DB.new(false, false)
+      tmp.load(file.path)
     ensure
       file.close
       file.unlink
     end
+
+    meta = tmp.instance_eval('@meta')
+    tbls = tmp.instance_eval('@tables')
+
+    meta[:paths].must_equal ['test/files/**/*']
+    files = meta[:files].map {|x| x[:name]}
+    files.must_include GOLANG_SAMPLE
+    files.must_include RUBY_SAMPLE
+
+    defs = tbls[:defs].map {|x| x[:name][-1]}
+    assert defs.include? :DB
+    assert defs.include? :NoTableError
+    assert defs.include? :load
+    assert defs.include? :update
+    assert defs.include? :files_from_path
   end
 
   it "must correctly export to ctags" do
