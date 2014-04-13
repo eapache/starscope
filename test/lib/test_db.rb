@@ -3,12 +3,20 @@ require 'tempfile'
 
 describe StarScope::DB do
 
-  def validate_db
-    files = @db.instance_eval('@meta[:files]')
+  def validate(db)
+    files = db.instance_eval('@meta[:files]')
     files.keys.must_include GOLANG_SAMPLE
     files.keys.must_include RUBY_SAMPLE
     files[GOLANG_SAMPLE][:last_updated].must_equal File.mtime(GOLANG_SAMPLE).to_i
     files[RUBY_SAMPLE][:last_updated].must_equal File.mtime(RUBY_SAMPLE).to_i
+
+    tbls = db.instance_eval('@tables')
+    defs = tbls[:defs].map {|x| x[:name][-1]}
+    assert defs.include? :DB
+    assert defs.include? :NoTableError
+    assert defs.include? :load
+    assert defs.include? :update
+    assert defs.include? :files_from_path
   end
 
   before do
@@ -23,13 +31,13 @@ describe StarScope::DB do
     paths = [GOLANG_SAMPLE, 'test/files/**/*']
     @db.add_paths(paths)
     @db.instance_eval('@meta[:paths]').must_equal paths
-    validate_db
+    validate(@db)
   end
 
   it "must correctly pick up new files in old paths" do
     @db.instance_eval('@meta[:paths] = ["test/files/**/*"]')
     @db.update
-    validate_db
+    validate(@db)
   end
 
   it "must correctly remove old files in existing paths" do
@@ -43,7 +51,7 @@ describe StarScope::DB do
   it "must correctly load an old DB file" do
     @db.load('test/files/db_old.json.gz')
     @db.instance_eval('@meta[:paths]').must_equal ['test/files/**/*']
-    validate_db
+    validate(@db)
   end
 
   it "must correctly round-trip a database" do
@@ -53,25 +61,11 @@ describe StarScope::DB do
       @db.save(file.path)
       tmp = StarScope::DB.new(false, false)
       tmp.load(file.path)
+      validate(tmp)
     ensure
       file.close
       file.unlink
     end
-
-    meta = tmp.instance_eval('@meta')
-    tbls = tmp.instance_eval('@tables')
-
-    meta[:paths].must_equal ['test/files/**/*']
-    files = meta[:files].keys
-    files.must_include GOLANG_SAMPLE
-    files.must_include RUBY_SAMPLE
-
-    defs = tbls[:defs].map {|x| x[:name][-1]}
-    assert defs.include? :DB
-    assert defs.include? :NoTableError
-    assert defs.include? :load
-    assert defs.include? :update
-    assert defs.include? :files_from_path
   end
 
   it "must correctly export to ctags" do
