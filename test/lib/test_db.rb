@@ -73,7 +73,9 @@ describe StarScope::DB do
     begin
       @db.add_paths(['test/files'])
       @db.export_ctags(file)
-      #TODO verify output
+      file.rewind
+      lines = file.lines.to_a
+      lines.must_include "NoTableError\ttest/files/sample_ruby.rb\t/^  class NoTableError < StandardError; end$/;\"\tkind:c\n"
     ensure
       file.close
       file.unlink
@@ -85,7 +87,11 @@ describe StarScope::DB do
     begin
       @db.add_paths(['test/files'])
       @db.export_cscope(file)
-      #TODO verify output
+      file.rewind
+      lines = file.lines.to_a
+      lines.must_include "\t@test/files/sample_golang.go\n"
+      lines.must_include "\tgSunday\n"
+      lines.must_include "\t`add_file\n"
     ensure
       file.close
       file.unlink
