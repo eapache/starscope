@@ -3,6 +3,14 @@ require 'tempfile'
 
 describe StarScope::DB do
 
+  def validate_db
+    files = @db.instance_eval('@meta[:files]')
+    files.keys.must_include GOLANG_SAMPLE
+    files.keys.must_include RUBY_SAMPLE
+    files[GOLANG_SAMPLE][:last_updated].must_equal File.mtime(GOLANG_SAMPLE).to_i
+    files[RUBY_SAMPLE][:last_updated].must_equal File.mtime(RUBY_SAMPLE).to_i
+  end
+
   before do
     @db = StarScope::DB.new(false, false)
   end
@@ -15,33 +23,27 @@ describe StarScope::DB do
     paths = [GOLANG_SAMPLE, 'test/files/**/*']
     @db.add_paths(paths)
     @db.instance_eval('@meta[:paths]').must_equal paths
-    files = @db.instance_eval('@meta[:files]').map{|x|x[:name]}
-    files.must_include GOLANG_SAMPLE
-    files.must_include RUBY_SAMPLE
+    validate_db
   end
 
   it "must correctly pick up new files in old paths" do
     @db.instance_eval('@meta[:paths] = ["test/files/**/*"]')
     @db.update
-    files = @db.instance_eval('@meta[:files]').map{|x|x[:name]}
-    files.must_include GOLANG_SAMPLE
-    files.must_include RUBY_SAMPLE
+    validate_db
   end
 
   it "must correctly remove old files in existing paths" do
     @db.instance_eval('@meta[:paths] = ["test/files"]')
-    @db.instance_eval('@meta[:files] = [{:name=>"test/files/foo", :last_update=>1}]')
-    @db.instance_eval('@meta[:files]').map{|x|x[:name]}.must_include 'test/files/foo'
+    @db.instance_eval('@meta[:files] = {"test/files/foo" => {:last_update=>1}}')
+    @db.instance_eval('@meta[:files]').keys.must_include 'test/files/foo'
     @db.update
-    @db.instance_eval('@meta[:files]').map{|x|x[:name]}.wont_include 'test/files/foo'
+    @db.instance_eval('@meta[:files]').keys.wont_include 'test/files/foo'
   end
 
   it "must correctly load an old DB file" do
     @db.load('test/files/db_old.json.gz')
     @db.instance_eval('@meta[:paths]').must_equal ['test/files/**/*']
-    files = @db.instance_eval('@meta[:files]').map{|x|x[:name]}
-    files.must_include GOLANG_SAMPLE
-    files.must_include RUBY_SAMPLE
+    validate_db
   end
 
   it "must correctly round-trip a database" do
@@ -60,7 +62,7 @@ describe StarScope::DB do
     tbls = tmp.instance_eval('@tables')
 
     meta[:paths].must_equal ['test/files/**/*']
-    files = meta[:files].map {|x| x[:name]}
+    files = meta[:files].keys
     files.must_include GOLANG_SAMPLE
     files.must_include RUBY_SAMPLE
 
