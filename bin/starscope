@@ -160,9 +160,13 @@ if options[:export]
   format, path = options[:export].split(',', 2)
   case format
   when 'ctags'
-    db.export_ctags(path || 'tags')
+    File.open(path || 'tags', 'w') do |file|
+      db.export_ctags(file)
+    end
   when 'cscope'
-    db.export_cscope(path || 'cscope.out')
+    File.open(path || 'cscope.out', 'w') do |file|
+      db.export_cscope(file)
+    end
   else
     puts "Unrecognized export format"
   end

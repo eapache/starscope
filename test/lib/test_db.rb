@@ -72,7 +72,7 @@ describe StarScope::DB do
     file = Tempfile.new('starscope_test')
     begin
       @db.add_paths(['test/files'])
-      @db.export_ctags(file.path)
+      @db.export_ctags(file)
       #TODO verify output
     ensure
       file.close
@@ -84,7 +84,7 @@ describe StarScope::DB do
     file = Tempfile.new('starscope_test')
     begin
       @db.add_paths(['test/files'])
-      @db.export_cscope(file.path)
+      @db.export_cscope(file)
       #TODO verify output
     ensure
       file.close

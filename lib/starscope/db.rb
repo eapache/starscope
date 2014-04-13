@@ -160,9 +160,8 @@ class StarScope::DB
     StarScope::Matcher.new(value, input).query()
   end
 
-  def export_ctags(filename)
-    File.open(filename, 'w') do |file|
-      file.puts <<END
+  def export_ctags(file)
+    file.puts <<END
 !_TAG_FILE_FORMAT	2	/extended format/
 !_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
 !_TAG_PROGRAM_AUTHOR	Evan Huus /eapache@gmail.com/
@@ -170,15 +169,14 @@ class StarScope::DB
 !_TAG_PROGRAM_URL	https://github.com/eapache/starscope //
 !_TAG_PROGRAM_VERSION	#{StarScope::VERSION}	//
 END
-      defs = (@tables[:defs] || {}).sort_by {|x| x[:name][-1].to_s}
-      defs.each do |record|
-        file.puts StarScope::Record.ctag_line(record)
-      end
+    defs = (@tables[:defs] || {}).sort_by {|x| x[:name][-1].to_s}
+    defs.each do |record|
+      file.puts StarScope::Record.ctag_line(record)
     end
   end
 
   # ftp://ftp.eeng.dcu.ie/pub/ee454/cygwin/usr/share/doc/mlcscope-14.1.8/html/cscope.html
-  def export_cscope(filename)
+  def export_cscope(file)
     buf = ""
     files = []
     db_by_line().each do |file, lines|
@@ -217,19 +215,17 @@ END
     header = "cscope 15 #{Dir.pwd} -c "
     offset = "%010d\n" % (header.length + 11 + buf.length)
 
-    File.open(filename, 'w') do |file|
-      file.print(header)
-      file.print(offset)
-      file.print(buf)
+    file.print(header)
+    file.print(offset)
+    file.print(buf)
 
-      file.print("#{@meta[:paths].length}\n")
-      @meta[:paths].each {|p| file.print("#{p}\n")}
-      file.print("0\n")
-      file.print("#{files.length}\n")
-      buf = ""
-      files.each {|f| buf << f + "\n"}
-      file.print("#{buf.length}\n#{buf}")
-    end
+    file.print("#{@meta[:paths].length}\n")
+    @meta[:paths].each {|p| file.print("#{p}\n")}
+    file.print("0\n")
+    file.print("#{files.length}\n")
+    buf = ""
+    files.each {|f| buf << f + "\n"}
+    file.print("#{buf.length}\n#{buf}")
   end
 
   private
