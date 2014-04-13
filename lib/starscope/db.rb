@@ -38,8 +38,8 @@ class StarScope::DB
       Zlib::GzipReader.wrap(file) do |file|
         format = file.gets.to_i
         if format == DB_FORMAT
-          @meta   = Oj.load(file.gets, :symbol_keys => true)
-          @tables = Oj.load(file.gets, :symbol_keys => true)
+          @meta   = Oj.load(file.gets)
+          @tables = Oj.load(file.gets)
           return false
         elsif format <= 2
           # Old format (pre-json), so read the directories segment then rebuild
