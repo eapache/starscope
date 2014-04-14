@@ -7,7 +7,9 @@ require 'optparse'
 require 'readline'
 require 'starscope'
 
-DEFAULT_DB=".starscope.db"
+DEFAULT_DB='.starscope.db'
+DEFAULT_CTAGS='tags'
+DEFAULT_CSCOPE='cscope.out'
 
 options = {:show_progress => true,
            :read => true,
@@ -23,7 +25,7 @@ OptionParser.new do |opts|
 Usage: starscope [options] [PATHS]
 
 The default database is `#{DEFAULT_DB}` if you don't specify one with -f.
-The default behaviour is to read the database, update it, and write it back out.
+The default behaviour is to read and update the database.
 If no database exists and no PATHS are specified, StarScope builds a new
 database by recursing in the current directory.
 
@@ -81,8 +83,8 @@ END
   opts.separator <<END
 \nEXPORTING
     At the moment two export formats are supported: 'ctags' and 'cscope'. If
-    you don't specify a path, the output is written to the files 'tags' (for
-    ctags) or 'cscope.out' (for cscope) in the current directory.
+    you don't specify a path, the output is written to the files '#{DEFAULT_CTAGS}' (for
+    ctags) or '#{DEFAULT_CSCOPE}' (for cscope) in the current directory.
 END
 
 end.parse!
@@ -100,7 +102,9 @@ def run_query(db, table, value)
   end
   results = db.query(table.to_sym, value)
   if results
-    puts results.map {|rec| StarScope::Record.to_s(rec)}
+    results.sort_by {|x| x[:name].join(' ')}.each do |rec|
+      puts StarScope::Record.format(rec)
+    end
   else
     puts "No results found."
   end
@@ -160,9 +164,13 @@ if options[:export]
   format, path = options[:export].split(',', 2)
   case format
   when 'ctags'
-    db.export_ctags(path || 'tags')
+    File.open(path || DEFAULT_CTAGS, 'w') do |file|
+      db.export_ctags(file)
+    end
   when 'cscope'
-    db.export_cscope(path || 'cscope.out')
+    File.open(path || DEFAULT_CSCOPE, 'w') do |file|
+      db.export_cscope(file)
+    end
   else
     puts "Unrecognized export format"
   end

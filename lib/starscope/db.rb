@@ -27,7 +27,7 @@ class StarScope::DB
 
   def initialize(progress, verbose)
     @output = StarScope::Output.new(progress, verbose)
-    @meta = {:paths => [], :files => [], :excludes => []}
+    @meta = {:paths => [], :files => {}, :excludes => []}
     @tables = {}
   end
 
@@ -38,8 +38,8 @@ class StarScope::DB
       Zlib::GzipReader.wrap(file) do |file|
         format = file.gets.to_i
         if format == DB_FORMAT
-          @meta   = Oj.load(file.gets, :symbol_keys => true)
-          @tables = Oj.load(file.gets, :symbol_keys => true)
+          @meta   = Oj.load(file.gets)
+          @tables = Oj.load(file.gets)
           return false
         elsif format <= 2
           # Old format (pre-json), so read the directories segment then rebuild
@@ -73,9 +73,9 @@ class StarScope::DB
     paths = paths.map {|p| normalize_fnmatch(p)}
     @meta[:excludes] += paths
     @meta[:excludes].uniq!
-    @meta[:files].delete_if do |f|
-      if matches_exclude(paths, f[:name])
-        remove_file(f)
+    @meta[:files].delete_if do |name, record|
+      if matches_exclude(paths, name)
+        remove_file(name)
         true
       else
         false
@@ -97,13 +97,13 @@ class StarScope::DB
   end
 
   def update
-    new_files = (Dir.glob(@meta[:paths]).select {|f| File.file? f}) - @meta[:files].map {|f| f[:name]}
+    new_files = (Dir.glob(@meta[:paths]).select {|f| File.file? f}) - @meta[:files].keys
     new_files.delete_if {|f| matches_exclude(@meta[:excludes], f)}
     @output.new_pbar("Updating", new_files.length + @meta[:files].length)
     changed = false
-    @meta[:files].delete_if do |f|
-      @output.log("Updating `#{f[:name]}`")
-      ret = update_file(f)
+    @meta[:files].delete_if do |name, record|
+      @output.log("Updating `#{name}`")
+      ret = update_file(name)
       @output.inc_pbar
       changed = true if ret == :update
       ret == :delete
@@ -117,9 +117,9 @@ class StarScope::DB
     raise NoTableError if not @tables[table]
     puts "== Table: #{table} =="
     @tables[table].sort {|a,b|
-      a[:name][-1].downcase <=> b[:name][-1].downcase
+      a[:name][-1].to_s.downcase <=> b[:name][-1].to_s.downcase
     }.each do |record|
-      puts StarScope::Record.to_s(record)
+      puts StarScope::Record.format(record)
     end
   end
 
@@ -133,7 +133,11 @@ class StarScope::DB
     end
     raise NoTableError if not @meta[key]
     puts "== Metadata: #{key} =="
-    @meta[key].each {|x| puts x}
+    if @meta[key].is_a? Array
+      @meta[key].sort.each {|x| puts x}
+    else
+      @meta[key].sort.each {|k,v| puts "#{k}: #{v}"}
+    end
   end
 
   def dump_all
@@ -156,31 +160,29 @@ class StarScope::DB
     StarScope::Matcher.new(value, input).query()
   end
 
-  def export_ctags(filename)
-    File.open(filename, 'w') do |file|
-      file.puts <<END
-!_TAG_FILE_FORMAT	2	//
+  def export_ctags(file)
+    file.puts <<END
+!_TAG_FILE_FORMAT	2	/extended format/
 !_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
-!_TAG_PROGRAM_AUTHOR	Evan Huus //
-!_TAG_PROGRAM_NAME	Starscope //
+!_TAG_PROGRAM_AUTHOR	Evan Huus /eapache@gmail.com/
+!_TAG_PROGRAM_NAME	StarScope //
 !_TAG_PROGRAM_URL	https://github.com/eapache/starscope //
 !_TAG_PROGRAM_VERSION	#{StarScope::VERSION}	//
 END
-      defs = (@tables[:defs] || {}).sort_by {|x| x[:name][-1].to_s}
-      defs.each do |record|
-        file.puts StarScope::Record.ctag_line(record)
-      end
+    defs = (@tables[:defs] || {}).sort_by {|x| x[:name][-1].to_s}
+    defs.each do |record|
+      file.puts StarScope::Record.ctag_line(record)
     end
   end
 
   # ftp://ftp.eeng.dcu.ie/pub/ee454/cygwin/usr/share/doc/mlcscope-14.1.8/html/cscope.html
-  def export_cscope(filename)
+  def export_cscope(file)
     buf = ""
     files = []
-    db_by_line().each do |file, lines|
+    db_by_line().each do |filename, lines|
       if not lines.empty?
-        buf << "\t@#{file}\n\n"
-        files << file
+        buf << "\t@#{filename}\n\n"
+        files << filename
       end
       lines.sort.each do |line_no, records|
         line = records.first[:line].strip.gsub(/\s+/, ' ')
@@ -213,19 +215,17 @@ END
     header = "cscope 15 #{Dir.pwd} -c "
     offset = "%010d\n" % (header.length + 11 + buf.length)
 
-    File.open(filename, 'w') do |file|
-      file.print(header)
-      file.print(offset)
-      file.print(buf)
+    file.print(header)
+    file.print(offset)
+    file.print(buf)
 
-      file.print("#{@meta[:paths].length}\n")
-      @meta[:paths].each {|p| file.print("#{p}\n")}
-      file.print("0\n")
-      file.print("#{files.length}\n")
-      buf = ""
-      files.each {|f| buf << f + "\n"}
-      file.print("#{buf.length}\n#{buf}")
-    end
+    file.print("#{@meta[:paths].length}\n")
+    @meta[:paths].each {|p| file.print("#{p}\n")}
+    file.print("0\n")
+    file.print("#{files.length}\n")
+    buf = ""
+    files.each {|f| buf << f + "\n"}
+    file.print("#{buf.length}\n#{buf}")
   end
 
   private
@@ -233,9 +233,8 @@ END
   def add_new_files(files)
     files.each do |file|
       @output.log("Adding `#{file}`")
-      record = {:name => file}
-      parse_file(record)
-      @meta[:files] << record
+      @meta[:files][file] = {}
+      parse_file(file)
       @output.inc_pbar
     end
   end
@@ -282,29 +281,29 @@ END
   end
 
   def parse_file(file)
-    file[:last_updated] = File.mtime(file[:name]).to_i
+    @meta[:files][file][:last_updated] = File.mtime(file).to_i
 
     LANGS.each do |lang|
-      next if not lang.match_file file[:name]
-      lang.extract file[:name] do |tbl, name, args|
+      next if not lang.match_file file
+      lang.extract file do |tbl, name, args|
         @tables[tbl] ||= []
-        @tables[tbl] << StarScope::Record.build(file[:name], name, args)
+        @tables[tbl] << StarScope::Record.build(file, name, args)
       end
-      file[:lang] = lang.name.split('::').last.to_sym
+      @meta[:files][file][:lang] = lang.name.split('::').last.to_sym
     end
   end
 
   def remove_file(file)
     @tables.each do |name, tbl|
-      tbl.delete_if {|val| val[:file] == file[:name]}
+      tbl.delete_if {|val| val[:file] == file}
     end
   end
 
   def update_file(file)
-    if not File.exists?(file[:name]) or not File.file?(file[:name])
+    if not File.exists?(file) or not File.file?(file)
       remove_file(file)
       :delete
-    elsif file[:last_updated] < File.mtime(file[:name]).to_i
+    elsif @meta[:files][file][:last_updated] < File.mtime(file).to_i
       remove_file(file)
       parse_file(file)
       :update

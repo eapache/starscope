@@ -16,14 +16,8 @@ class StarScope::Record
     args
   end
 
-  def self.location(rec)
-    "#{rec[:file]}:#{rec[:line_no]}"
-  end
-
-  def self.to_s(rec)
-    str = ""
-    str << "#{rec[:name].join " "} -- #{location rec}"
-    str << " (#{rec[:line].strip})"
+  def self.format(rec)
+    "#{rec[:name].join " "} -- #{rec[:file]}:#{rec[:line_no]} (#{rec[:line].strip})"
   end
 
   def self.ctag_line(rec)
