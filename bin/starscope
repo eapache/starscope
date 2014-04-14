@@ -25,7 +25,7 @@ OptionParser.new do |opts|
 Usage: starscope [options] [PATHS]
 
 The default database is `#{DEFAULT_DB}` if you don't specify one with -f.
-The default behaviour is to read the database, update it, and write it back out.
+The default behaviour is to read and update the database.
 If no database exists and no PATHS are specified, StarScope builds a new
 database by recursing in the current directory.
 
