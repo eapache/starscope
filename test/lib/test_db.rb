@@ -102,7 +102,7 @@ describe StarScope::DB do
     @db.add_paths(['test/files'])
     @db.query(:calls, "abc").must_equal []
     @db.query(:defs, "xyz").must_equal []
-    @db.query(:calls, "new").length.must_equal 5
+    @db.query(:calls, "add_file").length.must_equal 3
   end
 
 end
