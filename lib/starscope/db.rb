@@ -117,7 +117,7 @@ class StarScope::DB
     raise NoTableError if not @tables[table]
     puts "== Table: #{table} =="
     @tables[table].sort {|a,b|
-      a[:name][-1].downcase <=> b[:name][-1].downcase
+      a[:name][-1].to_s.downcase <=> b[:name][-1].to_s.downcase
     }.each do |record|
       puts StarScope::Record.format(record)
     end
