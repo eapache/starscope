@@ -100,8 +100,9 @@ describe StarScope::DB do
 
   it "must correctly run queries" do
     @db.add_paths(['test/files'])
-    @db.query(:calls, "abc")
-    @db.query(:defs, "xyz")
+    @db.query(:calls, "abc").must_equal []
+    @db.query(:defs, "xyz").must_equal []
+    @db.query(:calls, "new").length.must_equal 5
   end
 
 end
