@@ -26,6 +26,10 @@ class TestRuby < Minitest::Test
     assert defs.include? :files_from_path
   end
 
+  def test_constant_defs
+    assert @db[:defs].map {|x| x[:name][-1]}.include? :PBAR_FORMAT
+  end
+
   def test_ends
     assert @db.keys.include? :end
     assert @db[:end].count == 13
