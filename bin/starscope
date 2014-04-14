@@ -102,7 +102,9 @@ def run_query(db, table, value)
   end
   results = db.query(table.to_sym, value)
   if results
-    puts results.map {|rec| StarScope::Record.format(rec)}
+    results.sort_by {|x| x[:name].join(' ')}.each do |rec|
+      puts StarScope::Record.format(rec)
+    end
   else
     puts "No results found."
   end
