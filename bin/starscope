@@ -207,29 +207,32 @@ end
 
 if options[:linemode]
   puts "Run your query as 'TABLE QUERY' or run '!help' for more information."
-  while input = Readline.readline("> ", true)
-    cmd, param = input.split(' ', 2)
-    if cmd[0] == '!'
-      case cmd[1..-1]
-      when "dump"
-        dump(db, param)
-      when "summary"
-        print_summary(db)
-      when "update"
-        changed = db.update
-        db.save(options[:write]) if options[:write] and changed
-      when "help"
-        puts linemode_help
-      when "version"
-        puts StarScope::VERSION
-      when "quit"
-        exit
+  begin
+    while input = Readline.readline("> ", true)
+      cmd, param = input.split(' ', 2)
+      if cmd[0] == '!'
+        case cmd[1..-1]
+        when "dump"
+          dump(db, param)
+        when "summary"
+          print_summary(db)
+        when "update"
+          changed = db.update
+          db.save(options[:write]) if options[:write] and changed
+        when "help"
+          puts linemode_help
+        when "version"
+          puts StarScope::VERSION
+        when "quit"
+          exit
+        else
+          puts "Unknown command: '#{input}', try '!help'."
+        end
       else
-        puts "Unknown command: '#{input}', try '!help'."
+        success = run_query(db, cmd, param)
+        puts "Try '!help'." unless success
       end
-    else
-      success = run_query(db, cmd, param)
-      puts "Try '!help'." unless success
     end
+  rescue Interrupt
   end
 end
