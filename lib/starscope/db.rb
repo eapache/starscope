@@ -185,7 +185,12 @@ END
         files << filename
       end
       lines.sort.each do |line_no, records|
-        line = records.first[:line].strip.gsub(/\s+/, ' ')
+        begin
+          line = records.first[:line].strip.gsub(/\s+/, ' ')
+        rescue ArgumentError
+          # invalid utf-8 byte sequence in the line, just do our best
+          line = records.first[:line]
+        end
         toks = {}
 
         records.each do |record|
@@ -213,7 +218,7 @@ END
     buf << "\t@\n"
 
     header = "cscope 15 #{Dir.pwd} -c "
-    offset = "%010d\n" % (header.length + 11 + buf.length)
+    offset = "%010d\n" % (header.length + 11 + buf.bytes.to_a.length)
 
     file.print(header)
     file.print(offset)
