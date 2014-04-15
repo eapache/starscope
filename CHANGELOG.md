@@ -15,6 +15,7 @@ Bug Fixes:
  * Fix golang parsing untyped "var" declarations
  * Fix golang parsing multi-line literals
  * Record assignments to ruby constants as definitions
+ * Fix exporting to cscope when scanned files contain invalid unicode
 
 Improvements:
  * Faster file-type matching
