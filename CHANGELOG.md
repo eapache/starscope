@@ -1,10 +1,17 @@
 Changelog
 =========
 
-v1.0.1 (trunk)
+v1.0.2 (trunk)
 --------------------
 
 No changes yet.
+
+v1.0.1 (2014-04-16)
+--------------------
+
+Bug Fixes:
+ * Stupid forgot-to-change-the-gemspec to actually permit installing on Ruby
+   1.8.7!
 
 v1.0.0 (2014-04-16)
 --------------------
