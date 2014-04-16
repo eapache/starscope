@@ -83,7 +83,7 @@ END
   opts.separator <<END
 \nEXPORTING
     At the moment two export formats are supported: 'ctags' and 'cscope'. If
-    you don't specify a path, the output is written to the files '#{DEFAULT_CTAGS}' (for
+    you don't specify a path, the output is written to the file '#{DEFAULT_CTAGS}' (for
     ctags) or '#{DEFAULT_CSCOPE}' (for cscope) in the current directory.
 END
 
