@@ -4,7 +4,8 @@ Changelog
 v1.0.2 (trunk)
 --------------------
 
-No changes yet.
+Misc:
+ * A few trivial tweaks and optimizations.
 
 v1.0.1 (2014-04-16)
 --------------------

@@ -218,7 +218,7 @@ END
     buf << "\t@\n"
 
     header = "cscope 15 #{Dir.pwd} -c "
-    offset = "%010d\n" % (header.length + 11 + buf.bytes.to_a.length)
+    offset = "%010d\n" % (header.length + 11 + buf.bytes.count)
 
     file.print(header)
     file.print(offset)
