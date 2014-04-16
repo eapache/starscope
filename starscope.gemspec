@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.test_files    = `git ls-files -- test/*`.split("\n")
   gem.require_paths = ["lib"]
-  gem.required_ruby_version = '>= 1.9.3'
+  gem.required_ruby_version = '>= 1.8.7'
 
   gem.add_dependency 'oj', '~> 2.7'
   gem.add_dependency 'parser', '~> 2.1'
