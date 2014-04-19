@@ -227,7 +227,7 @@ if options[:linemode]
           print_summary(db)
         when "update"
           changed = db.update
-          db.save(options[:write]) if options[:write] and changed
+          db.save(options[:db]) if options[:write] and changed
         when "help"
           puts linemode_help
         when "version"

@@ -4,6 +4,9 @@ Changelog
 v1.0.2 (trunk)
 --------------------
 
+Bug Fixes:
+ * Fix db updates from line mode.
+
 Misc:
  * A few trivial tweaks and optimizations.
  * Permit exporting from line mode.
