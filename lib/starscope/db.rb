@@ -8,13 +8,11 @@ require 'starscope/record'
 
 require 'starscope/langs/coffeescript'
 require 'starscope/langs/go'
-require 'starscope/langs/lua'
 require 'starscope/langs/ruby'
 
 LANGS = [
   StarScope::Lang::CoffeeScript,
   StarScope::Lang::Go,
-  StarScope::Lang::Lua,
   StarScope::Lang::Ruby
 ]
 
