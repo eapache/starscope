@@ -128,6 +128,22 @@ rescue StarScope::DB::NoTableError
   return false
 end
 
+def export(db, param)
+  format, path = param.split(',', 2)
+  case format
+  when 'ctags'
+    File.open(path || DEFAULT_CTAGS, 'w') do |file|
+      db.export_ctags(file)
+    end
+  when 'cscope'
+    File.open(path || DEFAULT_CSCOPE, 'w') do |file|
+      db.export_cscope(file)
+    end
+  else
+    puts "Unrecognized export format"
+  end
+end
+
 db = StarScope::DB.new(options[:show_progress], options[:verbose])
 
 db_exists = File.exists?(options[:db])
@@ -160,21 +176,7 @@ new_data ||= updated
 
 db.save(options[:db]) if options[:write] and (new_data or not db_exists)
 
-if options[:export]
-  format, path = options[:export].split(',', 2)
-  case format
-  when 'ctags'
-    File.open(path || DEFAULT_CTAGS, 'w') do |file|
-      db.export_ctags(file)
-    end
-  when 'cscope'
-    File.open(path || DEFAULT_CSCOPE, 'w') do |file|
-      db.export_cscope(file)
-    end
-  else
-    puts "Unrecognized export format"
-  end
-end
+export(db, options[:export]) if options[:export]
 
 if options[:query]
   table, query = options[:query].split(',', 2)
@@ -196,6 +198,7 @@ def linemode_help
 Input can be a query of the form 'TABLE QUERY' or a special command starting
 with a '!'. Recognized special commands are:
   !dump [TABLE]
+  !export FORMAT[,PATH]
   !summary
   !update
 
@@ -214,6 +217,12 @@ if options[:linemode]
         case cmd[1..-1]
         when "dump"
           dump(db, param)
+        when "export"
+          if param
+            export(db, param)
+          else
+            puts "!export requires an argument"
+          end
         when "summary"
           print_summary(db)
         when "update"

@@ -6,6 +6,7 @@ v1.0.2 (trunk)
 
 Misc:
  * A few trivial tweaks and optimizations.
+ * Permit exporting from line mode.
 
 v1.0.1 (2014-04-16)
 --------------------
