@@ -25,7 +25,8 @@ class StarScope::DB
 
   def initialize(progress, verbose)
     @output = StarScope::Output.new(progress, verbose)
-    @meta = {:paths => [], :files => {}, :excludes => []}
+    @meta = {:paths => [], :files => {}, :excludes => [],
+             :version => StarScope::VERSION}
     @tables = {}
   end
 
@@ -57,6 +58,10 @@ class StarScope::DB
 
   def save(file)
     @output.log("Writing database to `#{file}`...")
+
+    # regardless of what the old version was, the new version is written by us
+    @meta[:version] = StarScope::VERSION
+
     File.open(file, 'w') do |file|
       Zlib::GzipWriter.wrap(file) do |file|
         file.puts DB_FORMAT
@@ -125,7 +130,12 @@ class StarScope::DB
     if key == :meta
       puts "== Metadata Summary =="
       @meta.each do |k, v|
-        puts "#{k}: #{v.count}"
+        print "#{k}: "
+        if [Array, Hash].include? v.class
+          puts v.count
+        else
+          puts v
+        end
       end
       return
     end
@@ -133,8 +143,10 @@ class StarScope::DB
     puts "== Metadata: #{key} =="
     if @meta[key].is_a? Array
       @meta[key].sort.each {|x| puts x}
-    else
+    elsif @meta[key].is_a? Hash
       @meta[key].sort.each {|k,v| puts "#{k}: #{v}"}
+    else
+      puts @meta[key]
     end
   end
 

@@ -10,6 +10,8 @@ Bug Fixes:
 
 Misc:
  * A few trivial tweaks and optimizations.
+ * Store the application version in the db metadata for more fine-grained
+   forwards-compatibility.
  * Permit exporting from line mode.
 
 v1.0.1 (2014-04-16)
