@@ -103,7 +103,7 @@ class StarScope::DB
       @output.log("Updating `#{name}`")
       ret = update_file(name)
       @output.inc_pbar
-      changed = true if ret == :update
+      changed = true if ret
       ret == :delete
     end
     add_new_files(new_files)

@@ -5,7 +5,8 @@ v1.0.2 (trunk)
 --------------------
 
 Bug Fixes:
- * Fix db updates from line mode.
+ * Fix an exception when updating the db from line mode.
+ * Make sure to mark the db as changed when a source file has been deleted
 
 Misc:
  * A few trivial tweaks and optimizations.
