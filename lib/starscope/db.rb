@@ -190,10 +190,11 @@ END
     buf = ""
     files = []
     db_by_line().each do |filename, lines|
-      if not lines.empty?
-        buf << "\t@#{filename}\n\n"
-        files << filename
-      end
+      next if lines.empty?
+
+      buf << "\t@#{filename}\n\n"
+      files << filename
+
       lines.sort.each do |line_no, records|
         begin
           line = records.first[:line].strip.gsub(/\s+/, ' ')
@@ -201,25 +202,25 @@ END
           # invalid utf-8 byte sequence in the line, just do our best
           line = records.first[:line]
         end
-        toks = {}
 
+        toks = {}
         records.each do |record|
-          index = line.index(record[:name][-1].to_s)
+          key = record[:name][-1].to_s
+          index = line.index(key)
           while index
             toks[index] = record
-            index = line.index(record[:name][-1].to_s, index + 1)
+            index = line.index(key, index + 1)
           end
         end
-
         next if toks.empty?
 
         prev = 0
         buf << line_no.to_s << " "
-        toks.sort().each do |offset, record|
+        toks.sort.each do |offset, record|
+          key = record[:name][-1].to_s
           buf << line.slice(prev...offset) << "\n"
-          buf << StarScope::Record.cscope_mark(record[:tbl], record)
-          buf << record[:name][-1].to_s << "\n"
-          prev = offset + record[:name][-1].to_s.length
+          buf << StarScope::Record.cscope_mark(record[:tbl], record) << key << "\n"
+          prev = offset + key.length
         end
         buf << line.slice(prev..-1) << "\n\n"
       end
