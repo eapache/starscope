@@ -35,19 +35,19 @@ class StarScope::DB
     @output.log("Reading database from `#{file}`... ")
     File.open(file, 'r') do |file|
       Zlib::GzipReader.wrap(file) do |file|
-        format = file.gets.to_i
-        if format == DB_FORMAT
+        case file.gets.to_i
+        when DB_FORMAT
           @meta   = Oj.load(file.gets)
           @tables = Oj.load(file.gets)
           return false
-        elsif format <= 2
+        when 3..4
+          # Old format, so read the directories segment then rebuild
+          add_paths(Oj.load(file.gets))
+          return true
+        when 0..2
           # Old format (pre-json), so read the directories segment then rebuild
           len = file.gets.to_i
           add_paths(Marshal::load(file.read(len)))
-          return true
-        elsif format <= 4
-          # Old format, so read the directories segment then rebuild
-          add_paths(Oj.load(file.gets))
           return true
         else
           raise UnknownDBFormatError
