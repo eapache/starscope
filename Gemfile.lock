@@ -22,7 +22,6 @@ GEM
       method_source (~> 0.8)
       slop (~> 3.4)
     rake (10.3.2)
-    ruby-prof (0.15.1)
     ruby-progressbar (1.5.1)
     slop (3.5.0)
 
@@ -34,5 +33,4 @@ DEPENDENCIES
   minitest
   pry
   rake
-  ruby-prof
   starscope!
