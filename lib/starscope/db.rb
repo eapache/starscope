@@ -35,19 +35,19 @@ class StarScope::DB
     @output.log("Reading database from `#{file}`... ")
     File.open(file, 'r') do |file|
       Zlib::GzipReader.wrap(file) do |file|
-        format = file.gets.to_i
-        if format == DB_FORMAT
+        case file.gets.to_i
+        when DB_FORMAT
           @meta   = Oj.load(file.gets)
           @tables = Oj.load(file.gets)
           return false
-        elsif format <= 2
+        when 3..4
+          # Old format, so read the directories segment then rebuild
+          add_paths(Oj.load(file.gets))
+          return true
+        when 0..2
           # Old format (pre-json), so read the directories segment then rebuild
           len = file.gets.to_i
           add_paths(Marshal::load(file.read(len)))
-          return true
-        elsif format <= 4
-          # Old format, so read the directories segment then rebuild
-          add_paths(Oj.load(file.gets))
           return true
         else
           raise UnknownDBFormatError
@@ -190,10 +190,11 @@ END
     buf = ""
     files = []
     db_by_line().each do |filename, lines|
-      if not lines.empty?
-        buf << "\t@#{filename}\n\n"
-        files << filename
-      end
+      next if lines.empty?
+
+      buf << "\t@#{filename}\n\n"
+      files << filename
+
       lines.sort.each do |line_no, records|
         begin
           line = records.first[:line].strip.gsub(/\s+/, ' ')
@@ -201,25 +202,25 @@ END
           # invalid utf-8 byte sequence in the line, just do our best
           line = records.first[:line]
         end
-        toks = {}
 
+        toks = {}
         records.each do |record|
-          index = line.index(record[:name][-1].to_s)
+          key = record[:name][-1].to_s
+          index = line.index(key)
           while index
             toks[index] = record
-            index = line.index(record[:name][-1].to_s, index + 1)
+            index = line.index(key, index + 1)
           end
         end
-
         next if toks.empty?
 
         prev = 0
         buf << line_no.to_s << " "
-        toks.sort().each do |offset, record|
+        toks.sort.each do |offset, record|
+          key = record[:name][-1].to_s
           buf << line.slice(prev...offset) << "\n"
-          buf << StarScope::Record.cscope_mark(record[:tbl], record)
-          buf << record[:name][-1].to_s << "\n"
-          prev = offset + record[:name][-1].to_s.length
+          buf << StarScope::Record.cscope_mark(record[:tbl], record) << key << "\n"
+          prev = offset + key.length
         end
         buf << line.slice(prev..-1) << "\n\n"
       end
