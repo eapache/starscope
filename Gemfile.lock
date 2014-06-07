@@ -2,9 +2,9 @@ PATH
   remote: .
   specs:
     starscope (1.0.3)
-      oj (~> 2.7)
+      oj (~> 2.9)
       parser (~> 2.1)
-      ruby-progressbar (~> 1.4)
+      ruby-progressbar (~> 1.5)
 
 GEM
   remote: https://rubygems.org/
@@ -12,8 +12,8 @@ GEM
     ast (2.0.0)
     coderay (1.1.0)
     method_source (0.8.2)
-    minitest (5.3.3)
-    oj (2.9.0)
+    minitest (5.3.4)
+    oj (2.9.4)
     parser (2.1.9)
       ast (>= 1.1, < 3.0)
       slop (~> 3.4, >= 3.4.5)
@@ -21,8 +21,8 @@ GEM
       coderay (~> 1.0)
       method_source (~> 0.8)
       slop (~> 3.4)
-    rake (10.3.1)
-    ruby-progressbar (1.4.2)
+    rake (10.3.2)
+    ruby-progressbar (1.5.1)
     slop (3.5.0)
 
 PLATFORMS
