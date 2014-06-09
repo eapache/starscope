@@ -1,5 +1,8 @@
 class StarScope::Record
 
+  @@cachedFile = nil
+  @@cachedLines = nil
+
   def self.build(file, name, args)
     args[:file] = file
 
@@ -10,7 +13,12 @@ class StarScope::Record
     end
 
     if args[:line_no]
-      args[:line] = File.readlines(file)[args[:line_no]-1].chomp
+      if @@cachedFile != file
+        @@cachedFile = file
+        @@cachedLines = File.readlines(file)
+      end
+
+      args[:line] = @@cachedLines[args[:line_no]-1].chomp
     end
 
     args

@@ -4,7 +4,11 @@ Changelog
 v1.0.3 (trunk)
 --------------------
 
-No changes yet.
+Misc:
+ * Code cleanup.
+
+Improvements:
+ * Small optimization to extracting lines from parsed files.
 
 v1.0.2 (2014-04-19)
 --------------------

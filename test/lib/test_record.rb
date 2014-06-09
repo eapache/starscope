@@ -13,8 +13,23 @@ describe StarScope::Record do
   end
 
   it "must read correct line from file" do
+
+    # we interleave the files here to test the cache
+
     rec = StarScope::Record.build(GOLANG_SAMPLE, :a, {:line_no => 1})
     rec[:line].must_equal "package main"
+
+    rec = StarScope::Record.build(GOLANG_SAMPLE, :a, {:line_no => 62})
+    rec[:line].must_equal "\tfmt.Println(t)"
+
+    rec = StarScope::Record.build(RUBY_SAMPLE, :a, {:line_no => 1})
+    rec[:line].must_equal "require 'date'"
+
+    rec = StarScope::Record.build(RUBY_SAMPLE, :a, {:line_no => 163})
+    rec[:line].must_equal "end"
+
+    rec = StarScope::Record.build(GOLANG_SAMPLE, :a, {:line_no => 63})
+    rec[:line].must_equal "}"
   end
 
 end
