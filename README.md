@@ -35,6 +35,8 @@ $ starscope -e ctags
 $ starscope -e cscope
 ```
 
+More flags and options are available, run `starscope --help` for the complete list.
+
 Other Uses
 ----------
 
