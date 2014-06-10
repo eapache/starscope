@@ -1,7 +1,12 @@
 Changelog
 =========
 
-v1.0.3 (trunk)
+v1.0.4 (trunk)
+--------------------
+
+No changes yet.
+
+v1.0.3 (2014-06-10)
 --------------------
 
 Improvements:
