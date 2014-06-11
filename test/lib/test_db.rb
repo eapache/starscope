@@ -17,6 +17,8 @@ describe StarScope::DB do
     assert defs.include? :load
     assert defs.include? :update
     assert defs.include? :files_from_path
+    assert defs.include? :single_var
+    assert defs.include? :single_const
   end
 
   before do
@@ -37,7 +39,13 @@ describe StarScope::DB do
   it "must add excludes" do
     paths = [GOLANG_SAMPLE, 'test/files/**/*']
     @db.add_paths(paths)
-    @db.add_excludes(paths)
+    @db.add_excludes(['test/files/**'])
+    files = @db.instance_eval('@meta[:files]').keys
+    files.wont_include RUBY_SAMPLE
+    files.wont_include GOLANG_SAMPLE
+    tbls = @db.instance_eval('@tables')
+    tbls[:defs].must_be_empty
+    tbls[:end].must_be_empty
   end
 
   it "must pick up new files in old paths" do
@@ -47,17 +55,18 @@ describe StarScope::DB do
   end
 
   it "must remove old files in existing paths" do
-    @db.instance_eval('@meta[:paths] = ["test/files"]')
+    @db.instance_eval('@meta[:paths] = ["test/files/**/*"]')
     @db.instance_eval('@meta[:files] = {"test/files/foo" => {:last_updated=>1}}')
     @db.update
     @db.instance_eval('@meta[:files]').keys.wont_include 'test/files/foo'
   end
 
   it "must update stale existing files" do
-    @db.instance_eval('@meta[:paths] = ["test/files"]')
+    @db.instance_eval('@meta[:paths] = ["test/files/**/*"]')
     @db.instance_eval("@meta[:files] = {\"#{GOLANG_SAMPLE}\" => {:last_updated=>1}}")
-    @db.instance_eval('@tables[:defs] = [{:file => "test/files"}]')
+    @db.instance_eval("@tables[:defs] = [{:file => \"#{GOLANG_SAMPLE}\"}]")
     @db.update
+    validate(@db)
   end
 
   it "must load an old DB file" do
