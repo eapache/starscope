@@ -76,14 +76,14 @@ class StarScope::DB
     paths = paths.map {|p| normalize_fnmatch(p)}
     @meta[:excludes] += paths
     @meta[:excludes].uniq!
+
+    deleted = []
     @meta[:files].delete_if do |name, record|
-      if matches_exclude(paths, name)
-        remove_file(name)
-        true
-      else
-        false
-      end
+      ret = matches_exclude(paths, name)
+      deleted << name if ret
+      ret
     end
+    remove_files(deleted)
   end
 
   def add_paths(paths)
@@ -102,15 +102,30 @@ class StarScope::DB
   def update
     new_files = (Dir.glob(@meta[:paths]).select {|f| File.file? f}) - @meta[:files].keys
     new_files.delete_if {|f| matches_exclude(@meta[:excludes], f)}
+
     @output.new_pbar("Updating", new_files.length + @meta[:files].length)
     changed = false
+    @tables, tmp_tbls = {}, @tables
+    to_prune = []
+
     @meta[:files].delete_if do |name, record|
       @output.log("Updating `#{name}`")
-      ret = update_file(name)
+
+      event = file_event(name, record)
+      if event != :unchanged
+        to_prune << name
+        changed = true
+        parse_file(name) if event == :modified
+      end
+
       @output.inc_pbar
-      changed = true if ret
-      ret == :delete
+      event == :deleted
     end
+
+    @tables, tmp_tbls = tmp_tbls, @tables
+    remove_files(to_prune)
+    merge_db(tmp_tbls)
+
     add_new_files(new_files)
     @output.finish_pbar
     changed || !new_files.empty?
@@ -309,20 +324,27 @@ END
     end
   end
 
-  def remove_file(file)
-    @tables.each do |name, tbl|
-      tbl.delete_if {|val| val[:file] == file}
+  def merge_db(new_tbls)
+    new_tbls.each do |name, tbl|
+      @tables[name] ||= []
+      @tables[name].concat(tbl)
     end
   end
 
-  def update_file(file)
-    if not File.exists?(file) or not File.file?(file)
-      remove_file(file)
-      :delete
-    elsif @meta[:files][file][:last_updated] < File.mtime(file).to_i
-      remove_file(file)
-      parse_file(file)
-      :update
+  def remove_files(files)
+    check = Hash[files.map {|f| [f, true]}]
+    @tables.each do |name, tbl|
+      tbl.delete_if {|val| check[val[:file]]}
+    end
+  end
+
+  def file_event(name, record)
+    if not File.exists?(name) or not File.file?(name)
+      :deleted
+    elsif record[:last_updated] < File.mtime(name).to_i
+      :modified
+    else
+      :unchanged
     end
   end
 

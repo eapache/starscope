@@ -17,6 +17,8 @@ describe StarScope::DB do
     assert defs.include? :load
     assert defs.include? :update
     assert defs.include? :files_from_path
+    assert defs.include? :single_var
+    assert defs.include? :single_const
   end
 
   before do
@@ -27,34 +29,53 @@ describe StarScope::DB do
     proc {@db.dump_table(:foo)}.must_raise StarScope::DB::NoTableError
   end
 
-  it "must correctly add paths" do
+  it "must add paths" do
     paths = [GOLANG_SAMPLE, 'test/files/**/*']
     @db.add_paths(paths)
     @db.instance_eval('@meta[:paths]').must_equal paths
     validate(@db)
   end
 
-  it "must correctly pick up new files in old paths" do
+  it "must add excludes" do
+    paths = [GOLANG_SAMPLE, 'test/files/**/*']
+    @db.add_paths(paths)
+    @db.add_excludes(['test/files/**'])
+    files = @db.instance_eval('@meta[:files]').keys
+    files.wont_include RUBY_SAMPLE
+    files.wont_include GOLANG_SAMPLE
+    tbls = @db.instance_eval('@tables')
+    tbls[:defs].must_be_empty
+    tbls[:end].must_be_empty
+  end
+
+  it "must pick up new files in old paths" do
     @db.instance_eval('@meta[:paths] = ["test/files/**/*"]')
     @db.update
     validate(@db)
   end
 
-  it "must correctly remove old files in existing paths" do
-    @db.instance_eval('@meta[:paths] = ["test/files"]')
-    @db.instance_eval('@meta[:files] = {"test/files/foo" => {:last_update=>1}}')
-    @db.instance_eval('@meta[:files]').keys.must_include 'test/files/foo'
+  it "must remove old files in existing paths" do
+    @db.instance_eval('@meta[:paths] = ["test/files/**/*"]')
+    @db.instance_eval('@meta[:files] = {"test/files/foo" => {:last_updated=>1}}')
     @db.update
     @db.instance_eval('@meta[:files]').keys.wont_include 'test/files/foo'
   end
 
-  it "must correctly load an old DB file" do
+  it "must update stale existing files" do
+    @db.instance_eval('@meta[:paths] = ["test/files/**/*"]')
+    @db.instance_eval("@meta[:files] = {\"#{GOLANG_SAMPLE}\" => {:last_updated=>1}}")
+    @db.instance_eval("@tables[:defs] = [{:file => \"#{GOLANG_SAMPLE}\"}]")
+    @db.update
+    validate(@db)
+  end
+
+  it "must load an old DB file" do
     @db.load('test/files/db_old.json.gz')
     @db.instance_eval('@meta[:paths]').must_equal ['test/files/**/*']
     validate(@db)
   end
 
-  it "must correctly round-trip a database" do
+  it "must round-trip a database" do
     file = Tempfile.new('starscope_test')
     begin
       @db.add_paths(['test/files'])
@@ -68,7 +89,7 @@ describe StarScope::DB do
     end
   end
 
-  it "must correctly export to ctags" do
+  it "must export to ctags" do
     file = Tempfile.new('starscope_test')
     begin
       @db.add_paths(['test/files'])
@@ -82,7 +103,7 @@ describe StarScope::DB do
     end
   end
 
-  it "must correctly export to cscope" do
+  it "must export to cscope" do
     file = Tempfile.new('starscope_test')
     begin
       @db.add_paths(['test/files'])
@@ -98,7 +119,7 @@ describe StarScope::DB do
     end
   end
 
-  it "must correctly run queries" do
+  it "must run queries" do
     @db.add_paths(['test/files'])
     @db.query(:calls, "abc").must_equal []
     @db.query(:defs, "xyz").must_equal []
