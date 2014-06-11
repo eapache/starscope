@@ -4,7 +4,8 @@ Changelog
 v1.0.5 (trunk)
 --------------------
 
-No changes yet.
+Misc:
+ * Give some feedback when exporting, the silence was unnerving.
 
 v1.0.4 (2014-06-10)
 --------------------

@@ -130,18 +130,23 @@ end
 
 def export(db, param)
   format, path = param.split(',', 2)
+
   case format
-  when 'ctags'
-    File.open(path || DEFAULT_CTAGS, 'w') do |file|
-      db.export_ctags(file)
-    end
-  when 'cscope'
-    File.open(path || DEFAULT_CSCOPE, 'w') do |file|
-      db.export_cscope(file)
-    end
+  when 'ctags'; path ||= DEFAULT_CTAGS
+  when 'cscope'; path ||= DEFAULT_CSCOPE
   else
     puts "Unrecognized export format"
+    return
   end
+
+  print "Exporting to '#{path}' in format '#{format}'... "
+  File.open(path, 'w') do |file|
+    case format
+    when 'ctags'; db.export_ctags(file)
+    when 'cscope'; db.export_cscope(file)
+    end
+  end
+  puts "done"
 end
 
 db = StarScope::DB.new(options[:show_progress], options[:verbose])
