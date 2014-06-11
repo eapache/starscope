@@ -78,7 +78,7 @@ class StarScope::DB
     @meta[:excludes].uniq!
 
     deleted = []
-    @meta[:files].delete_if do |name|
+    @meta[:files].delete_if do |name, record|
       ret = matches_exclude(paths, name)
       deleted << name if ret
       ret
