@@ -6,6 +6,8 @@ v1.1.0 (trunk)
 
 Misc:
  * Give some feedback when exporting, the silence was unnerving.
+ * Dynamically load language extractors, so new ones can be dropped in with no
+   other code changes.
 
 v1.0.4 (2014-06-10)
 --------------------
