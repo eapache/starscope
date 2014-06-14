@@ -6,15 +6,12 @@ require 'starscope/matcher'
 require 'starscope/output'
 require 'starscope/record'
 
-require 'starscope/langs/coffeescript'
-require 'starscope/langs/go'
-require 'starscope/langs/ruby'
-
-LANGS = [
-  StarScope::Lang::CoffeeScript,
-  StarScope::Lang::Go,
-  StarScope::Lang::Ruby
-]
+LANGS = []
+Dir.glob("#{File.dirname(__FILE__)}/langs/*.rb").each do |path|
+  require path
+  lang = /(\w+)\.rb$/.match(path)[1]
+  LANGS << eval("StarScope::Lang::#{lang.capitalize}")
+end
 
 class StarScope::DB
 
