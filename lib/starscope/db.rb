@@ -20,8 +20,8 @@ class StarScope::DB
   class NoTableError < StandardError; end
   class UnknownDBFormatError < StandardError; end
 
-  def initialize(progress, verbose)
-    @output = StarScope::Output.new(progress, verbose)
+  def initialize(output_level)
+    @output = StarScope::Output.new(output_level)
     @meta = {:paths => [], :files => {}, :excludes => [],
              :version => StarScope::VERSION}
     @tables = {}
@@ -69,6 +69,7 @@ class StarScope::DB
   end
 
   def add_excludes(paths)
+    @output.log("Excluding files in paths #{paths}...")
     @meta[:paths] -= paths.map {|p| normalize_glob(p)}
     paths = paths.map {|p| normalize_fnmatch(p)}
     @meta[:excludes] += paths
@@ -84,6 +85,7 @@ class StarScope::DB
   end
 
   def add_paths(paths)
+    @output.log("Adding files in paths #{paths}...")
     @meta[:excludes] -= paths.map {|p| normalize_fnmatch(p)}
     paths = paths.map {|p| normalize_glob(p)}
     @meta[:paths] += paths
@@ -130,7 +132,10 @@ class StarScope::DB
 
   def dump_table(table)
     raise NoTableError if not @tables[table]
+
     puts "== Table: #{table} =="
+    puts "No records" if @tables[table].empty?
+
     @tables[table].sort {|a,b|
       a[:name][-1].to_s.downcase <=> b[:name][-1].to_s.downcase
     }.each do |record|

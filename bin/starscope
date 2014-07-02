@@ -11,11 +11,10 @@ DEFAULT_DB='.starscope.db'
 DEFAULT_CTAGS='tags'
 DEFAULT_CSCOPE='cscope.out'
 
-options = {:show_progress => true,
-           :read => true,
+options = {:read => true,
            :write => true,
            :update => true,
-           :verbose => false,
+           :output => :normal,
            :db => DEFAULT_DB
 }
 
@@ -73,11 +72,19 @@ END
     puts StarScope::VERSION
     exit
   end
-  opts.on("--verbose", "Print extra details") do
-    options[:verbose] = true
+  opts.on("--verbose", "Print extra status messages") do
+    if options[:output] == :quiet
+      $stderr.puts "Can't be both verbose and quiet"
+      exit(1)
+    end
+    options[:output] = :verbose
   end
-  opts.on("--no-progress", "Don't show progress-bar when updating DB") do
-    options[:show_progress] = false
+  opts.on("--quiet", "Print fewer messages") do
+    if options[:output] == :verbose
+      $stderr.puts "Can't be both verbose and quiet"
+      exit(1)
+    end
+    options[:output] = :quiet
   end
 
   opts.separator <<END
@@ -90,7 +97,9 @@ END
 end.parse!
 
 def print_summary(db)
-  db.summary.each do |name, count|
+  summary = db.summary
+  puts "No tables" if summary.empty?
+  summary.each do |name, count|
     printf("%-8s %5d records\n", name, count)
   end
 end
@@ -101,12 +110,12 @@ def run_query(db, table, value)
     return false
   end
   results = db.query(table.to_sym, value)
-  if results
+  if !results || results.empty?
+    puts "No results found."
+  else
     results.sort_by {|x| x[:name].join(' ')}.each do |rec|
       puts StarScope::Record.format(rec)
     end
-  else
-    puts "No results found."
   end
   return true
 rescue StarScope::DB::NoTableError
@@ -128,28 +137,28 @@ rescue StarScope::DB::NoTableError
   return false
 end
 
-def export(db, param)
+def export(db, param, output)
   format, path = param.split(',', 2)
 
   case format
   when 'ctags'; path ||= DEFAULT_CTAGS
   when 'cscope'; path ||= DEFAULT_CSCOPE
   else
-    puts "Unrecognized export format"
+    $stderr.puts "Unrecognized export format \"#{format}\""
     return
   end
 
-  print "Exporting to '#{path}' in format '#{format}'... "
+  print "Exporting to '#{path}' in format '#{format}'... " unless output == :quiet
   File.open(path, 'w') do |file|
     case format
     when 'ctags'; db.export_ctags(file)
     when 'cscope'; db.export_cscope(file)
     end
   end
-  puts "done"
+  puts "done" unless output == :quiet
 end
 
-db = StarScope::DB.new(options[:show_progress], options[:verbose])
+db = StarScope::DB.new(options[:output])
 
 db_exists = File.exists?(options[:db])
 
@@ -181,7 +190,7 @@ new_data ||= updated
 
 db.save(options[:db]) if options[:write] and (new_data or not db_exists)
 
-export(db, options[:export]) if options[:export]
+export(db, options[:export], options[:output]) if options[:export]
 
 if options[:query]
   table, query = options[:query].split(',', 2)
@@ -224,7 +233,7 @@ if options[:linemode]
           dump(db, param)
         when "export"
           if param
-            export(db, param)
+            export(db, param, :normal)
           else
             puts "!export requires an argument"
           end

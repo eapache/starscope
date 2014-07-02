@@ -2,7 +2,7 @@ require File.expand_path('../../test_helper', __FILE__)
 
 class TestStarScope < Minitest::Test
 
-  EXEC = 'bundle exec bin/starscope --no-read --no-write --no-progress ./test/files/'
+  EXEC = 'bundle exec bin/starscope --no-read --no-write --quiet ./test/files/'
 
   def test_help
     `#{EXEC} -h`.each_line do |line|
