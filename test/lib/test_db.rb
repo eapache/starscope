@@ -22,7 +22,7 @@ describe StarScope::DB do
   end
 
   before do
-    @db = StarScope::DB.new(false, false)
+    @db = StarScope::DB.new(:quiet)
   end
 
   it "must raise on invalid tables" do
@@ -80,7 +80,7 @@ describe StarScope::DB do
     begin
       @db.add_paths(['test/files'])
       @db.save(file.path)
-      tmp = StarScope::DB.new(false, false)
+      tmp = StarScope::DB.new(:quiet)
       tmp.load(file.path)
       validate(tmp)
     ensure

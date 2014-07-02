@@ -11,11 +11,10 @@ DEFAULT_DB='.starscope.db'
 DEFAULT_CTAGS='tags'
 DEFAULT_CSCOPE='cscope.out'
 
-options = {:show_progress => true,
-           :read => true,
+options = {:read => true,
            :write => true,
            :update => true,
-           :verbose => false,
+           :output => :normal,
            :db => DEFAULT_DB
 }
 
@@ -73,11 +72,19 @@ END
     puts StarScope::VERSION
     exit
   end
-  opts.on("--verbose", "Print extra details") do
-    options[:verbose] = true
+  opts.on("--verbose", "Print extra status messages") do
+    if options[:output] == :quiet
+      $stderr.puts "Can't be both verbose and quiet"
+      exit(1)
+    end
+    options[:output] = :verbose
   end
-  opts.on("--no-progress", "Don't show progress-bar when updating DB") do
-    options[:show_progress] = false
+  opts.on("--quiet", "Print fewer messages") do
+    if options[:output] == :verbose
+      $stderr.puts "Can't be both verbose and quiet"
+      exit(1)
+    end
+    options[:output] = :quiet
   end
 
   opts.separator <<END
@@ -149,7 +156,7 @@ def export(db, param)
   puts "done"
 end
 
-db = StarScope::DB.new(options[:show_progress], options[:verbose])
+db = StarScope::DB.new(options[:output])
 
 db_exists = File.exists?(options[:db])
 
