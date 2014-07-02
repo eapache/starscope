@@ -130,7 +130,10 @@ class StarScope::DB
 
   def dump_table(table)
     raise NoTableError if not @tables[table]
+
     puts "== Table: #{table} =="
+    puts "No records" if @tables[table].empty?
+
     @tables[table].sort {|a,b|
       a[:name][-1].to_s.downcase <=> b[:name][-1].to_s.downcase
     }.each do |record|
