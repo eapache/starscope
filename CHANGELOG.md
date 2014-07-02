@@ -5,7 +5,8 @@ v1.1.0 (trunk)
 --------------------
 
 Misc:
- * Give some feedback when exporting, the silence was unnerving.
+ * Rename --no-progress to --quiet, and make sure all operations provide some
+   indication of success/failure except when quieted.
  * Dynamically load language extractors, so new ones can be dropped in with no
    other code changes.
 
