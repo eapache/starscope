@@ -69,6 +69,7 @@ class StarScope::DB
   end
 
   def add_excludes(paths)
+    @output.log("Excluding files in paths #{paths}...")
     @meta[:paths] -= paths.map {|p| normalize_glob(p)}
     paths = paths.map {|p| normalize_fnmatch(p)}
     @meta[:excludes] += paths
@@ -84,6 +85,7 @@ class StarScope::DB
   end
 
   def add_paths(paths)
+    @output.log("Adding files in paths #{paths}...")
     @meta[:excludes] -= paths.map {|p| normalize_fnmatch(p)}
     paths = paths.map {|p| normalize_glob(p)}
     @meta[:paths] += paths
