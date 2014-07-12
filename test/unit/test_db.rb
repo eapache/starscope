@@ -30,16 +30,16 @@ describe StarScope::DB do
   end
 
   it "must add paths" do
-    paths = [GOLANG_SAMPLE, 'test/files/**/*']
+    paths = [GOLANG_SAMPLE, "#{FIXTURES}/**/*"]
     @db.add_paths(paths)
     @db.instance_eval('@meta[:paths]').must_equal paths
     validate(@db)
   end
 
   it "must add excludes" do
-    paths = [GOLANG_SAMPLE, 'test/files/**/*']
+    paths = [GOLANG_SAMPLE, "#{FIXTURES}/**/*"]
     @db.add_paths(paths)
-    @db.add_excludes(['test/files/**'])
+    @db.add_excludes(["#{FIXTURES}/**"])
     files = @db.instance_eval('@meta[:files]').keys
     files.wont_include RUBY_SAMPLE
     files.wont_include GOLANG_SAMPLE
@@ -49,20 +49,20 @@ describe StarScope::DB do
   end
 
   it "must pick up new files in old paths" do
-    @db.instance_eval('@meta[:paths] = ["test/files/**/*"]')
+    @db.instance_eval("@meta[:paths] = [\"#{FIXTURES}/**/*\"]")
     @db.update
     validate(@db)
   end
 
   it "must remove old files in existing paths" do
-    @db.instance_eval('@meta[:paths] = ["test/files/**/*"]')
-    @db.instance_eval('@meta[:files] = {"test/files/foo" => {:last_updated=>1}}')
+    @db.instance_eval("@meta[:paths] = [\"#{FIXTURES}/**/*\"]")
+    @db.instance_eval("@meta[:files] = {\"#{FIXTURES}/foo\" => {:last_updated=>1}}")
     @db.update
-    @db.instance_eval('@meta[:files]').keys.wont_include 'test/files/foo'
+    @db.instance_eval("@meta[:files]").keys.wont_include "#{FIXTURES}/foo"
   end
 
   it "must update stale existing files" do
-    @db.instance_eval('@meta[:paths] = ["test/files/**/*"]')
+    @db.instance_eval("@meta[:paths] = [\"#{FIXTURES}/**/*\"]")
     @db.instance_eval("@meta[:files] = {\"#{GOLANG_SAMPLE}\" => {:last_updated=>1}}")
     @db.instance_eval("@tables[:defs] = [{:file => \"#{GOLANG_SAMPLE}\"}]")
     @db.update
@@ -70,15 +70,15 @@ describe StarScope::DB do
   end
 
   it "must load an old DB file" do
-    @db.load('test/files/db_old.json.gz')
-    @db.instance_eval('@meta[:paths]').must_equal ['test/files/**/*']
+    @db.load("#{FIXTURES}/db_old.json.gz")
+    @db.instance_eval('@meta[:paths]').must_equal ["#{FIXTURES}/**/*"]
     validate(@db)
   end
 
   it "must round-trip a database" do
     file = Tempfile.new('starscope_test')
     begin
-      @db.add_paths(['test/files'])
+      @db.add_paths(["#{FIXTURES}"])
       @db.save(file.path)
       tmp = StarScope::DB.new(:quiet)
       tmp.load(file.path)
@@ -92,11 +92,11 @@ describe StarScope::DB do
   it "must export to ctags" do
     file = Tempfile.new('starscope_test')
     begin
-      @db.add_paths(['test/files'])
+      @db.add_paths(["#{FIXTURES}"])
       @db.export_ctags(file)
       file.rewind
       lines = file.lines.to_a
-      lines.must_include "NoTableError\ttest/files/sample_ruby.rb\t/^  class NoTableError < StandardError; end$/;\"\tkind:c\n"
+      lines.must_include "NoTableError\t#{FIXTURES}/sample_ruby.rb\t/^  class NoTableError < StandardError; end$/;\"\tkind:c\n"
     ensure
       file.close
       file.unlink
@@ -106,11 +106,11 @@ describe StarScope::DB do
   it "must export to cscope" do
     file = Tempfile.new('starscope_test')
     begin
-      @db.add_paths(['test/files'])
+      @db.add_paths(["#{FIXTURES}"])
       @db.export_cscope(file)
       file.rewind
       lines = file.lines.to_a
-      lines.must_include "\t@test/files/sample_golang.go\n"
+      lines.must_include "\t@#{FIXTURES}/sample_golang.go\n"
       lines.must_include "\tgSunday\n"
       lines.must_include "\t`add_file\n"
     ensure
@@ -120,7 +120,7 @@ describe StarScope::DB do
   end
 
   it "must run queries" do
-    @db.add_paths(['test/files'])
+    @db.add_paths(["#{FIXTURES}"])
     @db.query(:calls, "abc").must_equal []
     @db.query(:defs, "xyz").must_equal []
     @db.query(:calls, "add_file").length.must_equal 3
