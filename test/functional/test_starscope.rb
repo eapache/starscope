@@ -3,7 +3,7 @@ require File.expand_path('../../test_helper', __FILE__)
 class TestStarScope < Minitest::Test
 
   BASE = "bundle exec bin/starscope --quiet"
-  EXTRACT = "#{BASE} --no-read --no-write ./test/fixtures"
+  EXTRACT = "#{BASE} --no-read --no-write #{FIXTURES}"
 
   def test_help
     `#{BASE} -h`.each_line do |line|
