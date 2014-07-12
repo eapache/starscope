@@ -4,6 +4,10 @@ Changelog
 v1.1.0 (trunk)
 --------------------
 
+Improvements:
+ * Optimized and refactored database update path. Now much simpler and about 8%
+   faster.
+
 Misc:
  * Rename --no-progress to --quiet, and make sure all operations provide some
    indication of success/failure except when quieted.
