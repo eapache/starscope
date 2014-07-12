@@ -3,7 +3,7 @@ require 'rake/testtask'
 
 Rake::TestTask.new do |t|
   t.libs << 'lib/starscope'
-  t.test_files = FileList['test/lib/test_*.rb']
+  t.test_files = FileList['test/unit/test_*.rb', 'test/functional/test_*.rb']
 end
 
 desc 'Run tests'
