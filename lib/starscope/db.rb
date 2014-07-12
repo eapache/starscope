@@ -77,7 +77,7 @@ class StarScope::DB
 
     deleted = []
     @meta[:files].delete_if do |name, record|
-      ret = matches_exclude(paths, name)
+      ret = matches_exclude?(paths, name)
       deleted << name if ret
       ret
     end
@@ -91,7 +91,7 @@ class StarScope::DB
     @meta[:paths] += paths
     @meta[:paths].uniq!
     files = Dir.glob(paths).select {|f| File.file? f}
-    files.delete_if {|f| matches_exclude(@meta[:excludes], f)}
+    files.delete_if {|f| matches_exclude?(@meta[:excludes], f)}
     return if files.empty?
     @output.new_pbar("Building", files.length)
     add_new_files(files)
@@ -100,7 +100,7 @@ class StarScope::DB
 
   def update
     new_files = (Dir.glob(@meta[:paths]).select {|f| File.file? f}) - @meta[:files].keys
-    new_files.delete_if {|f| matches_exclude(@meta[:excludes], f)}
+    new_files.delete_if {|f| matches_exclude?(@meta[:excludes], f)}
 
     @output.new_pbar("Updating", new_files.length + @meta[:files].length)
     changed = false
@@ -309,7 +309,7 @@ END
     return db
   end
 
-  def matches_exclude(patterns, file)
+  def matches_exclude?(patterns, file)
     patterns.map {|p| File.fnmatch(p, file)}.any?
   end
 
