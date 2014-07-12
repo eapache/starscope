@@ -1,5 +1,6 @@
 require 'date'
 require 'oj'
+require 'set'
 require 'zlib'
 
 require 'starscope/matcher'
@@ -75,13 +76,8 @@ class StarScope::DB
     @meta[:excludes] += paths
     @meta[:excludes].uniq!
 
-    deleted = []
-    @meta[:files].delete_if do |name, record|
-      ret = matches_exclude?(paths, name)
-      deleted << name if ret
-      ret
-    end
-    remove_files(deleted)
+    excluded = @meta[:files].keys.select {|name| matches_exclude?(paths, name)}
+    remove_files(excluded)
   end
 
   def add_paths(paths)
@@ -99,35 +95,20 @@ class StarScope::DB
   end
 
   def update
+    changes = @meta[:files].keys.group_by {|name| file_changed(name)}
+    changes[:modified] ||= []
+    changes[:deleted] ||= []
+
     new_files = (Dir.glob(@meta[:paths]).select {|f| File.file? f}) - @meta[:files].keys
     new_files.delete_if {|f| matches_exclude?(@meta[:excludes], f)}
 
-    @output.new_pbar("Updating", new_files.length + @meta[:files].length)
-    changed = false
-    @tables, tmp_tbls = {}, @tables
-    to_prune = []
-
-    @meta[:files].delete_if do |name, record|
-      @output.log("Updating `#{name}`")
-
-      event = file_event(name, record)
-      if event != :unchanged
-        to_prune << name
-        changed = true
-        parse_file(name) if event == :modified
-      end
-
-      @output.inc_pbar
-      event == :deleted
-    end
-
-    @tables, tmp_tbls = tmp_tbls, @tables
-    remove_files(to_prune)
-    merge_db(tmp_tbls)
-
+    @output.new_pbar("Updating", changes[:modified].length + new_files.length)
+    remove_files(changes[:deleted])
+    update_files(changes[:modified])
     add_new_files(new_files)
     @output.finish_pbar
-    changed || !new_files.empty?
+
+    true unless changes[:deleted].empty? && changes[:modified].empty? && new_files.empty?
   end
 
   def dump_table(table)
@@ -266,9 +247,24 @@ END
   def add_new_files(files)
     files.each do |file|
       @output.log("Adding `#{file}`")
-      @meta[:files][file] = {}
       parse_file(file)
       @output.inc_pbar
+    end
+  end
+
+  def update_files(files)
+    remove_files(files)
+    add_new_files(files)
+  end
+
+  def remove_files(files)
+    files.each do |file|
+      @output.log("Removing `#{file}`")
+      @meta[:files].delete(file)
+    end
+    files = files.to_set
+    @tables.each do |name, tbl|
+      tbl.delete_if {|val| files.include?(val[:file])}
     end
   end
 
@@ -314,7 +310,7 @@ END
   end
 
   def parse_file(file)
-    @meta[:files][file][:last_updated] = File.mtime(file).to_i
+    @meta[:files][file] = {:last_updated => File.mtime(file).to_i}
 
     LANGS.each do |lang|
       next if not lang.match_file file
@@ -323,27 +319,14 @@ END
         @tables[tbl] << StarScope::Record.build(file, name, args)
       end
       @meta[:files][file][:lang] = lang.name.split('::').last.to_sym
+      return
     end
   end
 
-  def merge_db(new_tbls)
-    new_tbls.each do |name, tbl|
-      @tables[name] ||= []
-      @tables[name].concat(tbl)
-    end
-  end
-
-  def remove_files(files)
-    check = Hash[files.map {|f| [f, true]}]
-    @tables.each do |name, tbl|
-      tbl.delete_if {|val| check[val[:file]]}
-    end
-  end
-
-  def file_event(name, record)
+  def file_changed(name)
     if not File.exists?(name) or not File.file?(name)
       :deleted
-    elsif record[:last_updated] < File.mtime(name).to_i
+    elsif @meta[:files][name][:last_updated] < File.mtime(name).to_i
       :modified
     else
       :unchanged
