@@ -12,22 +12,23 @@ class TestStarScope < Minitest::Test
   end
 
   def test_version
-    assert `#{BASE} -v`.chomp == StarScope::VERSION
+    assert_equal StarScope::VERSION, `#{BASE} -v`.chomp
   end
 
   def test_summary
-    lines = `#{EXTRACT} -s`.lines
+    lines = `#{EXTRACT} -s`.lines.to_a
+    assert_equal lines.length, 6
   end
 
   def test_dump
     lines = `#{EXTRACT} -d requires`.lines.to_a
-    assert lines[1].split.first == 'date'
-    assert lines[2].split.first == 'zlib'
+    assert_equal 'date', lines[1].split.first
+    assert_equal 'zlib', lines[2].split.first
   end
 
   def test_query
     `#{EXTRACT} -q calls,add_file`.each_line do |line|
-      assert line.split[0..2] == ["StarScope", "DB", "add_file"]
+      assert_equal ["StarScope", "DB", "add_file"], line.split[0..2]
     end
   end
 
