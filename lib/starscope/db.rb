@@ -102,13 +102,18 @@ class StarScope::DB
     new_files = (Dir.glob(@meta[:paths]).select {|f| File.file? f}) - @meta[:files].keys
     new_files.delete_if {|f| matches_exclude?(@meta[:excludes], f)}
 
+    if changes[:deleted].empty? && changes[:modified].empty? && new_files.empty?
+      @output.print("No changes detected.")
+      return false
+    end
+
     @output.new_pbar("Updating", changes[:modified].length + new_files.length)
     remove_files(changes[:deleted])
     update_files(changes[:modified])
     add_new_files(new_files)
     @output.finish_pbar
 
-    true unless changes[:deleted].empty? && changes[:modified].empty? && new_files.empty?
+    true
   end
 
   def dump_table(table)

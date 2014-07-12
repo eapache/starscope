@@ -27,7 +27,17 @@ class StarScope::Output
 
   def log(msg)
     return if @level != :verbose
+    output(msg)
+  end
 
+  def print(msg)
+    return if @level == :quiet
+    output(msg)
+  end
+
+  private
+
+  def output(msg)
     if @pbar
       @pbar.log(msg)
     else
