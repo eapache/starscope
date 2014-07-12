@@ -4,6 +4,11 @@ Changelog
 v1.1.0 (trunk)
 --------------------
 
+Bug Fixes:
+ * Fixed cscope export when the string for a token appeared multiple times on
+   the same line, for example the function call go("go")
+ * Fixed cscope export of function calls made from the global scope.
+
 Improvements:
  * Optimized and refactored database update path. Now much simpler and about 8%
    faster.
