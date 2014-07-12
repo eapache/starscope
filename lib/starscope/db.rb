@@ -7,6 +7,15 @@ require 'starscope/matcher'
 require 'starscope/output'
 require 'starscope/record'
 
+# cscope has this funky issue where it refuses to recognize function calls that
+# happen outside of a function definition - this isn't an issue in C, where all
+# calls must occur in a function, but in ruby et al. it is perfectly legal to
+# write normal code outside the "scope" of a function definition - we insert a
+# fake shim "global" function everywhere we can to work around this
+CSCOPE_GLOBAL_HACK_START = "\n\t$global\n"
+CSCOPE_GLOBAL_HACK_STOP = "\n\t}\n"
+
+# dynamically load all our language extractors
 LANGS = []
 Dir.glob("#{File.dirname(__FILE__)}/langs/*.rb").each do |path|
   require path
@@ -196,6 +205,7 @@ END
       next if lines.empty?
 
       buf << "\t@#{filename}\n\n"
+      buf << "0 #{CSCOPE_GLOBAL_HACK_START}"
       files << filename
 
       lines.sort.each do |line_no, records|
@@ -217,10 +227,12 @@ END
         prev = 0
         buf << line_no.to_s << " "
         toks.sort.each do |offset, record|
+          buf << CSCOPE_GLOBAL_HACK_STOP if record[:tbl] == :defs && record[:type] == :func
           key = record[:name][-1].to_s
           buf << line.slice(prev...offset) << "\n"
           buf << StarScope::Record.cscope_mark(record[:tbl], record) << key << "\n"
           prev = offset + key.length
+          buf << CSCOPE_GLOBAL_HACK_START if record[:tbl] == :end && record[:type] == :func
         end
         buf << line.slice(prev..-1) << "\n\n"
       end
