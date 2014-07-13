@@ -207,7 +207,7 @@ END
       buf << "\t@#{filename}\n\n"
       buf << "0 #{CSCOPE_GLOBAL_HACK_START}"
       files << filename
-      func_nest_count = 0
+      func_count = 0
 
       lines.sort.each do |line_no, records|
         begin
@@ -224,29 +224,30 @@ END
         prev = 0
         buf << line_no.to_s << " "
         toks.each do |offset, record|
+
+          # Don't export nested functions, cscope barfs on them since C doesn't
+          # have them at all. Skipping tokens is easy; since prev isn't updated
+          # they get turned into plain text automatically.
           if record[:type] == :func
             case record[:tbl]
             when :defs
-              func_nest_count += 1
-              if func_nest_count == 1
-                buf << CSCOPE_GLOBAL_HACK_STOP
-              else
-                next
-              end
+              func_count += 1
+              next unless func_count == 1
             when :end
-              func_nest_count -= 1
-              next unless func_nest_count == 0
+              func_count -= 1
+              next unless func_count == 0
             end
           end
+
+          buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
 
           key = record[:name][-1].to_s
           buf << line.slice(prev...offset) << "\n"
           buf << StarScope::Record.cscope_mark(record[:tbl], record) << key << "\n"
           prev = offset + key.length
 
-          if func_nest_count == 0 && record[:tbl] == :end && record[:type] == :func
-            buf << CSCOPE_GLOBAL_HACK_START
-          end
+          buf << CSCOPE_GLOBAL_HACK_START if record[:type] == :end && record[:tbl] == :defs
+
         end
         buf << line.slice(prev..-1) << "\n\n"
       end
