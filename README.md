@@ -37,6 +37,14 @@ $ starscope -e cscope
 
 More flags and options are available, run `starscope --help` for the complete list.
 
+More Documentation
+------------------
+
+ * [User Guide](doc/USER_GUIDE.md)
+ * [Database Format](doc/DB_FORMAT.md)
+ * [Language Support](doc/LANGUAGE_SUPPORT.md)
+ * [Version History](CHANGELOG.md)
+
 Other Uses
 ----------
 
