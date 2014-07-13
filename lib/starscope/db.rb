@@ -222,8 +222,8 @@ END
           key = record[:name][-1].to_s
           index = line.index(key)
           while index &&
-            ((index > 0 && line[index-1] =~ /[[:word:]]/) ||
-             (index+key.length < line.length && line[index+key.length] =~ /[[:word:]]/))
+            ((index > 0 && line[index-1] =~ /\w/) ||
+             (index+key.length < line.length && line[index+key.length] =~ /\w/))
             index = line.index(key, index+1)
           end
           toks[index] = record unless index.nil?
