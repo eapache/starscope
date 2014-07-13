@@ -240,7 +240,11 @@ END
           end
 
           key = record[:name][-1].to_s
-          key.sub!(/\W+$/, '') unless key =~ /^\W*$/
+          if key =~ /^\W*$/
+            next unless record[:tbl] == :defs
+          else
+            key.sub!(/\W+$/, '')
+          end
 
           buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
           buf << line.slice(prev...offset) << "\n"
