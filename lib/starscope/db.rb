@@ -246,7 +246,7 @@ END
           buf << StarScope::Record.cscope_mark(record[:tbl], record) << key << "\n"
           prev = offset + key.length
 
-          buf << CSCOPE_GLOBAL_HACK_START if record[:type] == :end && record[:tbl] == :defs
+          buf << CSCOPE_GLOBAL_HACK_START if record[:type] == :func && record[:tbl] == :end
 
         end
         buf << line.slice(prev..-1) << "\n\n"
