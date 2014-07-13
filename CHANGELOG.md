@@ -14,6 +14,8 @@ Bug Fixes:
 Improvements:
  * Optimized and refactored database update path. Now much simpler and about 8%
    faster.
+ * Documented the database format and language API. Added a user guide which is
+   much more complete than the simpler output of the `--help` flag.
 
 Misc:
  * Rename --no-progress to --quiet, and make sure all operations provide some
