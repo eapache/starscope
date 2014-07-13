@@ -49,22 +49,23 @@ flag.
 Paths
 -----
 
-StarScope has complex options with sane defaults for managing which paths get
-scanned for files and which do not. By default when creating a new database, it
-scans all files recursively in the current directory. To scan specific paths or
-files instead, pass them as arguments (so `starscope myfolder` would only scan
-files in `myfolder/`).
+StarScope has powerful options with sane defaults for managing which paths get
+scanned for files and which do not. By default when creating a new database,
+StarScope will scan all files recursively in the current directory. To scan
+specific paths or files instead, pass them as arguments (so `starscope myfolder`
+would only scan files in `myfolder/`).
 
 Paths are saved in the database metadata - once you have created a database with
 custom paths, all subsequent operations will remember and use those paths even
 when they are not explicitly specified. At any time, specifying *more* paths
-will add them (and the files they contain) to the database.
+will add them (and the files they contain) to the database without removing any
+existing paths.
 
 You can also exclude certain paths from processing by passing the `-x` or
 `--exclude` flag with the desired pattern. In a new project, `starscope
 --exclude test/` will scan all files *except* the ones in the `test/` directory.
 Excluded patterns are also remembered, and can be added at any time. If an
-existing file in the database matches a newly added exclusion rule, it is
+existing file in the database matches a newly added exclusion rule, it will be
 removed.
 
 Queries
@@ -72,10 +73,10 @@ Queries
 
 To query the starscope database, pass the `-q` or `--query` flag with an
 argument in the following format: `TABLE,QUERY`. For example, `-q calls,new`
-would list all callers of `new`. `-q defs,bar` would list places that define a
-method or class named `bar`. See the [language support
-documentation](LANGUAGE_SUPPORT.md) for a list of most common tables, or use the
-`--summary` flag to list all the tables in the current database.
+would list all callers of `new` and `-q defs,bar` would list places that define
+a method or class named `bar`. See the [language support
+documentation](LANGUAGE_SUPPORT.md) for a list of the most common tables, or use
+the `--summary` flag to list all the tables in the current database.
 
 You can also search for scoped names such as `MyClass.new`. To do this, you must
 specify the scope with `::`, even if the language or instance you are searching
@@ -100,34 +101,35 @@ want to specify a custom location, append it after the format with a comma (so
 
 You can also dump entire tables (or the entire database) to raw text output for
 manual inspection. This is mostly useful for debugging, but means you can pipe
-it to sed for example if you wanted to do something fancy. This is done with the
-`-d` or `--dump` flag which takes an optional argument of the table to dump
-(otherwise it dumps all tables).
+it to sed (for example) if you wanted to do something fancy. This can be done
+with the `-d` or `--dump` flag, which takes an optional argument of which table
+to dump (if no table is specified, it dumps all tables).
 
 Line-Mode
 ---------
 
 Specifying `-l` or `--line-mode` places you into line-oriented mode, letting you
 run multiple queries without reloading the database each time. In line mode,
-input can be a query of the form `TABLE QUERY` or a special command starting
-with a `!`. Recognized special commands generally map to non-line-mode options:
+input is normally a query of the form `TABLE QUERY`, or a special command
+starting with a `!`. Recognized special commands generally map to non-line-mode
+options:
  * `!dump [TABLE]` - same as the `--dump` flag
  * `!export FORMAT[,PATH]` - same as the `--export` flag
  * `!summary` - same as the `--summary` flag
  * `!update` - updates the database without exiting line-mode
- * `!help` - prints basic line-mode helpe
+ * `!help` - prints basic line-mode help
  * `!version` - same as the `--version` flag
- * `!quit` - exits line-mode
+ * `!quit` - exit line-mode
 
 
 Miscellanious
 -------------
 
-Pass -h or --help to get a brief summary of the availble options.
+Pass `-h` or `--help` to get a brief summary of the availble options.
 
-Pass -v or --version to get the current version number.
+Pass `-v` or `--version` to get the current version number.
 
-Pass --verbose to get a great deal more output about what it is doing.
+Pass `--verbose` to get a great deal more output about what it is doing.
 
-Pass --quiet to remove all non-critical output (you will still get error
+Pass `--quiet` to remove all non-critical output (you will still get error
 messages, query results, etc).
