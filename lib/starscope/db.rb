@@ -239,14 +239,15 @@ END
             end
           end
 
-          buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
-
           key = record[:name][-1].to_s
+          key.sub!(/\W+$/, '') unless key =~ /^\W*$/
+
+          buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
           buf << line.slice(prev...offset) << "\n"
           buf << StarScope::Record.cscope_mark(record[:tbl], record) << key << "\n"
-          prev = offset + key.length
-
           buf << CSCOPE_GLOBAL_HACK_START if record[:type] == :func && record[:tbl] == :end
+
+          prev = offset + key.length
 
         end
         buf << line.slice(prev..-1) << "\n\n"
