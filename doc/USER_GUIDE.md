@@ -122,7 +122,7 @@ options:
  * `!quit` - exit line-mode
 
 
-Miscellanious
+Miscellaneous
 -------------
 
 Pass `-h` or `--help` to get a brief summary of the availble options.
