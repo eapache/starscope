@@ -31,7 +31,8 @@ database by recursing in the current directory.
 Scoped queries must use `::` as the scope separator, even for languages which
 have their own scope syntax.
 
-Full user-guide: https://github.com/eapache/starscope/blob/doc/USER_GUIDE.md
+Website: https://github.com/eapache/starscope
+User Manual: https://github.com/eapache/starscope/blob/master/doc/USER_GUIDE.md
 END
 
   opts.separator "\nQueries"
