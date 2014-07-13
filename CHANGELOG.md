@@ -8,6 +8,7 @@ Bug Fixes:
  * Fixed cscope export when the string for a token appeared multiple times on
    the same line, for example the function call go("go").
  * Fixed cscope export of function calls made from the global scope.
+ * Fixed cscope export of functions that end in punctuation (e.g. "include?")
  * Fixed golang parsing of global function calls.
 
 Improvements:
