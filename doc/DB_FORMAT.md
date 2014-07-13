@@ -37,5 +37,6 @@ Databases
 This is also a [JSON](https://en.wikipedia.org/wiki/Json) object. The keys are
 table names, and the values are the tables themselves. Each table is an array of
 records, and each record is itself a JSON object. The only keys that are
-guaranteed are `:file` (the file the record is from) and `:name` an array
-containing the individual components of the fully-scoped name.
+guaranteed to exist in every record are `:file` (the name of the file the record
+is from) and `:name` (an array containing the individual components of the
+fully-scoped name).
