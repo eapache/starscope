@@ -60,6 +60,7 @@ module StarScope::Lang
             stack.pop
           when /(.+)\s*=.*/
             parse_def($1, line_no, scope, &block)
+            parse_call(line, line_no, scope, &block)
           else
             parse_def(line, line_no, scope, &block)
           end
@@ -122,10 +123,12 @@ module StarScope::Lang
         stack.push(:def)
       when /^var\s+(\w+)\s/
         yield :defs, scope + [$1], :line_no => line_no
+        parse_call(line, line_no, scope, &block)
       when /^const\s+\(/
         stack.push(:def)
       when /^const\s+(\w+)\s/
         yield :defs, scope + [$1], :line_no => line_no
+        parse_call(line, line_no, scope, &block)
       when /^\s+(.*?) :?=[^=]/
         $1.split(' ').each do |var|
           next if CONTROL_KEYS.include?(var)
