@@ -12,7 +12,7 @@ require 'starscope/record'
 # calls must occur in a function, but in ruby et al. it is perfectly legal to
 # write normal code outside the "scope" of a function definition - we insert a
 # fake shim "global" function everywhere we can to work around this
-CSCOPE_GLOBAL_HACK_START = "\n\t$__fake_global\n"
+CSCOPE_GLOBAL_HACK_START = "\n\t$-\n"
 CSCOPE_GLOBAL_HACK_STOP = "\n\t}\n"
 
 # dynamically load all our language extractors
@@ -207,55 +207,47 @@ END
       buf << "\t@#{filename}\n\n"
       buf << "0 #{CSCOPE_GLOBAL_HACK_START}"
       files << filename
-      func_nest_count = 0
+      func_count = 0
 
       lines.sort.each do |line_no, records|
         begin
-          line = records.first[:line].strip.gsub(/\s+/, ' ')
+          # replace tabs with spaces, otherwise cscope gets confused
+          line = records.first[:line].gsub(/\t/, ' ')
         rescue ArgumentError
-          # invalid utf-8 byte sequence in the line, just do our best
+          # invalid utf-8 byte sequence in the line, oh well
           line = records.first[:line]
         end
 
-        toks = {}
-        records.each do |record|
-          key = record[:name][-1].to_s
-          index = line.index(key)
-          while index &&
-            ((index > 0 && line[index-1] =~ /[\w@]/) ||
-             (index+key.length < line.length && line[index+key.length] =~ /\w/))
-            index = line.index(key, index+1)
-          end
-          toks[index] = record unless index.nil?
-        end
+        toks = tokenize_line(line, records)
         next if toks.empty?
 
         prev = 0
         buf << line_no.to_s << " "
-        toks.sort.each do |offset, record|
+        toks.each do |offset, record|
+
+          # Don't export nested functions, cscope barfs on them since C doesn't
+          # have them at all. Skipping tokens is easy; since prev isn't updated
+          # they get turned into plain text automatically.
           if record[:type] == :func
             case record[:tbl]
             when :defs
-              func_nest_count += 1
-              if func_nest_count == 1
-                buf << CSCOPE_GLOBAL_HACK_STOP
-              else
-                next
-              end
+              func_count += 1
+              next unless func_count == 1
             when :end
-              func_nest_count -= 1
-              next unless func_nest_count == 0
+              func_count -= 1
+              next unless func_count == 0
             end
           end
+
+          buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
 
           key = record[:name][-1].to_s
           buf << line.slice(prev...offset) << "\n"
           buf << StarScope::Record.cscope_mark(record[:tbl], record) << key << "\n"
           prev = offset + key.length
 
-          if func_nest_count == 0 && record[:tbl] == :end && record[:type] == :func
-            buf << CSCOPE_GLOBAL_HACK_START
-          end
+          buf << CSCOPE_GLOBAL_HACK_START if record[:type] == :func && record[:tbl] == :end
+
         end
         buf << line.slice(prev..-1) << "\n\n"
       end
@@ -340,6 +332,31 @@ END
       end
     end
     return db
+  end
+
+  def tokenize_line(line, records)
+    toks = {}
+
+    records.each do |record|
+      key = record[:name][-1].to_s
+
+      # use the column if we have it, otherwise fall back to scanning
+      index = record[:col] || line.index(key)
+
+      # keep scanning if our current index doesn't actually match the key, or if
+      # either the preceeding or succeeding character is a word character
+      # (meaning we've accidentally matched the middle of some other token)
+      while !index.nil? &&
+        ((line[index, key.length] != key) ||
+         (index > 0 && line[index-1] =~ /\w/) ||
+         (index+key.length < line.length && line[index+key.length] =~ /\w/))
+        index = line.index(key, index+1)
+      end
+
+      toks[index] = record unless index.nil?
+    end
+
+    return toks.sort
   end
 
   def matches_exclude?(patterns, file)

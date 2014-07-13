@@ -55,34 +55,34 @@ module StarScope::Lang
 
         case node.type
         when :send
-          yield :calls, scoped_name(node), :line_no => loc.expression.line
+          yield :calls, scoped_name(node), :line_no => loc.line, :col => loc.column
           if node.children[0].nil? and node.children[1] == :require and node.children[2].type == :str
             yield :requires, node.children[2].children[0].split("/"),
-              :line_no => loc.expression.line
+              :line_no => loc.line, :col => loc.column
           end
 
         when :def
           yield :defs, @scope + [node.children[0]],
-            :line_no => loc.expression.line, :type => :func
-          yield :end, :end, :line_no => loc.end.line, :type => :func
+            :line_no => loc.line, :type => :func, :col => loc.name.column
+          yield :end, :end, :line_no => loc.end.line, :type => :func, :col => loc.end.column
 
         when :defs
           yield :defs, @scope + [node.children[1]],
-            :line_no => loc.expression.line, :type => :func
-          yield :end, :end, :line_no => loc.end.line, :type => :func
+            :line_no => loc.line, :type => :func, :col => loc.name.column
+          yield :end, :end, :line_no => loc.end.line, :type => :func, :col => loc.end.column
 
         when :module, :class
           yield :defs, @scope + scoped_name(node.children[0]),
-            :line_no => loc.expression.line, :type => node.type
-          yield :end, :end, :line_no => loc.end.line, :type => node.type
+            :line_no => loc.line, :type => node.type, :col => loc.name.column
+          yield :end, :end, :line_no => loc.end.line, :type => node.type, :col => loc.end.column
 
         when :casgn
           fqn = scoped_name(node)
-          yield :assigns, fqn, :line_no => loc.expression.line
-          yield :defs, fqn, :line_no => loc.expression.line
+          yield :assigns, fqn, :line_no => loc.line, :col => loc.name.column
+          yield :defs, fqn, :line_no => loc.line, :col => loc.name.column
 
         when :lvasgn, :ivasgn, :cvasgn, :gvasgn
-          yield :assigns, @scope + [node.children[0]], :line_no => loc.expression.line
+          yield :assigns, @scope + [node.children[0]], :line_no => loc.line, :col => loc.name.column
         end
       end
 
