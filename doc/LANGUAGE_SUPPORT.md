@@ -56,20 +56,25 @@ belongs (basically its type). Current tables already include:
  * `assigns` for variable assignment
  * `requires` for required files in Ruby
  * `imports` for imported packages in Golang
+
 Try to use pre-existing tables where possible, but feel free to add more if the
-language has some weird feature that doesn't map to any of the above.
+language has some weird feature that doesn't map to any of the above. You don't
+have to do anything special to create a new table, just yield the appropriate
+symbol.
 
 The second yielded argument is the name (string or symbol) of the token that
 you want to add: the name of the function being called, or the name of the class
 being defined, etc. If the name is scoped (such as "def MyModule::MyClass") pass
-the array ["MyModule", "MyClass"].
+an array `["MyModule", "MyClass"]`.
 
 Finally, the entirely-optional `extras` is a hash of whatever other extra values
-you want. Some existing ones that you may want to add include:
+you want. Some existing ones that you may want to use include:
  * `line_no` for the line (starting at 1) where the record occurs - this is
    necessary for cscope and ctags export
  * `col` for the column in the line where the name occurs
  * `type` for the type of definition (`:func`, `:class`, etc)
 
 And that's it! Parse your files, yield your records, and the StarScope engine
-takes care of everything else for you.
+takes care of everything else for you. If you've added support for a language
+that you think others might find useful, please contribute it (with tests!) via
+pull request.
