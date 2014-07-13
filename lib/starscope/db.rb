@@ -220,6 +220,9 @@ END
         records.each do |record|
           key = record[:name][-1].to_s
           index = line.index(key)
+          while index && index > 0 && line[index-1] =~ /[[:alnum:]]/
+            index = line.index(key, index+1)
+          end
           toks[index] = record unless index.nil?
         end
         next if toks.empty?
