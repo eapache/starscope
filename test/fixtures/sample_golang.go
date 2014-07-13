@@ -19,6 +19,10 @@ const (
 	Monday
 )
 
+var x error = fmt.Errorf("ABC")
+
+const y error = fmt.Errorf("ABC")
+
 type foo interface {
 	bar() int
 }

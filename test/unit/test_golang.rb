@@ -48,10 +48,12 @@ class TestGolang < Minitest::Test
     assert calls.keys.include? :b
     assert calls.keys.include? :c
     assert calls.keys.include? :ttt
+    assert calls.keys.include? :Errorf
     assert calls[:a].count == 3
     assert calls[:b].count == 4
     assert calls[:c].count == 4
     assert calls[:ttt].count == 2
+    assert calls[:Errorf].count == 2
   end
 
   def test_variable_assigns
