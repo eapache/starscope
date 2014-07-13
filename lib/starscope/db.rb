@@ -12,7 +12,7 @@ require 'starscope/record'
 # calls must occur in a function, but in ruby et al. it is perfectly legal to
 # write normal code outside the "scope" of a function definition - we insert a
 # fake shim "global" function everywhere we can to work around this
-CSCOPE_GLOBAL_HACK_START = "\n\t$__fake_global\n"
+CSCOPE_GLOBAL_HACK_START = "\n\t$-\n"
 CSCOPE_GLOBAL_HACK_STOP = "\n\t}\n"
 
 # dynamically load all our language extractors
