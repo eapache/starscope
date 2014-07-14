@@ -241,7 +241,7 @@ END
 
           key = record[:name][-1].to_s
           if key =~ /^\W*$/
-            next unless record[:tbl] == :defs
+            next unless [:defs, :end].include?(record[:tbl])
           else
             key.sub!(/\W+$/, '')
           end
