@@ -205,7 +205,7 @@ END
       next if lines.empty?
 
       buf << "\t@#{filename}\n\n"
-      buf << "0 #{CSCOPE_GLOBAL_HACK_START}"
+      buf << "0 #{CSCOPE_GLOBAL_HACK_START}\n"
       files << filename
       func_count = 0
 
