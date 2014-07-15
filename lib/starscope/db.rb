@@ -363,10 +363,10 @@ END
   end
 
   def cscope_plaintext(line, start, stop)
-    line = line.slice(start, stop-start)
-    line.lstrip! if start == 0
-    line.rstrip! if stop == line.length
-    line.gsub(/\s+/, ' ')
+    ret = line.slice(start, stop-start)
+    ret.lstrip! if start == 0
+    ret.rstrip! if stop == line.length
+    ret.gsub(/\s+/, ' ')
   rescue ArgumentError
     # invalid utf-8 byte sequence in the line, oh well
     line
