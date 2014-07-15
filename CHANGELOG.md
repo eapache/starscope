@@ -10,7 +10,7 @@ Bug Fixes:
  * Fixed cscope export of function calls made from the global scope.
  * Fixed cscope export of functions that end in punctuation (e.g. `include?`)
  * Fixed golang parsing of global function calls.
- * Fixed <enter> with no input crashing in line-mode.
+ * Fixed crash in line-mode when pressing `<return>` with no input.
 
 Improvements:
  * Optimized and refactored database update path. Now much simpler and about 8%
