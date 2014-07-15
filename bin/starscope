@@ -229,6 +229,7 @@ if options[:linemode]
   puts "Run your query as 'TABLE QUERY' or run '!help' for more information."
   begin
     while input = Readline.readline("> ", true)
+      next if input.empty?
       cmd, param = input.split(' ', 2)
       if cmd[0] == '!'
         case cmd[1..-1]
