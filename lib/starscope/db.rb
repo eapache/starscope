@@ -210,14 +210,7 @@ END
       func_count = 0
 
       lines.sort.each do |line_no, records|
-        begin
-          # replace tabs with spaces, otherwise cscope gets confused
-          line = records.first[:line].gsub(/\t/, ' ')
-        rescue ArgumentError
-          # invalid utf-8 byte sequence in the line, oh well
-          line = records.first[:line]
-        end
-
+        line = records.first[:line]
         toks = tokenize_line(line, records)
         next if toks.empty?
 
@@ -239,22 +232,15 @@ END
             end
           end
 
-          key = record[:name][-1].to_s
-          if key =~ /^\W*$/
-            next unless [:defs, :end].include?(record[:tbl])
-          else
-            key.sub!(/\W+$/, '')
-          end
-
           buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
-          buf << line.slice(prev...offset) << "\n"
-          buf << StarScope::Record.cscope_mark(record[:tbl], record) << key << "\n"
+          buf << cscope_plaintext(line, prev, offset) << "\n"
+          buf << StarScope::Record.cscope_mark(record[:tbl], record) << record[:key] << "\n"
           buf << CSCOPE_GLOBAL_HACK_START if record[:type] == :func && record[:tbl] == :end
 
-          prev = offset + key.length
+          prev = offset + record[:key].length
 
         end
-        buf << line.slice(prev..-1) << "\n\n"
+        buf << cscope_plaintext(line, prev, line.length) << "\n\n"
       end
     end
 
@@ -358,10 +344,32 @@ END
         index = line.index(key, index+1)
       end
 
-      toks[index] = record unless index.nil?
+      next if index.nil?
+
+      # Strip trailing non-word characters, otherwise cscope barfs on
+      # function names like `include?`
+      if key =~ /^\W*$/
+        next unless [:defs, :end].include?(record[:tbl])
+      else
+        key.sub!(/\W+$/, '')
+      end
+
+      record[:key] = key
+      toks[index] = record
+
     end
 
     return toks.sort
+  end
+
+  def cscope_plaintext(line, start, stop)
+    line = line.slice(start, stop-start)
+    line.lstrip! if start == 0
+    line.rstrip! if stop == line.length
+    line.gsub(/\s+/, ' ')
+  rescue ArgumentError
+    # invalid utf-8 byte sequence in the line, oh well
+    line
   end
 
   def matches_exclude?(patterns, file)

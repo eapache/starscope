@@ -110,9 +110,16 @@ describe StarScope::DB do
       @db.export_cscope(file)
       file.rewind
       lines = file.lines.to_a
+
       lines.must_include "\t@#{FIXTURES}/sample_golang.go\n"
       lines.must_include "\tgSunday\n"
       lines.must_include "\t`add_file\n"
+      lines.must_include "\t}}\n"
+      lines.must_include "13 class \n"
+
+      lines.wont_include "= [\n"
+      lines.wont_include "4 LANGS = [\n"
+      lines.wont_include "116 tmpdb[entry[:file]][entry[:line_no]] ||= []\n"
     ensure
       file.close
       file.unlink
