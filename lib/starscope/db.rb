@@ -232,21 +232,12 @@ END
             end
           end
 
-          # Strip trailing non-word characters, otherwise cscope barfs on
-          # function names like `include?`
-          key = record[:name][-1].to_s
-          if key =~ /^\W*$/
-            next unless [:defs, :end].include?(record[:tbl])
-          else
-            key.sub!(/\W+$/, '')
-          end
-
           buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
           buf << cscope_plaintext(line, prev, offset) << "\n"
-          buf << StarScope::Record.cscope_mark(record[:tbl], record) << key << "\n"
+          buf << StarScope::Record.cscope_mark(record[:tbl], record) << record[:key] << "\n"
           buf << CSCOPE_GLOBAL_HACK_START if record[:type] == :func && record[:tbl] == :end
 
-          prev = offset + key.length
+          prev = offset + record[:key].length
 
         end
         buf << cscope_plaintext(line, prev, line.length) << "\n\n"
@@ -353,7 +344,19 @@ END
         index = line.index(key, index+1)
       end
 
-      toks[index] = record unless index.nil?
+      next if index.nil?
+
+      # Strip trailing non-word characters, otherwise cscope barfs on
+      # function names like `include?`
+      if key =~ /^\W*$/
+        next unless [:defs, :end].include?(record[:tbl])
+      else
+        key.sub!(/\W+$/, '')
+      end
+
+      record[:key] = key
+      toks[index] = record
+
     end
 
     return toks.sort

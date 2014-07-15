@@ -119,6 +119,7 @@ describe StarScope::DB do
 
       lines.wont_include "= [\n"
       lines.wont_include "4 LANGS = [\n"
+      lines.wont_include "116 tmpdb[entry[:file]][entry[:line_no]] ||= []\n"
     ensure
       file.close
       file.unlink
