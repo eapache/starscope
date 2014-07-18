@@ -193,7 +193,7 @@ class StarScope::DB
 END
     defs = (@tables[:defs] || {}).sort_by {|x| x[:name][-1].to_s}
     defs.each do |record|
-      file.puts StarScope::Record.ctag_line(record)
+      file.puts StarScope::Record.ctag_line(record, @meta[:files][record[:file]][:lang])
     end
   end
 
