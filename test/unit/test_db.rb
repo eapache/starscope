@@ -96,7 +96,7 @@ describe StarScope::DB do
       @db.export_ctags(file)
       file.rewind
       lines = file.lines.to_a
-      lines.must_include "NoTableError\t#{FIXTURES}/sample_ruby.rb\t/^  class NoTableError < StandardError; end$/;\"\tkind:c\n"
+      lines.must_include "NoTableError\t#{FIXTURES}/sample_ruby.rb\t/^  class NoTableError < StandardError; end$/;\"\tkind:c\tlanguage:Ruby\n"
     ensure
       file.close
       file.unlink
