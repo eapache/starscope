@@ -25,7 +25,7 @@ describe StarScope::Record do
     rec = StarScope::Record.build(RUBY_SAMPLE, :a, {:line_no => 1})
     rec[:line].must_equal "require 'date'"
 
-    rec = StarScope::Record.build(RUBY_SAMPLE, :a, {:line_no => 163})
+    rec = StarScope::Record.build(RUBY_SAMPLE, :a, {:line_no => 164})
     rec[:line].must_equal "end"
 
     rec = StarScope::Record.build(GOLANG_SAMPLE, :a, {:line_no => 67})
