@@ -28,10 +28,10 @@ class StarScope::Record
     "#{rec[:name].join " "} -- #{rec[:file]}:#{rec[:line_no]} (#{rec[:line].strip})"
   end
 
-  def self.ctag_line(rec, lang)
+  def self.ctag_line(rec, file)
     ret = "#{rec[:name][-1]}\t#{rec[:file]}\t/^#{rec[:line]}$/"
 
-    ext = self.ctag_ext_tags(rec, lang)
+    ext = self.ctag_ext_tags(rec, file)
     if not ext.empty?
       ret << ";\""
       ext.each do |k, v|
@@ -42,7 +42,7 @@ class StarScope::Record
     ret
   end
 
-  def self.ctag_ext_tags(rec, lang)
+  def self.ctag_ext_tags(rec, file)
     tag = {}
 
     # these extensions are documented at http://ctags.sourceforge.net/FORMAT
@@ -53,7 +53,7 @@ class StarScope::Record
       tag["kind"] = "c"
     end
 
-    tag["language"] = lang
+    tag["language"] = file[:lang]
 
     tag
   end
