@@ -1,11 +1,15 @@
 Changelog
 =========
 
-v1.2.0 (trunk)
+v1.1.1 (trunk)
 --------------------
 
 New Features:
- * Ctags language tag export
+ * Export of ctags `language` tag (needed for `YouCompleteMe` support).
+
+Bug Fixes:
+ * In ruby, correctly report calls to functions such as `foo=` as assignments to
+   `foo`.
 
 v1.1.0 (2014-07-16)
 --------------------

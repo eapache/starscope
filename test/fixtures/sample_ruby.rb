@@ -17,6 +17,7 @@ class StarScope::DB
     @paths = []
     @files = {}
     @tables = {}
+    self.foo = :bar
   end
 
   def load(file)

@@ -49,7 +49,9 @@ class TestRuby < Minitest::Test
     assigns = @db[:assigns].group_by {|x| x[:name][-1]}
     assert assigns.keys.include? :pbar
     assert assigns.keys.include? :PBAR_FORMAT
+    assert assigns.keys.include? :foo
     assert assigns[:pbar].count == 2
     assert assigns[:PBAR_FORMAT].count == 1
+    assert assigns[:foo].count == 1
   end
 end
