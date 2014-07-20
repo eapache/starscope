@@ -34,7 +34,7 @@ class StarScope::Record
     ext = self.ctag_ext_tags(rec, file)
     if not ext.empty?
       ret << ";\""
-      ext.each do |k, v|
+      ext.sort.each do |k, v|
         ret << "\t#{k}:#{v}"
       end
     end
