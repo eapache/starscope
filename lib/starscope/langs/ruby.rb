@@ -57,7 +57,7 @@ module StarScope::Lang
         when :send
           name = scoped_name(node)
           yield :calls, name, :line_no => loc.line, :col => loc.column
-          if name.last =~ /\w+=$/
+          if name.last.to_s =~ /\w+=$/
             name[-1] = name.last.to_s.chop.to_sym
             yield :assigns, name, :line_no => loc.line, :col => loc.column
           end
