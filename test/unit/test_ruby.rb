@@ -53,5 +53,8 @@ class TestRuby < Minitest::Test
     assert assigns[:pbar].count == 2
     assert assigns[:PBAR_FORMAT].count == 1
     assert assigns[:foo].count == 1
+
+    refute assigns.keys.include? "=".to_sym
+    refute assigns.keys.include? "<".to_sym
   end
 end
