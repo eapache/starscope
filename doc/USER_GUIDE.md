@@ -1,6 +1,17 @@
 StarScope User Guide
 ====================
 
+About
+-----
+
+Anyone who has done much programming in C (or C++) on a Unix-based OS has come
+across the fantastic [Cscope](http://cscope.sourceforge.net/) tool. Sadly, it
+only works for C (and sort of works for C++).
+
+StarScope is a similar tool for [Ruby](https://www.ruby-lang.org/) and
+[Golang](http://golang.org/), with a design intended to make it easy to add
+[support for other languages](doc/LANGUAGE_SUPPORT.md) within the same framework
+(thus the name StarScope, i.e. \*scope).
 
 Installation
 ------------
