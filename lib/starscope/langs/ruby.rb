@@ -57,11 +57,11 @@ module StarScope::Lang
         when :send
           name = scoped_name(node)
           yield :calls, name, :line_no => loc.line, :col => loc.column
+
           if name.last.to_s =~ /\w+=$/
             name[-1] = name.last.to_s.chop.to_sym
             yield :assigns, name, :line_no => loc.line, :col => loc.column
-          end
-          if node.children[0].nil? and node.children[1] == :require and node.children[2].type == :str
+          elsif node.children[0].nil? and node.children[1] == :require and node.children[2].type == :str
             yield :requires, node.children[2].children[0].split("/"),
               :line_no => loc.line, :col => loc.column
           end
