@@ -38,6 +38,12 @@ module StarScope::Lang
           stack.pop
         end
 
+        if stack[-1] != :import && !line.start_with?("import")
+          # strip string literals like "foo" unless they're part of an import
+          match = /(.*?)".*?"(.*)/.match(line)
+          line = match[1] + "\"\"" + match[2] if match
+        end
+
         # poor-man's parser
         case stack[-1]
         when :struct
