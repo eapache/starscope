@@ -4,7 +4,9 @@ Changelog
 v1.1.2 (trunk)
 --------------------
 
-No changes yet.
+Bug Fixes:
+ * Don't crash exporting to cscope if tokens overlap.
+ * In golang, don't parse inside string literals.
 
 v1.1.1 (2014-07-21)
 --------------------

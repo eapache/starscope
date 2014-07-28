@@ -218,6 +218,8 @@ END
         buf << line_no.to_s << " "
         toks.each do |offset, record|
 
+          next if offset < prev # this probably indicates an extractor bug
+
           # Don't export nested functions, cscope barfs on them since C doesn't
           # have them at all. Skipping tokens is easy; since prev isn't updated
           # they get turned into plain text automatically.

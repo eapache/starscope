@@ -3,6 +3,7 @@ module StarScope::Lang
     FUNC_CALL = /([\w\.]*?\w)\(/
     END_OF_BLOCK = /^\s*\}\s*$/
     END_OF_GROUP = /^\s*\)\s*$/
+    STRING_LITERAL = /".+?"/
     BUILTIN_FUNCS = ['new', 'make', 'len', 'close', 'copy', 'delete',
                      'int', 'int8', 'int16', 'int32', 'int64',
                      'uint', 'uint8', 'uint16', 'uint32', 'uint64',
@@ -16,18 +17,18 @@ module StarScope::Lang
     def self.extract(file, &block)
       stack = []
       scope = []
-      str = File.readlines(file).each_with_index do |line, line_no|
+      File.readlines(file).each_with_index do |line, line_no|
         line_no += 1 # zero-index to one-index
 
         # strip single-line comments like // foo
-        match = /(.*)\/\//.match(line)
-        line = match[1] if match
+        match = /\/\//.match(line)
+        line = match.pre_match if match
         # strip single-line comments like foo /* foo */ foo
-        match = /(.*?)\/\*.*\*\/(.*)/.match(line)
-        line = match[1] + match[2] if match
+        match = /\/\*.*\*\//.match(line)
+        line = match.pre_match + match.post_match if match
         # strip end-of-line comment starters like foo /* foo \n
-        match = /(.*?)\/\*/.match(line)
-        line = match[1] if match
+        match = /\/\*/.match(line)
+        line = match.pre_match if match
         ends_with_comment = !match.nil?
 
         # if we're in a block comment, wait for it to end
@@ -36,6 +37,15 @@ module StarScope::Lang
           next unless match
           line = match[1]
           stack.pop
+        end
+
+        if stack[-1] != :import && !line.start_with?("import")
+          # strip string literals like "foo" unless they're part of an import
+          pos = 0
+          while match = STRING_LITERAL.match(line[pos..-1])
+            line = match.pre_match + "\"\"" + match.post_match
+            pos += match.begin(0) + 2
+          end
         end
 
         # poor-man's parser
