@@ -42,9 +42,9 @@ module StarScope::Lang
         if stack[-1] != :import && !line.start_with?("import")
           # strip string literals like "foo" unless they're part of an import
           pos = 0
-          while match = STRING_LITERAL.match(line, pos)
+          while match = STRING_LITERAL.match(line[pos..-1])
             line = match.pre_match + "\"\"" + match.post_match
-            pos = match.begin(0)+2
+            pos += match.begin(0) + 2
           end
         end
 
