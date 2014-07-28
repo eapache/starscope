@@ -16,7 +16,7 @@ module StarScope::Lang
     def self.extract(file, &block)
       stack = []
       scope = []
-      str = File.readlines(file).each_with_index do |line, line_no|
+      File.readlines(file).each_with_index do |line, line_no|
         line_no += 1 # zero-index to one-index
 
         # strip single-line comments like // foo
