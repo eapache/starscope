@@ -70,4 +70,10 @@ class TestGolang < Minitest::Test
     assert assigns[:n].count == 1
     assert assigns[:m].count == 2
   end
+
+  def test_imports
+    assert @db.keys.include? :imports
+    imports = @db[:imports].group_by {|x| x[:name][-1]}
+    assert imports.keys.include? :fmt
+  end
 end
