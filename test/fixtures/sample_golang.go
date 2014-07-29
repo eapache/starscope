@@ -21,7 +21,7 @@ const (
 
 var x error = fmt.Errorf("ABC")
 
-const y error = fmt.Errorf("ABC")
+const y string = "ABC"
 
 type foo interface {
 	bar() int
@@ -41,6 +41,11 @@ func c(a, b int) int {
 
 func ttt() (int, int) {
 	return 1, 2
+}
+
+type Message struct {
+	Topic, Value string
+	Key          *int
 }
 
 func main() {
@@ -64,4 +69,8 @@ func main() {
 
 	fmt.Println(n)
 	fmt.Println(t)
+
+	msg := &Message{Topic: "single_partition", Key: nil, Value: string(fmt.Sprintf("testing %d", q))}
+
+	fmt.Print(msg)
 }

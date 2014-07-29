@@ -38,7 +38,7 @@ class TestGolang < Minitest::Test
 
   def test_ends
     assert @db.keys.include? :end
-    assert @db[:end].count == 6
+    assert @db[:end].count == 7
   end
 
   def test_function_calls
@@ -53,7 +53,7 @@ class TestGolang < Minitest::Test
     assert calls[:b].count == 4
     assert calls[:c].count == 4
     assert calls[:ttt].count == 2
-    assert calls[:Errorf].count == 2
+    assert calls[:Errorf].count == 1
   end
 
   def test_variable_assigns
@@ -64,6 +64,7 @@ class TestGolang < Minitest::Test
     assert assigns.keys.include? :z
     assert assigns.keys.include? :n
     assert assigns.keys.include? :m
+    assert assigns.keys.include? :msg
     assert assigns[:x].count == 2
     assert assigns[:y].count == 1
     assert assigns[:z].count == 1
