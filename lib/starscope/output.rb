@@ -4,7 +4,8 @@ class StarScope::Output
 
   PBAR_FORMAT = '%t: %c/%C %E ||%b>%i||'
 
-  def initialize(level)
+  def initialize(level, out=STDOUT)
+    @out = out
     @level = level
     @pbar = nil
   end
@@ -12,7 +13,8 @@ class StarScope::Output
   def new_pbar(title, num_items)
     if @level != :quiet
       @pbar = ProgressBar.create(:title => title, :total => num_items,
-                                :format => PBAR_FORMAT, :length => 80)
+                                :format => PBAR_FORMAT, :length => 80,
+                                :out => @out)
     end
   end
 
@@ -25,12 +27,12 @@ class StarScope::Output
     @pbar = nil
   end
 
-  def log(msg)
-    return if @level != :verbose
+  def extra(msg)
+    return unless @level == :verbose
     output(msg)
   end
 
-  def print(msg)
+  def normal(msg)
     return if @level == :quiet
     output(msg)
   end
@@ -41,7 +43,7 @@ class StarScope::Output
     if @pbar
       @pbar.log(msg)
     else
-      puts msg
+      @out.puts msg
     end
   end
 
