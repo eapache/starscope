@@ -4,6 +4,10 @@ Changelog
 v1.2.0 (trunk)
 --------------------
 
+Improvements:
+ * You can now specify `--export` multiple times with different formats in a
+   single run.
+
 Bug Fixes:
  * Proper handling of golang string literal escapes.
 

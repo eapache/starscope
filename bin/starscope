@@ -15,7 +15,8 @@ options = {:read => true,
            :write => true,
            :update => true,
            :output => :normal,
-           :db => DEFAULT_DB
+           :export => [],
+           :db => DEFAULT_DB,
 }
 
 # Options Parsing
@@ -51,7 +52,7 @@ END
 
   opts.separator "\nDatabase Management"
   opts.on("-e", "--export FORMAT[,PATH]", "Export in FORMAT to PATH, (see EXPORTING)") do |export|
-    options[:export] = export
+    options[:export] << export
   end
   opts.on("-f", "--file FILE", "Use FILE instead of `#{DEFAULT_DB}`") do |path|
     options[:db] = path
@@ -194,7 +195,7 @@ new_data ||= updated
 
 db.save(options[:db]) if options[:write] and (new_data or not db_exists)
 
-export(db, options[:export], output) if options[:export]
+options[:export].each { |target| export(db, target, output) }
 
 if options[:query]
   table, query = options[:query].split(',', 2)
