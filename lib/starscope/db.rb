@@ -33,8 +33,8 @@ class StarScope::DB
   class NoTableError < StandardError; end
   class UnknownDBFormatError < StandardError; end
 
-  def initialize(output_level)
-    @output = StarScope::Output.new(output_level)
+  def initialize(output)
+    @output = output
     @meta = {:paths => [], :files => {}, :excludes => [],
              :version => StarScope::VERSION}
     @tables = {}

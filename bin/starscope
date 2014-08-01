@@ -161,7 +161,8 @@ def export(db, param, output)
   puts "done" unless output == :quiet
 end
 
-db = StarScope::DB.new(options[:output])
+output = StarScope::Output.new(options[:output])
+db = StarScope::DB.new(output)
 
 db_exists = File.exists?(options[:db])
 
