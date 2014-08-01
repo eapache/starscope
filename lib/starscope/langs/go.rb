@@ -43,7 +43,8 @@ module StarScope::Lang
           # strip string literals like "foo" unless they're part of an import
           pos = 0
           while match = STRING_LITERAL.match(line[pos..-1])
-            line = line[0...pos] + match.pre_match + "\"\"" + match.post_match
+            eos = find_end_of_string(line, match.begin(0))
+            line = line[0..match.begin(0)] + line[eos..-1]
             pos += match.begin(0) + 2
           end
         end
@@ -187,6 +188,21 @@ module StarScope::Lang
       yield :end, scope + ["}"], :line_no => line_no, :type => :class
       stack.pop
       scope.pop
+    end
+
+    def self.find_end_of_string(line, start)
+      escape = false
+      (start+1...line.length).each do |i|
+        if escape
+          escape = false
+        elsif line[i].chr == '\\'
+          escape = true
+        elsif line[i].chr == '"'
+          return i
+        end
+      end
+
+      return line.length
     end
   end
 end
