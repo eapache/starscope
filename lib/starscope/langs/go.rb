@@ -195,9 +195,9 @@ module StarScope::Lang
       (start+1...line.length).each do |i|
         if escape
           escape = false
-        elsif line[i] == "\\"
+        elsif line[i].chr == '\\'
           escape = true
-        elsif line[i] == "\""
+        elsif line[i].chr == '"'
           return i
         end
       end
