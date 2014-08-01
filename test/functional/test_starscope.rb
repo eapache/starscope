@@ -32,4 +32,27 @@ class TestStarScope < Minitest::Test
     end
   end
 
+  def test_export_cscope
+    file = Tempfile.new('starscope_test')
+    begin
+      `#{EXTRACT} -e cscope,#{file.path()}`
+      assert_equal 0, $?.exitstatus
+      `#{EXTRACT} -e ctags,#{file.path()}`
+    ensure
+      file.close
+      file.unlink
+    end
+  end
+
+  def test_export_ctags
+    file = Tempfile.new('starscope_test')
+    begin
+      `#{EXTRACT} -e ctags,#{file.path()}`
+      assert_equal 0, $?.exitstatus
+    ensure
+      file.close
+      file.unlink
+    end
+  end
+
 end

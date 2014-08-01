@@ -151,17 +151,18 @@ def export(db, param, output)
     return
   end
 
-  print "Exporting to '#{path}' in format '#{format}'... " unless output == :quiet
+  output.normal("Exporting to '#{path}' in format '#{format}'...")
   File.open(path, 'w') do |file|
     case format
     when 'ctags'; db.export_ctags(file)
     when 'cscope'; db.export_cscope(file)
     end
   end
-  puts "done" unless output == :quiet
+  output.normal("Export complete.")
 end
 
-db = StarScope::DB.new(options[:output])
+output = StarScope::Output.new(options[:output])
+db = StarScope::DB.new(output)
 
 db_exists = File.exists?(options[:db])
 
@@ -193,7 +194,7 @@ new_data ||= updated
 
 db.save(options[:db]) if options[:write] and (new_data or not db_exists)
 
-export(db, options[:export], options[:output]) if options[:export]
+export(db, options[:export], output) if options[:export]
 
 if options[:query]
   table, query = options[:query].split(',', 2)
@@ -237,7 +238,7 @@ if options[:linemode]
           dump(db, param)
         when "export"
           if param
-            export(db, param, :normal)
+            export(db, param, output)
           else
             puts "!export requires an argument"
           end

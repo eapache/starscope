@@ -33,8 +33,8 @@ class StarScope::DB
   class NoTableError < StandardError; end
   class UnknownDBFormatError < StandardError; end
 
-  def initialize(output_level)
-    @output = StarScope::Output.new(output_level)
+  def initialize(output)
+    @output = output
     @meta = {:paths => [], :files => {}, :excludes => [],
              :version => StarScope::VERSION}
     @tables = {}
@@ -42,7 +42,7 @@ class StarScope::DB
 
   # returns true if the database had to be up-converted from an old format
   def load(file)
-    @output.log("Reading database from `#{file}`... ")
+    @output.extra("Reading database from `#{file}`... ")
     File.open(file, 'r') do |file|
       Zlib::GzipReader.wrap(file) do |file|
         case file.gets.to_i
@@ -67,7 +67,7 @@ class StarScope::DB
   end
 
   def save(file)
-    @output.log("Writing database to `#{file}`...")
+    @output.extra("Writing database to `#{file}`...")
 
     # regardless of what the old version was, the new version is written by us
     @meta[:version] = StarScope::VERSION
@@ -82,7 +82,7 @@ class StarScope::DB
   end
 
   def add_excludes(paths)
-    @output.log("Excluding files in paths #{paths}...")
+    @output.extra("Excluding files in paths #{paths}...")
     @meta[:paths] -= paths.map {|p| normalize_glob(p)}
     paths = paths.map {|p| normalize_fnmatch(p)}
     @meta[:excludes] += paths
@@ -93,7 +93,7 @@ class StarScope::DB
   end
 
   def add_paths(paths)
-    @output.log("Adding files in paths #{paths}...")
+    @output.extra("Adding files in paths #{paths}...")
     @meta[:excludes] -= paths.map {|p| normalize_fnmatch(p)}
     paths = paths.map {|p| normalize_glob(p)}
     @meta[:paths] += paths
@@ -115,7 +115,7 @@ class StarScope::DB
     new_files.delete_if {|f| matches_exclude?(@meta[:excludes], f)}
 
     if changes[:deleted].empty? && changes[:modified].empty? && new_files.empty?
-      @output.print("No changes detected.")
+      @output.normal("No changes detected.")
       return false
     end
 
@@ -189,7 +189,7 @@ class StarScope::DB
 
   def add_new_files(files)
     files.each do |file|
-      @output.log("Adding `#{file}`")
+      @output.extra("Adding `#{file}`")
       parse_file(file)
       @output.inc_pbar
     end
@@ -202,7 +202,7 @@ class StarScope::DB
 
   def remove_files(files)
     files.each do |file|
-      @output.log("Removing `#{file}`")
+      @output.extra("Removing `#{file}`")
       @meta[:files].delete(file)
     end
     files = files.to_set
