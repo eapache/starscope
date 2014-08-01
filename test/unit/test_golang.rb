@@ -77,4 +77,13 @@ class TestGolang < Minitest::Test
     imports = @db[:imports].group_by {|x| x[:name][-1]}
     assert imports.keys.include? :fmt
   end
+
+  def test_find_end_of_string
+    assert_equal 4, StarScope::Lang::Go.find_end_of_string('"123"foo', 0)
+    assert_equal 1, StarScope::Lang::Go.find_end_of_string('a"123"foo', 0)
+    assert_equal 5, StarScope::Lang::Go.find_end_of_string('a"123"foo', 1)
+    assert_equal 4, StarScope::Lang::Go.find_end_of_string('"1\""foo', 0)
+    assert_equal 4, StarScope::Lang::Go.find_end_of_string('"1\\""foo', 0)
+    assert_equal 9, StarScope::Lang::Go.find_end_of_string('"1\\\\\"foo', 0)
+  end
 end

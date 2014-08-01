@@ -4,7 +4,8 @@ Changelog
 v1.2.0 (trunk)
 --------------------
 
-No changes yet.
+Bug Fixes:
+ * Proper handling of golang string literal escapes.
 
 v1.1.2 (2014-07-29)
 --------------------
