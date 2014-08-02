@@ -263,7 +263,7 @@ class StarScope::DB
     if !File.exists?(name) || !File.file?(name)
       :deleted
     elsif (file_meta[:last_updated] < File.mtime(name).to_i) ||
-          ((@meta[:langs][file_meta[:lang]] || 0) < LANGS[file_meta[:lang]])
+          (file_meta[:lang] && (@meta[:langs][file_meta[:lang]] || 0) < LANGS[file_meta[:lang]])
       :modified
     else
       :unchanged
