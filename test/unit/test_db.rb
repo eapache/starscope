@@ -11,14 +11,15 @@ describe StarScope::DB do
     files[RUBY_SAMPLE][:last_updated].must_equal File.mtime(RUBY_SAMPLE).to_i
 
     tbls = db.instance_eval('@tables')
+    tbls.must_include :defs
     defs = tbls[:defs].map {|x| x[:name][-1]}
-    assert defs.include? :DB
-    assert defs.include? :NoTableError
-    assert defs.include? :load
-    assert defs.include? :update
-    assert defs.include? :files_from_path
-    assert defs.include? :single_var
-    assert defs.include? :single_const
+    defs.must_include :DB
+    defs.must_include :NoTableError
+    defs.must_include :load
+    defs.must_include :update
+    defs.must_include :files_from_path
+    defs.must_include :single_var
+    defs.must_include :single_const
   end
 
   before do
@@ -64,6 +65,15 @@ describe StarScope::DB do
   it "must update stale existing files" do
     @db.instance_eval("@meta[:paths] = [\"#{FIXTURES}/**/*\"]")
     @db.instance_eval("@meta[:files] = {\"#{GOLANG_SAMPLE}\" => {:last_updated=>1}}")
+    @db.instance_eval("@tables[:defs] = [{:file => \"#{GOLANG_SAMPLE}\"}]")
+    @db.update
+    validate(@db)
+  end
+
+  it "must update unchanged existing files with old extractor versions" do
+    @db.instance_eval("@meta[:paths] = [\"#{FIXTURES}/**/*\"]")
+    @db.instance_eval("@meta[:langs] = {:Go => 0}")
+    @db.instance_eval("@meta[:files] = {\"#{GOLANG_SAMPLE}\" => {:last_updated=>#{File.mtime(GOLANG_SAMPLE).to_i}, :lang => :Go}}")
     @db.instance_eval("@tables[:defs] = [{:file => \"#{GOLANG_SAMPLE}\"}]")
     @db.update
     validate(@db)

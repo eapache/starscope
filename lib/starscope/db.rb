@@ -17,11 +17,14 @@ CSCOPE_GLOBAL_HACK_START = "\n\t$-\n"
 CSCOPE_GLOBAL_HACK_STOP = "\n\t}\n"
 
 # dynamically load all our language extractors
-LANGS = []
+LANGS = {}
+EXTRACTORS = []
 Dir.glob("#{File.dirname(__FILE__)}/langs/*.rb").each do |path|
   require path
-  lang = /(\w+)\.rb$/.match(path)[1]
-  LANGS << eval("StarScope::Lang::#{lang.capitalize}")
+  lang = /(\w+)\.rb$/.match(path)[1].capitalize
+  mod_name = "StarScope::Lang::#{lang}"
+  EXTRACTORS << eval(mod_name)
+  LANGS[lang.to_sym] = eval("#{mod_name}::VERSION")
 end
 
 class StarScope::DB
@@ -36,7 +39,7 @@ class StarScope::DB
   def initialize(output)
     @output = output
     @meta = {:paths => [], :files => {}, :excludes => [],
-             :version => StarScope::VERSION}
+             :langs => LANGS, :version => StarScope::VERSION}
     @tables = {}
   end
 
@@ -49,6 +52,7 @@ class StarScope::DB
         when DB_FORMAT
           @meta   = Oj.load(file.gets)
           @tables = Oj.load(file.gets)
+          @meta[:langs] ||= {}
           return false
         when 3..4
           # Old format, so read the directories segment then rebuild
@@ -71,6 +75,8 @@ class StarScope::DB
 
     # regardless of what the old version was, the new version is written by us
     @meta[:version] = StarScope::VERSION
+
+    @meta[:langs].merge!(LANGS)
 
     File.open(file, 'w') do |file|
       Zlib::GzipWriter.wrap(file) do |file|
@@ -241,21 +247,23 @@ class StarScope::DB
   def parse_file(file)
     @meta[:files][file] = {:last_updated => File.mtime(file).to_i}
 
-    LANGS.each do |lang|
-      next if not lang.match_file file
-      lang.extract file do |tbl, name, args|
+    EXTRACTORS.each do |extractor|
+      next if not extractor.match_file file
+      extractor.extract file do |tbl, name, args|
         @tables[tbl] ||= []
         @tables[tbl] << StarScope::Record.build(file, name, args)
       end
-      @meta[:files][file][:lang] = lang.name.split('::').last.to_sym
+      @meta[:files][file][:lang] = extractor.name.split('::').last.to_sym
       return
     end
   end
 
   def file_changed(name)
-    if not File.exists?(name) or not File.file?(name)
+    file_meta = @meta[:files][name]
+    if !File.exists?(name) || !File.file?(name)
       :deleted
-    elsif @meta[:files][name][:last_updated] < File.mtime(name).to_i
+    elsif (file_meta[:last_updated] < File.mtime(name).to_i) ||
+          ((@meta[:langs][file_meta[:lang]] || 0) < LANGS[file_meta[:lang]])
       :modified
     else
       :unchanged

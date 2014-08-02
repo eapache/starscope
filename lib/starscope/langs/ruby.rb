@@ -2,6 +2,8 @@ require "parser/current"
 
 module StarScope::Lang
   module Ruby
+    VERSION = 1
+
     def self.match_file(name)
       return true if name.end_with?(".rb")
       File.open(name) do |f|

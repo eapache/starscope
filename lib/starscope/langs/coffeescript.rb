@@ -1,5 +1,6 @@
 module StarScope::Lang
   module Coffeescript
+    VERSION = 0
 
     def self.match_file(name)
       name.end_with?(".coffee")
