@@ -22,6 +22,7 @@ drop the following template in:
 ```ruby
 module StarScope::Lang
   module Mylanguage
+    VERSION = 1
 
     def self.match_file(name)
       name.end_with?(".mylang")
@@ -30,13 +31,16 @@ module StarScope::Lang
     def self.extract(file)
       # TODO
     end
-
   end
 end
 ```
 
 This code is pretty simple: we define a module called
-`StarScope::Lang::Mylanguage` and give it two public module methods:
+`StarScope::Lang::Mylanguage` and give it one constant and two public module
+methods:
+ * `VERSION` is a constant integer defining the current version of the
+   extractor. It should be incremented when the extractor has changed enough
+   that any existing files should be re-parsed with the new version.
  * `match_file` takes the name of the file and returns a boolean if that file is
    written in MyLanguage or not. This can be as simple as checking the file
    extension (which the sample code does) or looking for a shell #! line, or
