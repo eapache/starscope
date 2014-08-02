@@ -1,5 +1,7 @@
 module StarScope::Lang
   module Go
+    VERSION = 1
+
     FUNC_CALL = /([\w\.]*?\w)\(/
     END_OF_BLOCK = /^\s*\}\s*$/
     END_OF_GROUP = /^\s*\)\s*$/
