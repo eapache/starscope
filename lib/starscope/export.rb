@@ -1,4 +1,13 @@
 module StarScope::Export
+
+  # cscope has this funky issue where it refuses to recognize function calls that
+  # happen outside of a function definition - this isn't an issue in C, where all
+  # calls must occur in a function, but in ruby et al. it is perfectly legal to
+  # write normal code outside the "scope" of a function definition - we insert a
+  # fake shim "global" function everywhere we can to work around this
+  CSCOPE_GLOBAL_HACK_START = "\n\t$-\n"
+  CSCOPE_GLOBAL_HACK_STOP = "\n\t}\n"
+
   def export_ctags(file)
     file.puts <<END
 !_TAG_FILE_FORMAT	2	/extended format/
@@ -10,7 +19,7 @@ module StarScope::Export
 END
     defs = (@tables[:defs] || {}).sort_by {|x| x[:name][-1].to_s}
     defs.each do |record|
-      file.puts StarScope::Record.ctag_line(record, @meta[:files][record[:file]])
+      file.puts ctag_line(record, @meta[:files][record[:file]])
     end
   end
 
@@ -53,7 +62,7 @@ END
 
           buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
           buf << cscope_plaintext(line, prev, offset) << "\n"
-          buf << StarScope::Record.cscope_mark(record[:tbl], record) << record[:key] << "\n"
+          buf << cscope_mark(record[:tbl], record) << record[:key] << "\n"
           buf << CSCOPE_GLOBAL_HACK_START if record[:type] == :func && record[:tbl] == :end
 
           prev = offset + record[:key].length
@@ -142,6 +151,73 @@ END
   rescue ArgumentError
     # invalid utf-8 byte sequence in the line, oh well
     line
+  end
+
+  def cscope_mark(tbl, rec)
+    case tbl
+    when :end
+      case rec[:type]
+      when :func
+        ret = "}"
+      else
+        return ""
+      end
+    when :file
+      ret = "@"
+    when :defs
+      case rec[:type]
+      when :func
+        ret = "$"
+      when :class, :module
+        ret = "c"
+      when :type
+        ret = "t"
+      else
+        ret = "g"
+      end
+    when :calls
+      ret = "`"
+    when :requires
+      ret = "~\""
+    when :imports
+      ret = "~<"
+    when :assigns
+      ret = "="
+    else
+      return ""
+    end
+
+    return "\t" + ret
+  end
+
+  def ctag_line(rec, file)
+    ret = "#{rec[:name][-1]}\t#{rec[:file]}\t/^#{rec[:line]}$/"
+
+    ext = ctag_ext_tags(rec, file)
+    if not ext.empty?
+      ret << ";\""
+      ext.sort.each do |k, v|
+        ret << "\t#{k}:#{v}"
+      end
+    end
+
+    ret
+  end
+
+  def ctag_ext_tags(rec, file)
+    tag = {}
+
+    # these extensions are documented at http://ctags.sourceforge.net/FORMAT
+    case rec[:type]
+    when :func
+      tag["kind"] = "f"
+    when :module, :class
+      tag["kind"] = "c"
+    end
+
+    tag["language"] = file[:lang]
+
+    tag
   end
 
 end

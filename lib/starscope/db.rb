@@ -6,15 +6,6 @@ require 'zlib'
 require 'starscope/export'
 require 'starscope/matcher'
 require 'starscope/output'
-require 'starscope/record'
-
-# cscope has this funky issue where it refuses to recognize function calls that
-# happen outside of a function definition - this isn't an issue in C, where all
-# calls must occur in a function, but in ruby et al. it is perfectly legal to
-# write normal code outside the "scope" of a function definition - we insert a
-# fake shim "global" function everywhere we can to work around this
-CSCOPE_GLOBAL_HACK_START = "\n\t$-\n"
-CSCOPE_GLOBAL_HACK_STOP = "\n\t}\n"
 
 # dynamically load all our language extractors
 LANGS = {}
@@ -143,7 +134,7 @@ class StarScope::DB
     @tables[table].sort {|a,b|
       a[:name][-1].to_s.downcase <=> b[:name][-1].to_s.downcase
     }.each do |record|
-      puts StarScope::Record.format(record)
+      puts self.class.format_record(record)
     end
   end
 
@@ -189,6 +180,10 @@ class StarScope::DB
     raise NoTableError if not @tables[table]
     input = @tables[table]
     StarScope::Matcher.new(value, input).query()
+  end
+
+  def self.format_record(rec)
+    "#{rec[:name].join " "} -- #{rec[:file]}:#{rec[:line_no]} (#{rec[:line].strip})"
   end
 
   private
@@ -251,7 +246,7 @@ class StarScope::DB
       next if not extractor.match_file file
       extractor.extract file do |tbl, name, args|
         @tables[tbl] ||= []
-        @tables[tbl] << StarScope::Record.build(file, name, args)
+        @tables[tbl] << self.class.build_record(file, name, args)
       end
       @meta[:files][file][:lang] = extractor.name.split('::').last.to_sym
       return
@@ -268,6 +263,30 @@ class StarScope::DB
     else
       :unchanged
     end
+  end
+
+  @@cachedFile = nil
+  @@cachedLines = nil
+
+  def self.build_record(file, name, args)
+    args[:file] = file
+
+    if name.is_a? Array
+      args[:name] = name.map {|x| x.to_sym}
+    else
+      args[:name] = [name.to_sym]
+    end
+
+    if args[:line_no]
+      if @@cachedFile != file
+        @@cachedFile = file
+        @@cachedLines = File.readlines(file)
+      end
+
+      args[:line] = @@cachedLines[args[:line_no]-1].chomp
+    end
+
+    args
   end
 
 end
