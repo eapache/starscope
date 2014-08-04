@@ -143,4 +143,34 @@ describe StarScope::DB do
     @db.query(:calls, "add_file").length.must_equal 3
   end
 
+  it "must symbolize compound name" do
+    rec = StarScope::DB.build_record(:foo, ["a", :b], {})
+    rec[:name].must_equal [:a, :b]
+  end
+
+  it "must symbolize and array-wrap simple name" do
+    rec = StarScope::DB.build_record(:foo, "a", {})
+    rec[:name].must_equal [:a]
+  end
+
+  it "must read correct line from file" do
+
+    # we interleave the files here to test the cache
+
+    rec = StarScope::DB.build_record(GOLANG_SAMPLE, :a, {:line_no => 1})
+    rec[:line].must_equal "package main"
+
+    rec = StarScope::DB.build_record(GOLANG_SAMPLE, :a, {:line_no => 71})
+    rec[:line].must_equal "\tfmt.Println(t)"
+
+    rec = StarScope::DB.build_record(RUBY_SAMPLE, :a, {:line_no => 1})
+    rec[:line].must_equal "require 'date'"
+
+    rec = StarScope::DB.build_record(RUBY_SAMPLE, :a, {:line_no => 164})
+    rec[:line].must_equal "end"
+
+    rec = StarScope::DB.build_record(GOLANG_SAMPLE, :a, {:line_no => 44})
+    rec[:line].must_equal "}"
+  end
+
 end

@@ -5,7 +5,7 @@ class TestRuby < Minitest::Test
     @db = {}
     StarScope::Lang::Ruby.extract(RUBY_SAMPLE) do |tbl, name, args|
       @db[tbl] ||= []
-      @db[tbl] << StarScope::Record.build(RUBY_SAMPLE, name, args)
+      @db[tbl] << StarScope::DB.build_record(RUBY_SAMPLE, name, args)
     end
   end
 
