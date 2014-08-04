@@ -20,21 +20,21 @@ class StarScope::DB
     self.foo = :bar
   end
 
-  def load(file)
-    File.open(file, 'r') do |file|
-      Zlib::GzipReader.wrap(file) do |file|
-        format = file.gets.to_i
+  def load(filename)
+    File.open(filename, 'r') do |file|
+      Zlib::GzipReader.wrap(file) do |stream|
+        format = stream.gets.to_i
         if format == DB_FORMAT
-          @paths  = Oj.load(file.gets)
-          @files  = Oj.load(file.gets)
-          @tables = Oj.load(file.gets, :symbol_keys => true)
+          @paths  = Oj.load(stream.gets)
+          @files  = Oj.load(stream.gets)
+          @tables = Oj.load(stream.gets, :symbol_keys => true)
         elsif format <= 2
           # Old format (pre-json), so read the directories segment then rebuild
-          len = file.gets.to_i
-          add_paths(Marshal::load(file.read(len)))
+          len = stream.gets.to_i
+          add_paths(Marshal::load(stream.read(len)))
         elsif format < DB_FORMAT
           # Old format, so read the directories segment then rebuild
-          add_paths(Oj.load(file.gets))
+          add_paths(Oj.load(stream.gets))
         elsif format > DB_FORMAT
           raise UnknownDBFormatError
         end
@@ -42,13 +42,13 @@ class StarScope::DB
     end
   end
 
-  def save(file)
-    File.open(file, 'w') do |file|
-      Zlib::GzipWriter.wrap(file) do |file|
-        file.puts DB_FORMAT
-        file.puts Oj.dump @paths
-        file.puts Oj.dump @files
-        file.puts Oj.dump @tables
+  def save(filename)
+    File.open(filename, 'w') do |file|
+      Zlib::GzipWriter.wrap(file) do |stream|
+        stream.puts DB_FORMAT
+        stream.puts Oj.dump @paths
+        stream.puts Oj.dump @files
+        stream.puts Oj.dump @tables
       end
     end
   end

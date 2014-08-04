@@ -20,7 +20,7 @@ module StarScope::Lang
         ast = Parser::CurrentRuby.parse_file(file)
       rescue
       else
-        Extractor.new(ast).extract &block
+        Extractor.new(ast).extract(&block)
       end
     end
 
