@@ -13,6 +13,10 @@ Improvements:
 Bug Fixes:
  * Proper handling of golang string literal escapes.
 
+Misc:
+ * Some internal refactoring and test suite improvements for better
+   maintainability going forward.
+
 v1.1.2 (2014-07-29)
 --------------------
 
