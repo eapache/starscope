@@ -109,7 +109,7 @@ def print_summary(db)
 end
 
 def run_query(db, table, value)
-  if not value
+  if !value
     $stderr.puts "Invalid input - no query found."
     return false
   end
@@ -167,7 +167,7 @@ db = StarScope::DB.new(output)
 
 db_exists = File.exists?(options[:db])
 
-if options[:read] and db_exists
+if options[:read] && db_exists
   new_data = db.load(options[:db])
 else
   # no need to run an update if we didn't read any old data
@@ -179,11 +179,11 @@ if options[:exclude]
   new_data = true
 end
 
-if not ARGV.empty?
+if !ARGV.empty?
   # paths specified, add them
   db.add_paths(ARGV)
   new_data = true
-elsif not (options[:read] and db_exists)
+elsif !(options[:read] && db_exists)
   # no paths were specified and the database was not read or did not exist;
   # default to building a new DB in the current directory
   db.add_paths(['.'])
@@ -193,7 +193,7 @@ end
 updated = db.update() if options[:update]
 new_data ||= updated
 
-db.save(options[:db]) if options[:write] and (new_data or not db_exists)
+db.save(options[:db]) if options[:write] && (new_data || !db_exists)
 
 options[:export].each { |target| export(db, target, output) }
 
@@ -247,7 +247,7 @@ if options[:linemode]
           print_summary(db)
         when "update"
           changed = db.update
-          db.save(options[:db]) if options[:write] and changed
+          db.save(options[:db]) if options[:write] && changed
         when "help"
           puts linemode_help
         when "version"

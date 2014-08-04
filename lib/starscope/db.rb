@@ -44,24 +44,24 @@ class StarScope::DB
   end
 
   # returns true if the database had to be up-converted from an old format
-  def load(file)
-    @output.extra("Reading database from `#{file}`... ")
-    File.open(file, 'r') do |file|
-      Zlib::GzipReader.wrap(file) do |file|
-        case file.gets.to_i
+  def load(filename)
+    @output.extra("Reading database from `#{filename}`... ")
+    File.open(filename, 'r') do |file|
+      Zlib::GzipReader.wrap(file) do |stream|
+        case stream.gets.to_i
         when DB_FORMAT
-          @meta   = Oj.load(file.gets)
-          @tables = Oj.load(file.gets)
+          @meta   = Oj.load(stream.gets)
+          @tables = Oj.load(stream.gets)
           @meta[:langs] ||= {}
           return false
         when 3..4
           # Old format, so read the directories segment then rebuild
-          add_paths(Oj.load(file.gets))
+          add_paths(Oj.load(stream.gets))
           return true
         when 0..2
           # Old format (pre-json), so read the directories segment then rebuild
-          len = file.gets.to_i
-          add_paths(Marshal::load(file.read(len)))
+          len = stream.gets.to_i
+          add_paths(Marshal::load(stream.read(len)))
           return true
         else
           raise UnknownDBFormatError
@@ -70,19 +70,19 @@ class StarScope::DB
     end
   end
 
-  def save(file)
-    @output.extra("Writing database to `#{file}`...")
+  def save(filename)
+    @output.extra("Writing database to `#{filename}`...")
 
     # regardless of what the old version was, the new version is written by us
     @meta[:version] = StarScope::VERSION
 
     @meta[:langs].merge!(LANGS)
 
-    File.open(file, 'w') do |file|
-      Zlib::GzipWriter.wrap(file) do |file|
-        file.puts DB_FORMAT
-        file.puts Oj.dump @meta
-        file.puts Oj.dump @tables
+    File.open(filename, 'w') do |file|
+      Zlib::GzipWriter.wrap(file) do |stream|
+        stream.puts DB_FORMAT
+        stream.puts Oj.dump @meta
+        stream.puts Oj.dump @tables
       end
     end
   end
