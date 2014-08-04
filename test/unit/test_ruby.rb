@@ -17,44 +17,44 @@ class TestRuby < Minitest::Test
   end
 
   def test_function_defs
-    assert @db.keys.include? :defs
+    assert_includes @db.keys, :defs
     defs = @db[:defs].map {|x| x[:name][-1]}
-    assert defs.include? :DB
-    assert defs.include? :NoTableError
-    assert defs.include? :load
-    assert defs.include? :update
-    assert defs.include? :files_from_path
+    assert_includes defs, :DB
+    assert_includes defs, :NoTableError
+    assert_includes defs, :load
+    assert_includes defs, :update
+    assert_includes defs, :files_from_path
   end
 
   def test_constant_defs
-    assert @db[:defs].map {|x| x[:name][-1]}.include? :PBAR_FORMAT
+    assert_includes @db[:defs].map {|x| x[:name][-1]}, :PBAR_FORMAT
   end
 
   def test_ends
-    assert @db.keys.include? :end
-    assert @db[:end].count == 13
+    assert_includes @db.keys, :end
+    assert_equal 13, @db[:end].count
   end
 
   def test_function_calls
-    assert @db.keys.include? :calls
+    assert_includes @db.keys, :calls
     calls = @db[:calls].group_by {|x| x[:name][-1]}
-    assert calls.keys.include? :add_file
-    assert calls.keys.include? :each
-    assert calls[:add_file].count == 3
-    assert calls[:each].count == 8
+    assert_includes calls.keys, :add_file
+    assert_includes calls.keys, :each
+    assert_equal 3, calls[:add_file].count
+    assert_equal 8, calls[:each].count
   end
 
   def test_variable_assigns
-    assert @db.keys.include? :assigns
+    assert_includes @db.keys, :assigns
     assigns = @db[:assigns].group_by {|x| x[:name][-1]}
-    assert assigns.keys.include? :pbar
-    assert assigns.keys.include? :PBAR_FORMAT
-    assert assigns.keys.include? :foo
-    assert assigns[:pbar].count == 2
-    assert assigns[:PBAR_FORMAT].count == 1
-    assert assigns[:foo].count == 1
+    assert_includes assigns.keys, :pbar
+    assert_includes assigns.keys, :PBAR_FORMAT
+    assert_includes assigns.keys, :foo
+    assert_equal 2, assigns[:pbar].count
+    assert_equal 1, assigns[:PBAR_FORMAT].count
+    assert_equal 1, assigns[:foo].count
 
-    refute assigns.keys.include? "=".to_sym
-    refute assigns.keys.include? "<".to_sym
+    refute_includes assigns.keys, "=".to_sym
+    refute_includes assigns.keys, "<".to_sym
   end
 end

@@ -18,22 +18,22 @@ class TestGolang < Minitest::Test
   def test_defs
     assert @db.keys.include? :defs
     defs = @db[:defs].map {|x| x[:name][-1]}
-    assert defs.include? :a
-    assert defs.include? :b
-    assert defs.include? :c
-    assert defs.include? :ttt
-    assert defs.include? :main
-    assert defs.include? :v1
-    assert defs.include? :v2
-    assert defs.include? :Sunday
-    assert defs.include? :Monday
-    assert defs.include? :single_var
-    assert defs.include? :single_const
+    assert_includes defs, :a
+    assert_includes defs, :b
+    assert_includes defs, :c
+    assert_includes defs, :ttt
+    assert_includes defs, :main
+    assert_includes defs, :v1
+    assert_includes defs, :v2
+    assert_includes defs, :Sunday
+    assert_includes defs, :Monday
+    assert_includes defs, :single_var
+    assert_includes defs, :single_const
 
-    refute defs.include? :"0x00"
-    refute defs.include? :"0x01"
-    refute defs.include? :"0x02"
-    refute defs.include? :"0x03"
+    refute_includes defs, :"0x00"
+    refute_includes defs, :"0x01"
+    refute_includes defs, :"0x02"
+    refute_includes defs, :"0x03"
   end
 
   def test_ends
@@ -44,38 +44,38 @@ class TestGolang < Minitest::Test
   def test_function_calls
     assert @db.keys.include? :calls
     calls = @db[:calls].group_by {|x| x[:name][-1]}
-    assert calls.keys.include? :a
-    assert calls.keys.include? :b
-    assert calls.keys.include? :c
-    assert calls.keys.include? :ttt
-    assert calls.keys.include? :Errorf
-    assert calls[:a].count == 3
-    assert calls[:b].count == 4
-    assert calls[:c].count == 4
-    assert calls[:ttt].count == 2
-    assert calls[:Errorf].count == 1
+    assert_includes calls.keys, :a
+    assert_includes calls.keys, :b
+    assert_includes calls.keys, :c
+    assert_includes calls.keys, :ttt
+    assert_includes calls.keys, :Errorf
+    assert_equal 3, calls[:a].count
+    assert_equal 4, calls[:b].count
+    assert_equal 4, calls[:c].count
+    assert_equal 2, calls[:ttt].count
+    assert_equal 1, calls[:Errorf].count
   end
 
   def test_variable_assigns
     assert @db.keys.include? :assigns
     assigns = @db[:assigns].group_by {|x| x[:name][-1]}
-    assert assigns.keys.include? :x
-    assert assigns.keys.include? :y
-    assert assigns.keys.include? :z
-    assert assigns.keys.include? :n
-    assert assigns.keys.include? :m
-    assert assigns.keys.include? :msg
-    assert assigns[:x].count == 2
-    assert assigns[:y].count == 1
-    assert assigns[:z].count == 1
-    assert assigns[:n].count == 1
-    assert assigns[:m].count == 2
+    assert_includes assigns.keys, :x
+    assert_includes assigns.keys, :y
+    assert_includes assigns.keys, :z
+    assert_includes assigns.keys, :n
+    assert_includes assigns.keys, :m
+    assert_includes assigns.keys, :msg
+    assert_equal 2, assigns[:x].count
+    assert_equal 1, assigns[:y].count
+    assert_equal 1, assigns[:z].count
+    assert_equal 1, assigns[:n].count
+    assert_equal 2, assigns[:m].count
   end
 
   def test_imports
-    assert @db.keys.include? :imports
+    assert_includes @db.keys, :imports
     imports = @db[:imports].group_by {|x| x[:name][-1]}
-    assert imports.keys.include? :fmt
+    assert_includes imports.keys, :fmt
   end
 
   def test_find_end_of_string
