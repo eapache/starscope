@@ -118,7 +118,7 @@ def run_query(db, table, value)
     puts "No results found."
   else
     results.sort_by {|x| x[:name].join(' ')}.each do |rec|
-      puts StarScope::DB.format_record(rec)
+      puts db.format_record(rec)
     end
   end
   return true

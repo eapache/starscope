@@ -134,7 +134,7 @@ class StarScope::DB
     @tables[table].sort {|a,b|
       a[:name][-1].to_s.downcase <=> b[:name][-1].to_s.downcase
     }.each do |record|
-      puts self.class.format_record(record)
+      puts format_record(record)
     end
   end
 
@@ -182,8 +182,8 @@ class StarScope::DB
     StarScope::Matcher.new(value, input).query()
   end
 
-  def self.format_record(rec)
-    "#{rec[:name].join " "} -- #{rec[:file]}:#{rec[:line_no]} (#{rec[:line].strip})"
+  def format_record(rec)
+    "#{rec[:name].join " "} -- #{rec[:file]}:#{rec[:line_no]} (#{line_for_record(rec).strip})"
   end
 
   private
@@ -244,11 +244,21 @@ class StarScope::DB
 
     EXTRACTORS.each do |extractor|
       next if not extractor.match_file file
+
+      lines = {}
+      line_cache = File.readlines(file)
       extractor.extract file do |tbl, name, args|
         @tables[tbl] ||= []
-        @tables[tbl] << self.class.build_record(file, name, args)
+        @tables[tbl] << self.class.normalize_record(file, name, args)
+
+        if args[:line_no]
+          # we to-string it because json keys must be strings :(
+          lines[args[:line_no].to_s] ||= line_cache[args[:line_no] - 1].chomp
+        end
       end
+
       @meta[:files][file][:lang] = extractor.name.split('::').last.to_sym
+      @meta[:files][file][:lines] = lines
       return
     end
   end
@@ -265,25 +275,21 @@ class StarScope::DB
     end
   end
 
-  @@cachedFile = nil
-  @@cachedLines = nil
+  def line_for_record(rec)
+    return rec[:line] if rec[:line]
 
-  def self.build_record(file, name, args)
+    file = @meta[:files][rec[:file]]
+
+    return file[:lines][rec[:line_no].to_s] if file[:lines]
+  end
+
+  def self.normalize_record(file, name, args)
     args[:file] = file
 
     if name.is_a? Array
       args[:name] = name.map {|x| x.to_sym}
     else
       args[:name] = [name.to_sym]
-    end
-
-    if args[:line_no]
-      if @@cachedFile != file
-        @@cachedFile = file
-        @@cachedLines = File.readlines(file)
-      end
-
-      args[:line] = @@cachedLines[args[:line_no]-1].chomp
     end
 
     args

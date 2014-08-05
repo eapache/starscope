@@ -36,7 +36,7 @@ END
       func_count = 0
 
       lines.sort.each do |line_no, records|
-        line = records.first[:line]
+        line = line_for_record(records.first)
         toks = tokenize_line(line, records)
         next if toks.empty?
 
@@ -191,7 +191,7 @@ END
   end
 
   def ctag_line(rec, file)
-    ret = "#{rec[:name][-1]}\t#{rec[:file]}\t/^#{rec[:line]}$/"
+    ret = "#{rec[:name][-1]}\t#{rec[:file]}\t/^#{line_for_record(rec)}$/"
 
     ext = ctag_ext_tags(rec, file)
     if not ext.empty?
