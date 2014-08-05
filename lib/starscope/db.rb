@@ -245,15 +245,16 @@ class StarScope::DB
     EXTRACTORS.each do |extractor|
       next if not extractor.match_file file
 
-      lines = {}
-      line_cache = File.readlines(file)
+      lines = nil
+      line_cache = nil
       extractor.extract file do |tbl, name, args|
         @tables[tbl] ||= []
         @tables[tbl] << self.class.normalize_record(file, name, args)
 
         if args[:line_no]
-          # we to-string it because json keys must be strings :(
-          lines[args[:line_no].to_s] ||= line_cache[args[:line_no] - 1].chomp
+          line_cache ||= File.readlines(file)
+          lines ||= Array.new(line_cache.length, "")
+          lines[args[:line_no]-1] = line_cache[args[:line_no]-1].chomp
         end
       end
 
@@ -280,7 +281,7 @@ class StarScope::DB
 
     file = @meta[:files][rec[:file]]
 
-    return file[:lines][rec[:line_no].to_s] if file[:lines]
+    return file[:lines][rec[:line_no]-1] if file[:lines]
   end
 
   def self.normalize_record(file, name, args)
