@@ -9,6 +9,7 @@ Improvements:
    single run.
  * Language extractors are now individually versioned. When an extractor is
    upgraded, files it owns will be automatically re-parsed.
+ * Deduplicated some metadata, shrinking database size slightly.
 
 Bug Fixes:
  * Proper handling of golang string literal escapes.
