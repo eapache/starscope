@@ -253,7 +253,7 @@ class Starscope::DB
 
         if args[:line_no]
           line_cache ||= File.readlines(file)
-          lines ||= Array.new(line_cache.length, "")
+          lines ||= Array.new(line_cache.length)
           lines[args[:line_no]-1] = line_cache[args[:line_no]-1].chomp
         end
       end
