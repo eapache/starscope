@@ -1,4 +1,4 @@
-module StarScope::Export
+module Starscope::Export
 
   # cscope has this funky issue where it refuses to recognize function calls that
   # happen outside of a function definition - this isn't an issue in C, where all
@@ -13,9 +13,9 @@ module StarScope::Export
 !_TAG_FILE_FORMAT	2	/extended format/
 !_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
 !_TAG_PROGRAM_AUTHOR	Evan Huus /eapache@gmail.com/
-!_TAG_PROGRAM_NAME	StarScope //
+!_TAG_PROGRAM_NAME	Starscope //
 !_TAG_PROGRAM_URL	https://github.com/eapache/starscope //
-!_TAG_PROGRAM_VERSION	#{StarScope::VERSION}	//
+!_TAG_PROGRAM_VERSION	#{Starscope::VERSION}	//
 END
     defs = (@tables[:defs] || {}).sort_by {|x| x[:name][-1].to_s}
     defs.each do |record|

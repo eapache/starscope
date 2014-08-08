@@ -1,4 +1,4 @@
-class StarScope::Matcher
+class Starscope::Matcher
 
   MATCH_TYPES = [:full_match, :simple_match, :simple_regexp, :full_regexp]
 

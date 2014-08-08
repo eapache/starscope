@@ -1,6 +1,6 @@
 require "parser/current"
 
-module StarScope::Lang
+module Starscope::Lang
   module Ruby
     VERSION = 1
 

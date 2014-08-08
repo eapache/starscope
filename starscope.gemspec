@@ -2,7 +2,7 @@ require File.expand_path('../lib/starscope/version.rb', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.name          = 'starscope'
-  gem.version       = StarScope::VERSION
+  gem.version       = Starscope::VERSION
   gem.summary       = "A code indexer and analyzer"
   gem.description   = "A tool like the venerable cscope, but for ruby, golang and other languages"
   gem.authors       = ["Evan Huus"]

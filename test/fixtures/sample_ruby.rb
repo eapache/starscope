@@ -2,11 +2,11 @@ require 'date'
 require 'zlib'
 
 LANGS = [
-  StarScope::Lang::Go,
-  StarScope::Lang::Ruby
+  Starscope::Lang::Go,
+  Starscope::Lang::Ruby
 ]
 
-class StarScope::DB
+class Starscope::DB
 
   PBAR_FORMAT = '%t: %c/%C %E ||%b>%i||'
 
@@ -134,7 +134,7 @@ class StarScope::DB
         key = key.to_sym
         @tables[tbl] ||= {}
         @tables[tbl][key] ||= []
-        @tables[tbl][key] << StarScope::Datum.build(file, key, args)
+        @tables[tbl][key] << Starscope::Datum.build(file, key, args)
       end
     end
   end

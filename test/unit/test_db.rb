@@ -1,7 +1,7 @@
 require File.expand_path('../../test_helper', __FILE__)
 require 'tempfile'
 
-describe StarScope::DB do
+describe Starscope::DB do
 
   def validate(db)
     files = db.instance_eval('@meta[:files]')
@@ -23,11 +23,11 @@ describe StarScope::DB do
   end
 
   before do
-    @db = StarScope::DB.new(StarScope::Output.new(:quiet))
+    @db = Starscope::DB.new(Starscope::Output.new(:quiet))
   end
 
   it "must raise on invalid tables" do
-    proc {@db.dump_table(:foo)}.must_raise StarScope::DB::NoTableError
+    proc {@db.dump_table(:foo)}.must_raise Starscope::DB::NoTableError
   end
 
   it "must add paths" do
@@ -90,7 +90,7 @@ describe StarScope::DB do
     begin
       @db.add_paths(["#{FIXTURES}"])
       @db.save(file.path)
-      tmp = StarScope::DB.new(StarScope::Output.new(:quiet))
+      tmp = Starscope::DB.new(Starscope::Output.new(:quiet))
       tmp.load(file.path)
       validate(tmp)
     ensure
@@ -144,12 +144,12 @@ describe StarScope::DB do
   end
 
   it "must symbolize compound name" do
-    rec = StarScope::DB.normalize_record(:foo, ["a", :b], {})
+    rec = Starscope::DB.normalize_record(:foo, ["a", :b], {})
     rec[:name].must_equal [:a, :b]
   end
 
   it "must symbolize and array-wrap simple name" do
-    rec = StarScope::DB.normalize_record(:foo, "a", {})
+    rec = Starscope::DB.normalize_record(:foo, "a", {})
     rec[:name].must_equal [:a]
   end
 

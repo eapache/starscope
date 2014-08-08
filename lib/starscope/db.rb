@@ -13,14 +13,14 @@ EXTRACTORS = []
 Dir.glob("#{File.dirname(__FILE__)}/langs/*.rb").each do |path|
   require path
   lang = /(\w+)\.rb$/.match(path)[1].capitalize
-  mod_name = "StarScope::Lang::#{lang}"
+  mod_name = "Starscope::Lang::#{lang}"
   EXTRACTORS << eval(mod_name)
   LANGS[lang.to_sym] = eval("#{mod_name}::VERSION")
 end
 
-class StarScope::DB
+class Starscope::DB
 
-  include StarScope::Export
+  include Starscope::Export
 
   DB_FORMAT = 5
 
@@ -30,7 +30,7 @@ class StarScope::DB
   def initialize(output)
     @output = output
     @meta = {:paths => [], :files => {}, :excludes => [],
-             :langs => LANGS, :version => StarScope::VERSION}
+             :langs => LANGS, :version => Starscope::VERSION}
     @tables = {}
   end
 
@@ -65,7 +65,7 @@ class StarScope::DB
     @output.extra("Writing database to `#{filename}`...")
 
     # regardless of what the old version was, the new version is written by us
-    @meta[:version] = StarScope::VERSION
+    @meta[:version] = Starscope::VERSION
 
     @meta[:langs].merge!(LANGS)
 
@@ -179,7 +179,7 @@ class StarScope::DB
   def query(table, value)
     raise NoTableError if not @tables[table]
     input = @tables[table]
-    StarScope::Matcher.new(value, input).query()
+    Starscope::Matcher.new(value, input).query()
   end
 
   def format_record(rec)

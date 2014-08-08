@@ -3,17 +3,17 @@ require File.expand_path('../../test_helper', __FILE__)
 class TestRuby < Minitest::Test
   def setup
     @db = {}
-    StarScope::Lang::Ruby.extract(RUBY_SAMPLE) do |tbl, name, args|
+    Starscope::Lang::Ruby.extract(RUBY_SAMPLE) do |tbl, name, args|
       @db[tbl] ||= []
-      @db[tbl] << StarScope::DB.normalize_record(RUBY_SAMPLE, name, args)
+      @db[tbl] << Starscope::DB.normalize_record(RUBY_SAMPLE, name, args)
     end
   end
 
   def test_recognition
-    assert StarScope::Lang::Ruby.match_file(RUBY_SAMPLE)
-    assert StarScope::Lang::Ruby.match_file('bin/starscope')
-    refute StarScope::Lang::Ruby.match_file(GOLANG_SAMPLE)
-    refute StarScope::Lang::Ruby.match_file(EMPTY_FILE)
+    assert Starscope::Lang::Ruby.match_file(RUBY_SAMPLE)
+    assert Starscope::Lang::Ruby.match_file('bin/starscope')
+    refute Starscope::Lang::Ruby.match_file(GOLANG_SAMPLE)
+    refute Starscope::Lang::Ruby.match_file(EMPTY_FILE)
   end
 
   def test_function_defs
