@@ -1,7 +1,7 @@
 Database Format
 ===============
 
-The StarScope database format has gone through a couple of iterations over the
+The Starscope database format has gone through a couple of iterations over the
 last year, but the current one is pretty nice and I don't see it changing again
 in the near future. We magically read old formats and convert them, so we only
 document the current version here.
@@ -28,7 +28,7 @@ This is a [JSON](https://en.wikipedia.org/wiki/Json) object. Keys include:
  * `:excludes` - the paths and patterns to exclude from scanning
  * `:files` - the files previously scanned (including things like last-modified
    time)
- * `:version` - The StarScope version which wrote the database (not the same as
+ * `:version` - The Starscope version which wrote the database (not the same as
    the database format version).
 
 Databases

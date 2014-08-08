@@ -20,7 +20,7 @@ For this doc, we're going to pretend to add support for a language called
 drop the following template in:
 
 ```ruby
-module StarScope::Lang
+module Starscope::Lang
   module Mylanguage
     VERSION = 1
 
@@ -36,7 +36,7 @@ end
 ```
 
 This code is pretty simple: we define a module called
-`StarScope::Lang::Mylanguage` and give it one constant and two public module
+`Starscope::Lang::Mylanguage` and give it one constant and two public module
 methods:
  * `VERSION` is a constant integer defining the current version of the
    extractor. It should be incremented when the extractor has changed enough
@@ -78,7 +78,7 @@ you want. Some existing ones that you may want to use include:
  * `col` for the column in the line where the name occurs
  * `type` for the type of definition (`:func`, `:class`, etc)
 
-And that's it! Parse your files, yield your records, and the StarScope engine
+And that's it! Parse your files, yield your records, and the Starscope engine
 takes care of everything else for you. If you've added support for a language
 that you think others might find useful, please contribute it (with tests!) via
 pull request.

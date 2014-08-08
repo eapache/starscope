@@ -122,7 +122,7 @@ v0.1.10 (2014-02-24)
 --------------------
 
 Improvements:
- * Import new ruby parser version and make necessary changes so that StarScope
+ * Import new ruby parser version and make necessary changes so that Starscope
    now runs on older Ruby versions (1.9.2 and 1.8.7)
 
 v0.1.9 (2014-02-22)

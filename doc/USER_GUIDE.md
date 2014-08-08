@@ -1,4 +1,4 @@
-StarScope User Guide
+Starscope User Guide
 ====================
 
 About
@@ -8,15 +8,15 @@ Anyone who has done much programming in C (or C++) on a Unix-based OS has come
 across the fantastic [Cscope](http://cscope.sourceforge.net/) tool. Sadly, it
 only works for C (and sort of works for C++).
 
-StarScope is a similar tool for [Ruby](https://www.ruby-lang.org/) and
+Starscope is a similar tool for [Ruby](https://www.ruby-lang.org/) and
 [Golang](http://golang.org/), with a design intended to make it easy to add
 [support for other languages](doc/LANGUAGE_SUPPORT.md) within the same framework
-(thus the name StarScope, i.e. \*scope).
+(thus the name Starscope, i.e. \*scope).
 
 Installation
 ------------
 
-StarScope is a ruby gem available at https://rubygems.org/gems/starscope.
+Starscope is a ruby gem available at https://rubygems.org/gems/starscope.
 Install it with:
 ```
 $ gem install starscope
@@ -60,9 +60,9 @@ flag.
 Paths
 -----
 
-StarScope has powerful options with sane defaults for managing which paths get
+Starscope has powerful options with sane defaults for managing which paths get
 scanned for files and which do not. By default when creating a new database,
-StarScope will scan all files recursively in the current directory. To scan
+Starscope will scan all files recursively in the current directory. To scan
 specific paths or files instead, pass them as arguments (so `starscope myfolder`
 would only scan files in `myfolder/`).
 
@@ -100,7 +100,7 @@ scope separator).
 Exporting
 ---------
 
-StarScope can export its database into two other formats for use with
+Starscope can export its database into two other formats for use with
 third-party tools:
  * cscope format (default path: `cscope.out`)
  * ctags format (default path: `tags`)
