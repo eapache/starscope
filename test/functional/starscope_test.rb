@@ -1,6 +1,6 @@
 require File.expand_path('../../test_helper', __FILE__)
 
-class TestStarScope < Minitest::Test
+class TestStarscope < Minitest::Test
 
   BASE = "bundle exec bin/starscope --quiet"
   EXTRACT = "#{BASE} --no-read --no-write #{FIXTURES}"
@@ -12,7 +12,7 @@ class TestStarScope < Minitest::Test
   end
 
   def test_version
-    assert_equal StarScope::VERSION, `#{BASE} -v`.chomp
+    assert_equal Starscope::VERSION, `#{BASE} -v`.chomp
   end
 
   def test_summary
@@ -28,7 +28,7 @@ class TestStarScope < Minitest::Test
 
   def test_query
     `#{EXTRACT} -q calls,add_file`.each_line do |line|
-      assert_equal ["StarScope", "DB", "add_file"], line.split[0..2]
+      assert_equal ["Starscope", "DB", "add_file"], line.split[0..2]
     end
   end
 

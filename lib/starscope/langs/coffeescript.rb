@@ -1,4 +1,4 @@
-module StarScope::Lang
+module Starscope::Lang
   module Coffeescript
     VERSION = 0
 

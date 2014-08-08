@@ -1,6 +1,6 @@
 require 'ruby-progressbar'
 
-class StarScope::Output
+class Starscope::Output
 
   PBAR_FORMAT = '%t: %c/%C %E ||%b>%i||'
 

@@ -26,7 +26,7 @@ Usage: starscope [options] [PATHS]
 
 The default database is `#{DEFAULT_DB}` if you don't specify one with -f.
 The default behaviour is to read and update the database.
-If no database exists and no PATHS are specified, StarScope builds a new
+If no database exists and no PATHS are specified, Starscope builds a new
 database by recursing in the current directory.
 
 Scoped queries must use `::` as the scope separator, even for languages which
@@ -73,7 +73,7 @@ END
 
   opts.separator "\nMisc"
   opts.on("-v", "--version", "Print the version number") do
-    puts StarScope::VERSION
+    puts Starscope::VERSION
     exit
   end
   opts.on("--verbose", "Print extra status messages") do
@@ -122,7 +122,7 @@ def run_query(db, table, value)
     end
   end
   return true
-rescue StarScope::DB::NoTableError
+rescue Starscope::DB::NoTableError
   $stderr.puts "Table '#{table}' doesn't exist."
   return false
 end
@@ -136,7 +136,7 @@ def dump(db, table)
     db.dump_table(table.to_sym)
   end
   return true
-rescue StarScope::DB::NoTableError
+rescue Starscope::DB::NoTableError
   $stderr.puts "Table '#{table}' doesn't exist."
   return false
 end
@@ -162,8 +162,8 @@ def export(db, param, output)
   output.normal("Export complete.")
 end
 
-output = StarScope::Output.new(options[:output])
-db = StarScope::DB.new(output)
+output = Starscope::Output.new(options[:output])
+db = Starscope::DB.new(output)
 
 db_exists = File.exists?(options[:db])
 
@@ -251,7 +251,7 @@ if options[:linemode]
         when "help"
           puts linemode_help
         when "version"
-          puts StarScope::VERSION
+          puts Starscope::VERSION
         when "quit"
           exit
         else

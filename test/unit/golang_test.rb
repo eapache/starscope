@@ -3,16 +3,16 @@ require File.expand_path('../../test_helper', __FILE__)
 class TestGolang < Minitest::Test
   def setup
     @db = {}
-    StarScope::Lang::Go.extract(GOLANG_SAMPLE) do |tbl, name, args|
+    Starscope::Lang::Go.extract(GOLANG_SAMPLE) do |tbl, name, args|
       @db[tbl] ||= []
-      @db[tbl] << StarScope::DB.normalize_record(GOLANG_SAMPLE, name, args)
+      @db[tbl] << Starscope::DB.normalize_record(GOLANG_SAMPLE, name, args)
     end
   end
 
   def test_recognition
-    assert StarScope::Lang::Go.match_file(GOLANG_SAMPLE)
-    refute StarScope::Lang::Go.match_file(RUBY_SAMPLE)
-    refute StarScope::Lang::Go.match_file(EMPTY_FILE)
+    assert Starscope::Lang::Go.match_file(GOLANG_SAMPLE)
+    refute Starscope::Lang::Go.match_file(RUBY_SAMPLE)
+    refute Starscope::Lang::Go.match_file(EMPTY_FILE)
   end
 
   def test_defs
@@ -79,11 +79,11 @@ class TestGolang < Minitest::Test
   end
 
   def test_find_end_of_string
-    assert_equal 4, StarScope::Lang::Go.find_end_of_string('"123"foo', 0)
-    assert_equal 1, StarScope::Lang::Go.find_end_of_string('a"123"foo', 0)
-    assert_equal 5, StarScope::Lang::Go.find_end_of_string('a"123"foo', 1)
-    assert_equal 4, StarScope::Lang::Go.find_end_of_string('"1\""foo', 0)
-    assert_equal 4, StarScope::Lang::Go.find_end_of_string('"1\\""foo', 0)
-    assert_equal 9, StarScope::Lang::Go.find_end_of_string('"1\\\\\"foo', 0)
+    assert_equal 4, Starscope::Lang::Go.find_end_of_string('"123"foo', 0)
+    assert_equal 1, Starscope::Lang::Go.find_end_of_string('a"123"foo', 0)
+    assert_equal 5, Starscope::Lang::Go.find_end_of_string('a"123"foo', 1)
+    assert_equal 4, Starscope::Lang::Go.find_end_of_string('"1\""foo', 0)
+    assert_equal 4, Starscope::Lang::Go.find_end_of_string('"1\\""foo', 0)
+    assert_equal 9, Starscope::Lang::Go.find_end_of_string('"1\\\\\"foo', 0)
   end
 end
