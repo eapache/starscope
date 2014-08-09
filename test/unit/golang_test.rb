@@ -1,7 +1,7 @@
 require File.expand_path('../../test_helper', __FILE__)
 
-class TestGolang < Minitest::Test
-  def setup
+describe Starscope::Lang::Go do
+  before do
     @db = {}
     Starscope::Lang::Go.extract(GOLANG_SAMPLE) do |tbl, name, args|
       @db[tbl] ||= []
@@ -9,81 +9,90 @@ class TestGolang < Minitest::Test
     end
   end
 
-  def test_recognition
-    assert Starscope::Lang::Go.match_file(GOLANG_SAMPLE)
-    refute Starscope::Lang::Go.match_file(RUBY_SAMPLE)
-    refute Starscope::Lang::Go.match_file(EMPTY_FILE)
+  it "must match golang files" do
+    Starscope::Lang::Go.match_file(GOLANG_SAMPLE).must_equal true
   end
 
-  def test_defs
-    assert @db.keys.include? :defs
+  it "must not match non-golang files" do
+    Starscope::Lang::Go.match_file(RUBY_SAMPLE).must_equal false
+    Starscope::Lang::Go.match_file(EMPTY_FILE).must_equal false
+  end
+
+  it "must identify definitions" do
+    @db.keys.must_include :defs
     defs = @db[:defs].map {|x| x[:name][-1]}
-    assert_includes defs, :a
-    assert_includes defs, :b
-    assert_includes defs, :c
-    assert_includes defs, :ttt
-    assert_includes defs, :main
-    assert_includes defs, :v1
-    assert_includes defs, :v2
-    assert_includes defs, :Sunday
-    assert_includes defs, :Monday
-    assert_includes defs, :single_var
-    assert_includes defs, :single_const
 
-    refute_includes defs, :"0x00"
-    refute_includes defs, :"0x01"
-    refute_includes defs, :"0x02"
-    refute_includes defs, :"0x03"
+    defs.must_include :a
+    defs.must_include :b
+    defs.must_include :c
+    defs.must_include :ttt
+    defs.must_include :main
+    defs.must_include :v1
+    defs.must_include :v2
+    defs.must_include :Sunday
+    defs.must_include :Monday
+    defs.must_include :single_var
+    defs.must_include :single_const
+
+    defs.wont_include :"0x00"
+    defs.wont_include :"0x01"
+    defs.wont_include :"0x02"
+    defs.wont_include :"0x03"
   end
 
-  def test_ends
-    assert @db.keys.include? :end
-    assert @db[:end].count == 7
+  it "must identify endings" do
+    @db.keys.must_include :end
+    @db[:end].count.must_equal 7
   end
 
-  def test_function_calls
-    assert @db.keys.include? :calls
+  it "must identify function calls" do
+    @db.keys.must_include :calls
     calls = @db[:calls].group_by {|x| x[:name][-1]}
-    assert_includes calls.keys, :a
-    assert_includes calls.keys, :b
-    assert_includes calls.keys, :c
-    assert_includes calls.keys, :ttt
-    assert_includes calls.keys, :Errorf
-    assert_equal 3, calls[:a].count
-    assert_equal 4, calls[:b].count
-    assert_equal 4, calls[:c].count
-    assert_equal 2, calls[:ttt].count
-    assert_equal 1, calls[:Errorf].count
+
+    calls.keys.must_include :a
+    calls.keys.must_include :b
+    calls.keys.must_include :c
+    calls.keys.must_include :ttt
+    calls.keys.must_include :Errorf
+
+    calls[:a].count.must_equal 3
+    calls[:b].count.must_equal 4
+    calls[:c].count.must_equal 4
+    calls[:ttt].count.must_equal 2
+    calls[:Errorf].count.must_equal 1
   end
 
-  def test_variable_assigns
-    assert @db.keys.include? :assigns
+  it "must identify variable assignments" do
+    @db.keys.must_include :assigns
     assigns = @db[:assigns].group_by {|x| x[:name][-1]}
-    assert_includes assigns.keys, :x
-    assert_includes assigns.keys, :y
-    assert_includes assigns.keys, :z
-    assert_includes assigns.keys, :n
-    assert_includes assigns.keys, :m
-    assert_includes assigns.keys, :msg
-    assert_equal 2, assigns[:x].count
-    assert_equal 1, assigns[:y].count
-    assert_equal 1, assigns[:z].count
-    assert_equal 1, assigns[:n].count
-    assert_equal 2, assigns[:m].count
+
+    assigns.keys.must_include :x
+    assigns.keys.must_include :y
+    assigns.keys.must_include :z
+    assigns.keys.must_include :n
+    assigns.keys.must_include :m
+    assigns.keys.must_include :msg
+
+    assigns[:x].count.must_equal 2
+    assigns[:y].count.must_equal 1
+    assigns[:z].count.must_equal 1
+    assigns[:n].count.must_equal 1
+    assigns[:m].count.must_equal 2
   end
 
-  def test_imports
-    assert_includes @db.keys, :imports
+  it "must identify imports" do
+    @db.keys.must_include :imports
     imports = @db[:imports].group_by {|x| x[:name][-1]}
-    assert_includes imports.keys, :fmt
+
+    imports.keys.must_include :fmt
   end
 
-  def test_find_end_of_string
-    assert_equal 4, Starscope::Lang::Go.find_end_of_string('"123"foo', 0)
-    assert_equal 1, Starscope::Lang::Go.find_end_of_string('a"123"foo', 0)
-    assert_equal 5, Starscope::Lang::Go.find_end_of_string('a"123"foo', 1)
-    assert_equal 4, Starscope::Lang::Go.find_end_of_string('"1\""foo', 0)
-    assert_equal 4, Starscope::Lang::Go.find_end_of_string('"1\\""foo', 0)
-    assert_equal 9, Starscope::Lang::Go.find_end_of_string('"1\\\\\"foo', 0)
+  it "must correctly find the end of string constants" do
+    Starscope::Lang::Go.find_end_of_string('"123"foo', 0).must_equal 4
+    Starscope::Lang::Go.find_end_of_string('a"123"foo', 0).must_equal 1
+    Starscope::Lang::Go.find_end_of_string('a"123"foo', 1).must_equal 5
+    Starscope::Lang::Go.find_end_of_string('"1\""foo', 0).must_equal 4
+    Starscope::Lang::Go.find_end_of_string('"1\\""foo', 0).must_equal 4
+    Starscope::Lang::Go.find_end_of_string('"1\\\\\"foo', 0).must_equal 9
   end
 end
