@@ -29,13 +29,11 @@ Ask it things directly:
 $ starscope -q calls,new # Lists all callers of new
 ```
 
-Export it to various formats for use with your editor:
+Export it to various existing formats for automatic integration with your editor:
 ```
 $ starscope -e ctags
 $ starscope -e cscope
 ```
-
-More flags and options are available, run `starscope --help` for the complete list.
 
 More Documentation
 ------------------
