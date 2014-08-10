@@ -54,7 +54,7 @@ their file formats.
 
 For Vim (which is what I use, so what I'm going to document) you can simply
 tell Starscope to export to a cscope database (see the section on
-[Exporting](#Exporting) below), then use Vim's [existing Cscope
+[Exporting](#exporting) below), then use Vim's [existing Cscope
 integration](http://cscope.sourceforge.net/cscope_vim_tutorial.html) and
 everything will Just Work :TM:.
 
