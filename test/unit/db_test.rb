@@ -99,43 +99,6 @@ describe Starscope::DB do
     end
   end
 
-  it "must export to ctags" do
-    file = Tempfile.new('starscope_test')
-    begin
-      @db.add_paths(["#{FIXTURES}"])
-      @db.export_ctags(file)
-      file.rewind
-      lines = file.lines.to_a
-      lines.must_include "NoTableError\t#{FIXTURES}/sample_ruby.rb\t/^  class NoTableError < StandardError; end$/;\"\tkind:c\tlanguage:Ruby\n"
-    ensure
-      file.close
-      file.unlink
-    end
-  end
-
-  it "must export to cscope" do
-    file = Tempfile.new('starscope_test')
-    begin
-      @db.add_paths(["#{FIXTURES}"])
-      @db.export_cscope(file)
-      file.rewind
-      lines = file.lines.to_a
-
-      lines.must_include "\t@#{FIXTURES}/sample_golang.go\n"
-      lines.must_include "\tgSunday\n"
-      lines.must_include "\t`add_file\n"
-      lines.must_include "\t}}\n"
-      lines.must_include "13 class \n"
-
-      lines.wont_include "= [\n"
-      lines.wont_include "4 LANGS = [\n"
-      lines.wont_include "116 tmpdb[entry[:file]][entry[:line_no]] ||= []\n"
-    ensure
-      file.close
-      file.unlink
-    end
-  end
-
   it "must run queries" do
     @db.add_paths(["#{FIXTURES}"])
     @db.query(:calls, "abc").must_equal []
