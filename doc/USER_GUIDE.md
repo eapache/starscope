@@ -52,11 +52,15 @@ Starscope, that isn't actually a problem. Almost all editors know how to
 interface with Cscope and Ctags, and Starscope is able to export to both of
 their file formats.
 
-For Vim (which is what I use, so what I'm going to document) you can simply
-tell Starscope to export to a cscope database (see the section on
-[Exporting](#exporting) below), then use Vim's [existing Cscope
-integration](http://cscope.sourceforge.net/cscope_vim_tutorial.html) and
-everything will Just Work :TM:.
+For Vim (which is what I use) you can simply have Starscope export to a cscope
+database (see the section on [Exporting](#exporting) below), then use Vim's
+[existing Cscope integration](http://cscope.sourceforge.net/cscope_vim_tutorial.html)
+and everything should Just Work (TM).
+
+While this approach isn't 100% reliable (for example, cscope can have issues
+with function names ending in `?`, which are common in Ruby), it works well
+enough that I have no plans to try and write native integration at this time. If
+somebody else wants to, however, I am more than happy to assist!
 
 Database Options
 ----------------
