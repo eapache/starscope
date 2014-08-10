@@ -88,7 +88,7 @@ describe Starscope::DB do
   it "must round-trip a database" do
     file = Tempfile.new('starscope_test')
     begin
-      @db.add_paths(["#{FIXTURES}"])
+      @db.add_paths([FIXTURES])
       @db.save(file.path)
       tmp = Starscope::DB.new(Starscope::Output.new(:quiet))
       tmp.load(file.path)
@@ -100,7 +100,7 @@ describe Starscope::DB do
   end
 
   it "must run queries" do
-    @db.add_paths(["#{FIXTURES}"])
+    @db.add_paths([FIXTURES])
     @db.query(:calls, "abc").must_equal []
     @db.query(:defs, "xyz").must_equal []
     @db.query(:calls, "add_file").length.must_equal 3

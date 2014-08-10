@@ -4,7 +4,7 @@ describe Starscope::Export do
 
   before do
     @db = Starscope::DB.new(Starscope::Output.new(:quiet))
-    @db.add_paths(["#{FIXTURES}"])
+    @db.add_paths([FIXTURES])
     @buf = StringIO.new
   end
 
