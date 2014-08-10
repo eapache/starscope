@@ -38,11 +38,25 @@ Ask it things directly:
 $ starscope -q calls,new # Lists all callers of new
 ```
 
-Export it to various formats for use with your editor:
+Export it to various existing formats for automatic integration with your editor:
 ```
 $ starscope -e ctags
 $ starscope -e cscope
 ```
+
+Editor Integration
+------------------
+
+While there aren't any editors (that I know of) which interface natively with
+Starscope, that isn't actually a problem. Almost all editors know how to
+interface with Cscope and Ctags, and Starscope is able to export to both of
+their file formats.
+
+For Vim (which is what I use, so what I'm going to document) you can simply
+tell Starscope to export to a cscope database (see the section on
+[Exporting](#Exporting) below), then use Vim's [existing Cscope
+integration](http://cscope.sourceforge.net/cscope_vim_tutorial.html) and
+everything will Just Work :TM:.
 
 Database Options
 ----------------
