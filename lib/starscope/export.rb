@@ -1,5 +1,32 @@
 module Starscope::Export
 
+  CTAGS_DEFAULT_PATH='tags'
+  CSCOPE_DEFAULT_PATH='cscope.out'
+
+  class UnknownExportFormatError < StandardError; end
+
+  def export(format, path=nil)
+    case format
+    when 'ctags'
+      path ||= CTAGS_DEFAULT_PATH
+    when 'cscope'
+      path ||= CSCOPE_DEFAULT_PATH
+    else
+      raise UnknownExportFormatError
+    end
+
+    @output.normal("Exporting to '#{path}' in format '#{format}'...")
+    File.open(path, 'w') do |file|
+      case format
+      when 'ctags'; export_ctags(file)
+      when 'cscope'; export_cscope(file)
+      end
+    end
+    @output.normal("Export complete.")
+  end
+
+  private
+
   # cscope has this funky issue where it refuses to recognize function calls that
   # happen outside of a function definition - this isn't an issue in C, where all
   # calls must occur in a function, but in ruby et al. it is perfectly legal to
@@ -89,8 +116,6 @@ END
     files.each {|f| buf << f + "\n"}
     file.print("#{buf.length}\n#{buf}")
   end
-
-  private
 
   def db_by_line()
     db = {}
