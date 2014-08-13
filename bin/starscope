@@ -141,7 +141,7 @@ end
 
 def export(db, param)
   format, path = param.split(',', 2)
-  db.export(format, path)
+  db.export(format.to_sym, path)
 rescue Starscope::Export::UnknownExportFormatError
   $stderr.puts "Unrecognized export format \"#{format}\""
 end

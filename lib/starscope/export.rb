@@ -7,9 +7,9 @@ module Starscope::Export
 
   def export(format, path=nil)
     case format
-    when 'ctags'
+    when :ctags
       path ||= CTAGS_DEFAULT_PATH
-    when 'cscope'
+    when :cscope
       path ||= CSCOPE_DEFAULT_PATH
     else
       raise UnknownExportFormatError
@@ -17,12 +17,20 @@ module Starscope::Export
 
     @output.normal("Exporting to '#{path}' in format '#{format}'...")
     File.open(path, 'w') do |file|
-      case format
-      when 'ctags'; export_ctags(file)
-      when 'cscope'; export_cscope(file)
-      end
+      export_to(format, file)
     end
     @output.normal("Export complete.")
+  end
+
+  def export_to(format, io)
+    case format
+    when :ctags
+      export_ctags(io)
+    when :cscope
+      export_cscope(io)
+    else
+      raise UnknownExportFormatError
+    end
   end
 
   private
