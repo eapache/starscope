@@ -4,7 +4,7 @@ require 'tempfile'
 describe Starscope::DB do
 
   def validate(db)
-    files = db.instance_eval('@meta[:files]')
+    files = db.metadata(:files)
     files.keys.must_include GOLANG_SAMPLE
     files.keys.must_include RUBY_SAMPLE
     files[GOLANG_SAMPLE][:last_updated].must_equal File.mtime(GOLANG_SAMPLE).to_i
@@ -33,7 +33,7 @@ describe Starscope::DB do
   it "must add paths" do
     paths = [GOLANG_SAMPLE, "#{FIXTURES}/**/*"]
     @db.add_paths(paths)
-    @db.instance_eval('@meta[:paths]').must_equal paths
+    @db.metadata(:paths).must_equal paths
     validate(@db)
   end
 
@@ -41,7 +41,7 @@ describe Starscope::DB do
     paths = [GOLANG_SAMPLE, "#{FIXTURES}/**/*"]
     @db.add_paths(paths)
     @db.add_excludes(["#{FIXTURES}/**"])
-    files = @db.instance_eval('@meta[:files]').keys
+    files = @db.metadata(:files).keys
     files.wont_include RUBY_SAMPLE
     files.wont_include GOLANG_SAMPLE
     tbls = @db.instance_eval('@tables')
@@ -59,7 +59,7 @@ describe Starscope::DB do
     @db.instance_eval("@meta[:paths] = [\"#{FIXTURES}/**/*\"]")
     @db.instance_eval("@meta[:files] = {\"#{FIXTURES}/foo\" => {:last_updated=>1}}")
     @db.update
-    @db.instance_eval("@meta[:files]").keys.wont_include "#{FIXTURES}/foo"
+    @db.metadata(:files).keys.wont_include "#{FIXTURES}/foo"
   end
 
   it "must update stale existing files" do
@@ -81,7 +81,7 @@ describe Starscope::DB do
 
   it "must load an old DB file" do
     @db.load("#{FIXTURES}/db_old.json.gz")
-    @db.instance_eval('@meta[:paths]').must_equal ["#{FIXTURES}/**/*"]
+    @db.metadata(:paths).must_equal ["#{FIXTURES}/**/*"]
     validate(@db)
   end
 

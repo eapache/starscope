@@ -80,26 +80,26 @@ class Starscope::DB
 
   def add_excludes(paths)
     @output.extra("Excluding files in paths #{paths}...")
-    @meta[:paths] -= paths.map {|p| normalize_glob(p)}
-    paths = paths.map {|p| normalize_fnmatch(p)}
+    @meta[:paths] -= paths.map {|p| self.class.normalize_glob(p)}
+    paths = paths.map {|p| self.class.normalize_fnmatch(p)}
     @meta[:excludes] += paths
     @meta[:excludes].uniq!
 
-    excluded = @meta[:files].keys.select {|name| matches_exclude?(paths, name)}
+    excluded = @meta[:files].keys.select {|name| matches_exclude?(name, paths)}
     remove_files(excluded)
   end
 
   def add_paths(paths)
     @output.extra("Adding files in paths #{paths}...")
-    @meta[:excludes] -= paths.map {|p| normalize_fnmatch(p)}
-    paths = paths.map {|p| normalize_glob(p)}
+    @meta[:excludes] -= paths.map {|p| self.class.normalize_fnmatch(p)}
+    paths = paths.map {|p| self.class.normalize_glob(p)}
     @meta[:paths] += paths
     @meta[:paths].uniq!
     files = Dir.glob(paths).select {|f| File.file? f}
-    files.delete_if {|f| matches_exclude?(@meta[:excludes], f)}
+    files.delete_if {|f| matches_exclude?(f)}
     return if files.empty?
     @output.new_pbar("Building", files.length)
-    add_new_files(files)
+    add_files(files)
     @output.finish_pbar
   end
 
@@ -109,7 +109,7 @@ class Starscope::DB
     changes[:deleted] ||= []
 
     new_files = (Dir.glob(@meta[:paths]).select {|f| File.file? f}) - @meta[:files].keys
-    new_files.delete_if {|f| matches_exclude?(@meta[:excludes], f)}
+    new_files.delete_if {|f| matches_exclude?(f)}
 
     if changes[:deleted].empty? && changes[:modified].empty? && new_files.empty?
       @output.normal("No changes detected.")
@@ -119,10 +119,24 @@ class Starscope::DB
     @output.new_pbar("Updating", changes[:modified].length + new_files.length)
     remove_files(changes[:deleted])
     update_files(changes[:modified])
-    add_new_files(new_files)
+    add_files(new_files)
     @output.finish_pbar
 
     true
+  end
+
+  def query(table, value)
+    raise NoTableError if not @tables[table]
+    input = @tables[table]
+    Starscope::Matcher.new(value, input).query()
+  end
+
+  def line_for_record(rec)
+    return rec[:line] if rec[:line]
+
+    file = @meta[:files][rec[:file]]
+
+    return file[:lines][rec[:line_no]-1] if file[:lines]
   end
 
   def tables
@@ -143,33 +157,41 @@ class Starscope::DB
     @meta[key]
   end
 
-  def query(table, value)
-    raise NoTableError if not @tables[table]
-    input = @tables[table]
-    Starscope::Matcher.new(value, input).query()
-  end
-
-  def line_for_record(rec)
-    return rec[:line] if rec[:line]
-
-    file = @meta[:files][rec[:file]]
-
-    return file[:lines][rec[:line_no]-1] if file[:lines]
-  end
-
   private
 
-  def add_new_files(files)
+  # File.fnmatch treats a "**" to match files and directories recursively
+  def self.normalize_fnmatch(path)
+    if path == "."
+      "**"
+    elsif File.directory?(path)
+      File.join(path, "**")
+    else
+      path
+    end
+  end
+
+  # Dir.glob treats a "**" to only match directories recursively; you need
+  # "**/*" to match all files recursively
+  def self.normalize_glob(path)
+    if path == "."
+      File.join("**", "*")
+    elsif File.directory?(path)
+      File.join(path, "**", "*")
+    else
+      path
+    end
+  end
+
+  def matches_exclude?(file, patterns = @meta[:excludes])
+    patterns.map {|p| File.fnmatch(p, file)}.any?
+  end
+
+  def add_files(files)
     files.each do |file|
       @output.extra("Adding `#{file}`")
       parse_file(file)
       @output.inc_pbar
     end
-  end
-
-  def update_files(files)
-    remove_files(files)
-    add_new_files(files)
   end
 
   def remove_files(files)
@@ -183,31 +205,9 @@ class Starscope::DB
     end
   end
 
-  # File.fnmatch treats a "**" to match files and directories recursively
-  def normalize_fnmatch(path)
-    if path == "."
-      "**"
-    elsif File.directory?(path)
-      File.join(path, "**")
-    else
-      path
-    end
-  end
-
-  # Dir.glob treats a "**" to only match directories recursively; you need
-  # "**/*" to match all files recursively
-  def normalize_glob(path)
-    if path == "."
-      File.join("**", "*")
-    elsif File.directory?(path)
-      File.join(path, "**", "*")
-    else
-      path
-    end
-  end
-
-  def matches_exclude?(patterns, file)
-    patterns.map {|p| File.fnmatch(p, file)}.any?
+  def update_files(files)
+    remove_files(files)
+    add_files(files)
   end
 
   def parse_file(file)
