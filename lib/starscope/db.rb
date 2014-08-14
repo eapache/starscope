@@ -125,49 +125,22 @@ class Starscope::DB
     true
   end
 
-  def dump_table(table)
+  def tables
+    @tables.keys
+  end
+
+  def records(table)
     raise NoTableError if not @tables[table]
 
-    puts "== Table: #{table} =="
-    puts "No records" if @tables[table].empty?
-
-    @tables[table].sort {|a,b|
-      a[:name][-1].to_s.downcase <=> b[:name][-1].to_s.downcase
-    }.each do |record|
-      puts format_record(record)
-    end
+    @tables[table]
   end
 
-  def dump_meta(key)
-    if key == :meta
-      puts "== Metadata Summary =="
-      @meta.each do |k, v|
-        print "#{k}: "
-        if [Array, Hash].include? v.class
-          puts v.count
-        else
-          puts v
-        end
-      end
-      return
-    end
-    raise NoTableError if not @meta[key]
-    puts "== Metadata: #{key} =="
-    if @meta[key].is_a? Array
-      @meta[key].sort.each {|x| puts x}
-    elsif @meta[key].is_a? Hash
-      @meta[key].sort.each {|k,v| puts "#{k}: #{v}"}
-    else
-      puts @meta[key]
-    end
-  end
+  def metadata(key=nil)
+    return @meta.keys if key.nil?
 
-  def dump_all
-    @tables.keys.each {|tbl| dump_table(tbl)}
-  end
+    raise NoTableError unless @meta[key]
 
-  def summary
-    Hash[@tables.map {|k,v| [k,v.count]}]
+    @meta[key]
   end
 
   def query(table, value)
@@ -176,8 +149,12 @@ class Starscope::DB
     Starscope::Matcher.new(value, input).query()
   end
 
-  def format_record(rec)
-    "#{rec[:name].join " "} -- #{rec[:file]}:#{rec[:line_no]} (#{line_for_record(rec).strip})"
+  def line_for_record(rec)
+    return rec[:line] if rec[:line]
+
+    file = @meta[:files][rec[:file]]
+
+    return file[:lines][rec[:line_no]-1] if file[:lines]
   end
 
   private
@@ -268,14 +245,6 @@ class Starscope::DB
     else
       :unchanged
     end
-  end
-
-  def line_for_record(rec)
-    return rec[:line] if rec[:line]
-
-    file = @meta[:files][rec[:file]]
-
-    return file[:lines][rec[:line_no]-1] if file[:lines]
   end
 
   def self.normalize_record(file, name, args)
