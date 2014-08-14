@@ -167,13 +167,7 @@ class Starscope::DB
   end
 
   def summary
-    ret = {}
-
-    @tables.each_key do |key|
-      ret[key] = @tables[key].count
-    end
-
-    ret
+    Hash[@tables.map {|k,v| [k,v.count]}]
   end
 
   def query(table, value)
