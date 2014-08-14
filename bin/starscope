@@ -101,7 +101,7 @@ end.parse!
 def print_summary(db)
   tables = db.tables
   puts "No tables" if tables.empty?
-  tables.sort.each do |table|
+  tables.sort {|a,b| a.to_s <=> b.to_s}.each do |table|
     printf("%-8s %5d records\n", table, db.records(table).length)
   end
 end
