@@ -17,8 +17,8 @@ compression, the file has three lines:
 Version Number
 --------------
 
-This is just the ascii character '5'. If the format changes signficantly, it
-will be increased, but that is unlikely.
+This is just the ASCII character '5'. If the format changes significantly, it
+will be incremented, but that is unlikely.
 
 Metadata
 --------
