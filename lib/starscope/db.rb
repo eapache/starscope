@@ -38,25 +38,13 @@ class Starscope::DB
   def load(filename)
     @output.extra("Reading database from `#{filename}`... ")
     File.open(filename, 'r') do |file|
-      Zlib::GzipReader.wrap(file) do |stream|
-        case stream.gets.to_i
-        when DB_FORMAT
-          @meta   = Oj.load(stream.gets)
-          @tables = Oj.load(stream.gets)
-          @meta[:langs] ||= {}
-          return false
-        when 3..4
-          # Old format, so read the directories segment then rebuild
-          add_paths(Oj.load(stream.gets))
-          return true
-        when 0..2
-          # Old format (pre-json), so read the directories segment then rebuild
-          len = stream.gets.to_i
-          add_paths(Marshal::load(stream.read(len)))
-          return true
-        else
-          raise UnknownDBFormatError
+      begin
+        Zlib::GzipReader.wrap(file) do |stream|
+          read_db(stream)
         end
+      rescue Zlib::GzipFile::Error
+        file.rewind
+        read_db(file)
       end
     end
   end
@@ -158,6 +146,27 @@ class Starscope::DB
   end
 
   private
+
+  def read_db(stream)
+    case stream.gets.to_i
+    when DB_FORMAT
+      @meta   = Oj.load(stream.gets)
+      @tables = Oj.load(stream.gets)
+      @meta[:langs] ||= {}
+      return false
+    when 3..4
+      # Old format, so read the directories segment then rebuild
+      add_paths(Oj.load(stream.gets))
+      return true
+    when 0..2
+      # Old format (pre-json), so read the directories segment then rebuild
+      len = stream.gets.to_i
+      add_paths(Marshal::load(stream.read(len)))
+      return true
+    else
+      raise UnknownDBFormatError
+    end
+  end
 
   # File.fnmatch treats a "**" to match files and directories recursively
   def self.normalize_fnmatch(path)
