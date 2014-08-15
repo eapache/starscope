@@ -34,19 +34,11 @@ class Starscope::DB
     @tables = {}
   end
 
-  # returns true if the database had to be up-converted from an old format
   def load(filename)
     @output.extra("Reading database from `#{filename}`... ")
-    File.open(filename, 'r') do |file|
-      begin
-        Zlib::GzipReader.wrap(file) do |stream|
-          read_db(stream)
-        end
-      rescue Zlib::GzipFile::Error
-        file.rewind
-        read_db(file)
-      end
-    end
+    current_fmt = open_db(filename)
+    fixup if current_fmt
+    current_fmt
   end
 
   def save(filename)
@@ -147,25 +139,52 @@ class Starscope::DB
 
   private
 
-  def read_db(stream)
+  def open_db(filename)
+    File.open(filename, 'r') do |file|
+      begin
+        Zlib::GzipReader.wrap(file) do |stream|
+          parse_db(stream)
+        end
+      rescue Zlib::GzipFile::Error
+        file.rewind
+        parse_db(file)
+      end
+    end
+  end
+
+  # returns true iff the database is in the most recent format
+  def parse_db(stream)
     case stream.gets.to_i
     when DB_FORMAT
       @meta   = Oj.load(stream.gets)
       @tables = Oj.load(stream.gets)
-      @meta[:langs] ||= {}
-      return false
+      return true
     when 3..4
       # Old format, so read the directories segment then rebuild
       add_paths(Oj.load(stream.gets))
-      return true
+      return false
     when 0..2
       # Old format (pre-json), so read the directories segment then rebuild
       len = stream.gets.to_i
       add_paths(Marshal::load(stream.read(len)))
-      return true
+      return false
     else
       raise UnknownDBFormatError
     end
+  rescue Oj::ParseError
+    stream.rewind
+    raise unless stream.gets.to_i == DB_FORMAT
+    # try reading as formated json, which is much slower, but it is sometimes
+    # useful to be able to directly read your db
+    objects = []
+    Oj.load(stream) {|obj| objects << obj}
+    @meta, @tables = objects
+    return true
+  end
+
+  def fixup
+    # misc things that were't worth bumping the format for, but which might not be written by old versions
+    @meta[:langs] ||= {}
   end
 
   # File.fnmatch treats a "**" to match files and directories recursively
