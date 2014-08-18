@@ -3,36 +3,20 @@ require 'tempfile'
 
 describe Starscope::DB do
 
-  def validate(db)
-    files = db.metadata(:files)
-    files.keys.must_include GOLANG_SAMPLE
-    files.keys.must_include RUBY_SAMPLE
-    files[GOLANG_SAMPLE][:last_updated].must_equal File.mtime(GOLANG_SAMPLE).to_i
-    files[RUBY_SAMPLE][:last_updated].must_equal File.mtime(RUBY_SAMPLE).to_i
-
-    tbls = db.instance_eval('@tables')
-    tbls.must_include :defs
-    defs = tbls[:defs].map {|x| x[:name][-1]}
-    defs.must_include :DB
-    defs.must_include :NoTableError
-    defs.must_include :load
-    defs.must_include :update
-    defs.must_include :files_from_path
-    defs.must_include :single_var
-    defs.must_include :single_const
-  end
-
   before do
     @db = Starscope::DB.new(Starscope::Output.new(:quiet))
   end
 
   it "must raise on invalid tables" do
-    proc {@db.records(:foo)}.must_raise Starscope::DB::NoTableError
+    proc {
+      @db.records(:foo)
+    }.must_raise Starscope::DB::NoTableError
   end
 
   it "must add paths" do
     paths = [GOLANG_SAMPLE, "#{FIXTURES}/**/*"]
     @db.add_paths(paths)
+
     @db.metadata(:paths).must_equal paths
     validate(@db)
   end
@@ -41,42 +25,58 @@ describe Starscope::DB do
     paths = [GOLANG_SAMPLE, "#{FIXTURES}/**/*"]
     @db.add_paths(paths)
     @db.add_excludes(["#{FIXTURES}/**"])
+
     files = @db.metadata(:files).keys
     files.wont_include RUBY_SAMPLE
     files.wont_include GOLANG_SAMPLE
-    tbls = @db.instance_eval('@tables')
-    tbls[:defs].must_be_empty
-    tbls[:end].must_be_empty
+    @db.records(:defs).must_be_empty
+    @db.records(:end).must_be_empty
   end
 
   it "must pick up new files in old paths" do
-    @db.instance_eval("@meta[:paths] = [\"#{FIXTURES}/**/*\"]")
+    @db.load("#{FIXTURES}/db_added_files.json")
     @db.update
+
     validate(@db)
   end
 
   it "must remove old files in existing paths" do
-    @db.instance_eval("@meta[:paths] = [\"#{FIXTURES}/**/*\"]")
-    @db.instance_eval("@meta[:files] = {\"#{FIXTURES}/foo\" => {:last_updated=>1}}")
+    @db.load("#{FIXTURES}/db_removed_files.json")
     @db.update
     @db.metadata(:files).keys.wont_include "#{FIXTURES}/foo"
   end
 
   it "must update stale existing files" do
-    @db.instance_eval("@meta[:paths] = [\"#{FIXTURES}/**/*\"]")
-    @db.instance_eval("@meta[:files] = {\"#{GOLANG_SAMPLE}\" => {:last_updated=>1}}")
-    @db.instance_eval("@tables[:defs] = [{:file => \"#{GOLANG_SAMPLE}\"}]")
+    @db.load("#{FIXTURES}/db_out_of_date.json")
     @db.update
-    validate(@db)
+
+    file = @db.metadata(:files)[GOLANG_SAMPLE]
+    file[:last_updated].must_equal File.mtime(GOLANG_SAMPLE).to_i
+    file[:lang].must_equal :Go
+    file[:lines].wont_be_empty
+    @db.records(:defs).wont_be_empty
+    @db.records(:calls).wont_be_empty
   end
 
   it "must update unchanged existing files with old extractor versions" do
-    @db.instance_eval("@meta[:paths] = [\"#{FIXTURES}/**/*\"]")
-    @db.instance_eval("@meta[:langs] = {:Go => 0}")
-    @db.instance_eval("@meta[:files] = {\"#{GOLANG_SAMPLE}\" => {:last_updated=>#{File.mtime(GOLANG_SAMPLE).to_i}, :lang => :Go}}")
-    @db.instance_eval("@tables[:defs] = [{:file => \"#{GOLANG_SAMPLE}\"}]")
+    @db.load("#{FIXTURES}/db_old_extractor.json")
     @db.update
-    validate(@db)
+
+    file = @db.metadata(:files)[GOLANG_SAMPLE]
+    file[:last_updated].must_equal File.mtime(GOLANG_SAMPLE).to_i
+    file[:lang].must_equal :Go
+    file[:lines].wont_be_empty
+    @db.records(:defs).wont_be_empty
+    @db.records(:calls).wont_be_empty
+  end
+
+  it "must not update file with up-to-date time and extractor" do
+    @db.load("#{FIXTURES}/db_up_to_date.json")
+    @db.update
+
+    file = @db.metadata(:files)[GOLANG_SAMPLE]
+    file[:last_updated].must_equal 10000000000
+    @db.tables.must_be_empty
   end
 
   it "must load an old DB file" do
@@ -114,6 +114,21 @@ describe Starscope::DB do
   it "must symbolize and array-wrap simple name" do
     rec = Starscope::DB.normalize_record(:foo, "a", {})
     rec[:name].must_equal [:a]
+  end
+
+  private
+
+  def validate(db)
+    files = db.metadata(:files)
+    files.keys.must_include GOLANG_SAMPLE
+    files.keys.must_include RUBY_SAMPLE
+    files[GOLANG_SAMPLE][:last_updated].must_equal File.mtime(GOLANG_SAMPLE).to_i
+    files[RUBY_SAMPLE][:last_updated].must_equal File.mtime(RUBY_SAMPLE).to_i
+
+    db.records(:defs).wont_be_empty
+    db.records(:calls).wont_be_empty
+    db.records(:imports).wont_be_empty
+    db.records(:requires).wont_be_empty
   end
 
 end

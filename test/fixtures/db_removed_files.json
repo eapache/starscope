@@ -1,0 +1,12 @@
+5
+{
+    ":paths": ["test/fixtures/**/*"],
+    ":excludes": [],
+    ":langs": {},
+    ":files": {
+        "test/fixtures/foo": {
+            ":last_updated": 1
+        }
+    }
+}
+{}
