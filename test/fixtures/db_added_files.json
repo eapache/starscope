@@ -1,0 +1,8 @@
+5
+{
+    ":paths": ["test/fixtures/**/*"],
+    ":excludes": [],
+    ":langs": {},
+    ":files": {}
+}
+{}
