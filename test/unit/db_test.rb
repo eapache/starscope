@@ -46,12 +46,16 @@ describe Starscope::DB do
     @db.metadata(:files).keys.wont_include "#{FIXTURES}/foo"
   end
 
-  it "must update stale existing files" do
+  it "must update stale existing files when extractor hasn't changed" do
     @db.load("#{FIXTURES}/db_out_of_date.json")
+    @db.metadata(:langs)[:Go].must_be :>=, LANGS[:Go]
+
+    cur_mtime = @db.metadata(:files)[GOLANG_SAMPLE][:last_updated]
+    File.expects(:mtime).twice.returns(cur_mtime + 1)
     @db.update
 
     file = @db.metadata(:files)[GOLANG_SAMPLE]
-    file[:last_updated].must_equal File.mtime(GOLANG_SAMPLE).to_i
+    file[:last_updated].must_equal cur_mtime + 1
     file[:lang].must_equal :Go
     file[:lines].wont_be_empty
     @db.records(:defs).wont_be_empty
@@ -60,10 +64,13 @@ describe Starscope::DB do
 
   it "must update unchanged existing files with old extractor versions" do
     @db.load("#{FIXTURES}/db_old_extractor.json")
+
+    cur_mtime = @db.metadata(:files)[GOLANG_SAMPLE][:last_updated]
+    File.expects(:mtime).twice.returns(cur_mtime)
     @db.update
 
     file = @db.metadata(:files)[GOLANG_SAMPLE]
-    file[:last_updated].must_equal File.mtime(GOLANG_SAMPLE).to_i
+    file[:last_updated].must_equal cur_mtime
     file[:lang].must_equal :Go
     file[:lines].wont_be_empty
     @db.records(:defs).wont_be_empty
