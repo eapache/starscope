@@ -11,8 +11,11 @@ GEM
   specs:
     ast (2.0.0)
     coderay (1.1.0)
+    metaclass (0.0.4)
     method_source (0.8.2)
     minitest (5.4.0)
+    mocha (1.1.0)
+      metaclass (~> 0.0.1)
     oj (2.9.9)
     parser (2.1.9)
       ast (>= 1.1, < 3.0)
@@ -31,6 +34,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.5)
   minitest
+  mocha
   pry
   rake
   starscope!
