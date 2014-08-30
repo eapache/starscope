@@ -1,9 +1,6 @@
 Starscope User Guide
 ====================
 
-Table of Contents
------------------
-
 * [About](#about)
 * [Installation](#installation)
 * [Quick Start](#quick-start)
