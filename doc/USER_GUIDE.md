@@ -44,23 +44,21 @@ $ starscope -e ctags
 $ starscope -e cscope
 ```
 
-Editor Integration
-------------------
+Editor and Workflow Integration
+-------------------------------
 
-While there aren't any editors (that I know of) which interface natively with
-Starscope, that isn't actually a problem. Almost all editors know how to
-interface with Cscope and Ctags, and Starscope is able to export to both of
-their file formats.
+While I don't know of any editors that interface natively with Starscope
+(if you find one, let me know!) there is a much simpler solution. Almost
+all modern editors know how to read Cscope and Ctags files, and Starscope
+can export to both of those file formats. Simply export to the appropriate
+file (see the section on [Exporting](#exporting) below), then use your
+editor's existing integration and it should just work.
 
-For Vim (which is what I use) you can simply have Starscope export to a cscope
-database (see the section on [Exporting](#exporting) below), then use Vim's
-[existing Cscope integration](http://cscope.sourceforge.net/cscope_vim_tutorial.html)
-and everything should Just Work (TM).
-
-While this approach isn't 100% reliable (for example, cscope can have issues
-with function names ending in `?`, which are common in Ruby), it works well
-enough that I have no plans to try and write native integration at this time. If
-somebody else wants to, however, I am more than happy to assist!
+Many people also like to have this kind of tool automatically run when
+certain events happen, such as a `git commit`. Tim Pope has an excellent
+article on [how to do this with Ctags](http://tbaggery.com/2011/08/08/effortless-ctags-with-git.html)
+and with Starscope it is even simpler. Just place the line
+`starscope --quiet -e cscope &` into the hooks documented by Tim.
 
 Database Options
 ----------------
