@@ -1,6 +1,20 @@
 Starscope User Guide
 ====================
 
+Table of Contents
+-----------------
+
+* [About](#about)
+* [Installation](#installation)
+* [Quick Start](#quick-start)
+* [Editor and Workflow Integration](#editor-and-workflow-integration)
+* [Database Options](#database-options)
+* [Paths](#paths)
+* [Queries](#queries)
+* [Exporting](#exporting)
+* [Line-Mode](#line-mode)
+* [Miscellaneous](#miscellaneous)
+
 About
 -----
 
