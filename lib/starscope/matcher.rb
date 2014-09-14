@@ -1,6 +1,6 @@
 class Starscope::Matcher
 
-  MATCH_TYPES = [:full_match, :simple_match, :simple_regexp, :full_regexp]
+  MATCH_TYPES = [:literal_match, :regexp_match]
 
   def initialize(query, input)
     @query  = query
@@ -11,20 +11,13 @@ class Starscope::Matcher
   end
 
   def match(record)
-    name = record[:name].map {|x| x.to_s}
-    fullname = name.join('::')
+    name = record[:name].map {|x| x.to_s}.join('::')
 
     case
-    when fullname == @query
-      :full_match
-    when name[-1] == @query
-      :simple_match
-    when @regexp
-      if @regexp.match(name[-1])
-        :simple_regexp
-      elsif @regexp.match(fullname)
-        :full_regexp
-      end
+    when name.end_with?(@query)
+      :literal_match
+    when @regexp && @regexp.match(name)
+      :regexp_match
     end
   end
 
