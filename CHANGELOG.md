@@ -4,7 +4,8 @@ Changelog
 v1.2.1 (trunk)
 --------------------
 
-No changes yet.
+Bug Fixes:
+ * Simplify query logic to match user expectations (#91)
 
 v1.2.0 (2014-09-02)
 --------------------
