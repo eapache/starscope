@@ -4,6 +4,9 @@ Changelog
 v1.2.1 (trunk)
 --------------------
 
+New Features:
+ * Give `*` as the table name in order to query all tables at once (#58).
+
 Bug Fixes:
  * Simplify query logic to match user expectations (#91)
 

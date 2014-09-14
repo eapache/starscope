@@ -115,7 +115,8 @@ def run_query(db, table, value)
     $stderr.puts "Invalid input - no query found."
     return false
   end
-  results = db.query(table.to_sym, value)
+  tables = (table == '*' ? db.tables : table.to_sym)
+  results = db.query(tables, value)
   if !results || results.empty?
     puts "No results found."
   else
