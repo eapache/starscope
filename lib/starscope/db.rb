@@ -1,3 +1,4 @@
+require 'backports'
 require 'date'
 require 'oj'
 require 'set'
@@ -105,10 +106,17 @@ class Starscope::DB
     true
   end
 
-  def query(table, value)
-    raise NoTableError if not @tables[table]
-    input = @tables[table]
-    Starscope::Matcher.new(value, input).query()
+  def query(tables, value)
+    tables = [tables] if tables.is_a?(Symbol)
+    tables.each { |t| raise NoTableError, "Table '#{t}' not found" unless @tables[t] }
+    input = Enumerator.new do |y|
+      tables.each do |t|
+        @tables[t].each do |elem|
+          y << elem
+        end
+      end
+    end
+    Starscope::Matcher.new(value, input).query
   end
 
   def line_for_record(rec)
