@@ -114,7 +114,8 @@ argument in the following format: `TABLE,QUERY`. For example, `-q calls,new`
 would list all callers of `new` and `-q defs,bar` would list places that define
 a method or class named `bar`. See the [language support
 documentation](LANGUAGE_SUPPORT.md) for a list of the most common tables, or use
-the `--summary` flag to list all the tables in the current database.
+the `--summary` flag to list all the tables in the current database. Pass `*` as
+the table name to query all tables.
 
 You can also search for scoped names such as `MyClass.new`. To do this, you must
 specify the scope with `::`, even if the language or instance you are searching

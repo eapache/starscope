@@ -22,8 +22,6 @@ class Starscope::Matcher
   end
 
   def query
-    return [] if @input.empty?
-
     results = @input.group_by {|x| match(x)}
 
     MATCH_TYPES.each do |type|

@@ -113,6 +113,13 @@ describe Starscope::DB do
     @db.query(:calls, "add_file").length.must_equal 3
   end
 
+  it "must run queries on multiple tables" do
+    @db.add_paths([FIXTURES])
+    ret = @db.query([:calls, :defs], "foo")
+    ret.length.must_equal 1
+    ret.first[:name].last.must_equal :foo
+  end
+
   it "must symbolize compound name" do
     rec = Starscope::DB.normalize_record(:foo, ["a", :b], {})
     rec[:name].must_equal [:a, :b]
