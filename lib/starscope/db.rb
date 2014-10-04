@@ -257,27 +257,32 @@ class Starscope::DB
         next
       end
 
-      lines = nil
-      line_cache = nil
-      begin
-        extractor.extract file do |tbl, name, args|
-          @tables[tbl] ||= []
-          @tables[tbl] << self.class.normalize_record(file, name, args)
+      extract_file(extractor, file)
 
-          if args[:line_no]
-            line_cache ||= File.readlines(file)
-            lines ||= Array.new(line_cache.length)
-            lines[args[:line_no]-1] = line_cache[args[:line_no]-1].chomp
-          end
-        end
-      rescue => e
-        @output.normal("#{extractor} raised #{e} while extracting #{file}")
-      end
-
-      @meta[:files][file][:lang] = extractor.name.split('::').last.to_sym
-      @meta[:files][file][:lines] = lines
       return
     end
+  end
+
+  def extract_file(extractor, file)
+    lines = nil
+    line_cache = nil
+
+    extractor.extract file do |tbl, name, args|
+      @tables[tbl] ||= []
+      @tables[tbl] << self.class.normalize_record(file, name, args)
+
+      if args[:line_no]
+        line_cache ||= File.readlines(file)
+        lines ||= Array.new(line_cache.length)
+        lines[args[:line_no]-1] = line_cache[args[:line_no]-1].chomp
+      end
+    end
+
+    @meta[:files][file][:lang] = extractor.name.split('::').last.to_sym
+    @meta[:files][file][:lines] = lines
+
+  rescue => e
+    @output.normal("#{extractor} raised #{e} while extracting #{file}")
   end
 
   def file_changed(name)
