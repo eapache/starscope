@@ -250,19 +250,28 @@ class Starscope::DB
     @meta[:files][file] = {:last_updated => File.mtime(file).to_i}
 
     EXTRACTORS.each do |extractor|
-      next if not extractor.match_file file
+      begin
+        next unless extractor.match_file file
+      rescue => e
+        @output.normal("#{extractor} raised #{e} while matching #{file}")
+        next
+      end
 
       lines = nil
       line_cache = nil
-      extractor.extract file do |tbl, name, args|
-        @tables[tbl] ||= []
-        @tables[tbl] << self.class.normalize_record(file, name, args)
+      begin
+        extractor.extract file do |tbl, name, args|
+          @tables[tbl] ||= []
+          @tables[tbl] << self.class.normalize_record(file, name, args)
 
-        if args[:line_no]
-          line_cache ||= File.readlines(file)
-          lines ||= Array.new(line_cache.length)
-          lines[args[:line_no]-1] = line_cache[args[:line_no]-1].chomp
+          if args[:line_no]
+            line_cache ||= File.readlines(file)
+            lines ||= Array.new(line_cache.length)
+            lines[args[:line_no]-1] = line_cache[args[:line_no]-1].chomp
+          end
         end
+      rescue => e
+        @output.normal("#{extractor} raised #{e} while extracting #{file}")
       end
 
       @meta[:files][file][:lang] = extractor.name.split('::').last.to_sym
