@@ -130,6 +130,18 @@ describe Starscope::DB do
     rec[:name].must_equal [:a]
   end
 
+  it "must store extractor metadata returned from the `extract` call" do
+    extractor = mock('extractor')
+    extractor.expects(:match_file).with(GOLANG_SAMPLE).returns(true)
+    extractor.expects(:extract).with(GOLANG_SAMPLE).returns({:a => 1})
+    extractor.expects(:name).returns('Foo')
+    EXTRACTORS.stubs(:each).yields(extractor)
+
+    @db.add_paths([GOLANG_SAMPLE])
+
+    @db.metadata(:files)[GOLANG_SAMPLE][:a].must_equal 1
+  end
+
   private
 
   def validate(db)

@@ -267,7 +267,7 @@ class Starscope::DB
     lines = nil
     line_cache = nil
 
-    extractor.extract file do |tbl, name, args|
+    extractor_metadata = extractor.extract(file) do |tbl, name, args|
       @tables[tbl] ||= []
       @tables[tbl] << self.class.normalize_record(file, name, args)
 
@@ -280,6 +280,10 @@ class Starscope::DB
 
     @meta[:files][file][:lang] = extractor.name.split('::').last.to_sym
     @meta[:files][file][:lines] = lines
+
+    if extractor_metadata.is_a? Hash
+      @meta[:files][file] = extractor_metadata.merge!(@meta[:files][file])
+    end
 
   rescue => e
     @output.normal("#{extractor} raised #{e} while extracting #{file}")
