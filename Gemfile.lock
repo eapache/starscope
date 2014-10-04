@@ -11,11 +11,11 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.0.0)
-    backports (3.6.0)
+    backports (3.6.2)
     coderay (1.1.0)
     metaclass (0.0.4)
     method_source (0.8.2)
-    minitest (5.4.1)
+    minitest (5.4.2)
     mocha (1.1.0)
       metaclass (~> 0.0.1)
     oj (2.10.2)
@@ -27,7 +27,7 @@ GEM
       method_source (~> 0.8.1)
       slop (~> 3.4)
     rake (10.3.2)
-    ruby-progressbar (1.5.1)
+    ruby-progressbar (1.6.0)
     slop (3.6.0)
 
 PLATFORMS
