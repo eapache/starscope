@@ -8,20 +8,14 @@ module Starscope::Lang
       return true if name.end_with?(".rb")
       File.open(name) do |f|
         head = f.read(2)
-        return false if head.nil? or not head.start_with?("#!")
+        return false if head.nil? || !head.start_with?("#!")
         return f.readline.include?("ruby")
       end
-    rescue ArgumentError # may occur if file is binary (invalid UTF)
-      false
     end
 
     def self.extract(file, &block)
-      begin
-        ast = Parser::CurrentRuby.parse_file(file)
-      rescue
-      else
-        extract_tree(ast, [], &block) if not ast.nil?
-      end
+      ast = Parser::CurrentRuby.parse_file(file)
+      extract_tree(ast, [], &block) unless ast.nil?
     end
 
     private

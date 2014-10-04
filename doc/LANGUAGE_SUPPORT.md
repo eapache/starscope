@@ -47,6 +47,7 @@ methods:
    anything you want.
  * `extract` takes a readable file handle pointing to the file, and must parse
    the file, `yield`ing records as it finds function definitions and the like.
+   It may also return a final hash of file-wide metadata to store.
 
 The record requirements are pretty straight-forward:
 ```ruby
