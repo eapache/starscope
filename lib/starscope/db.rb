@@ -11,12 +11,12 @@ require 'starscope/output'
 # dynamically load all our language extractors
 LANGS = {}
 EXTRACTORS = []
-Dir.glob("#{File.dirname(__FILE__)}/langs/*.rb").each do |path|
-  require path
-  lang = /(\w+)\.rb$/.match(path)[1].capitalize
-  mod_name = "Starscope::Lang::#{lang}"
-  EXTRACTORS << eval(mod_name)
-  LANGS[lang.to_sym] = eval("#{mod_name}::VERSION")
+Dir.glob("#{File.dirname(__FILE__)}/langs/*.rb").each { |path| require path }
+
+Starscope::Lang.constants.each do |lang|
+  extractor = Starscope::Lang.const_get(lang)
+  EXTRACTORS << extractor
+  LANGS[lang.to_sym] = extractor.const_get(:VERSION)
 end
 
 class Starscope::DB
