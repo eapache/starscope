@@ -5,7 +5,7 @@ Already Supported
 -----------------
 
  * [Ruby](https://www.ruby-lang.org/)
- * [Golang](http://golang.org/)
+ * [Golang](https://golang.org/)
 
 How to Add Another Language
 ---------------------------
