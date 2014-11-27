@@ -4,7 +4,7 @@ require 'oj'
 require 'set'
 require 'zlib'
 
-require 'starscope/export'
+require 'starscope/exportable'
 require 'starscope/matcher'
 require 'starscope/output'
 
@@ -21,7 +21,7 @@ end
 
 class Starscope::DB
 
-  include Starscope::Export
+  include Starscope::Exportable
 
   DB_FORMAT = 5
 

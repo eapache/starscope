@@ -92,8 +92,8 @@ END
   opts.separator <<END
 \nEXPORTING
     At the moment two export formats are supported: 'ctags' and 'cscope'. If
-    you don't specify a path, the output is written to the file '#{Starscope::Export::CTAGS_DEFAULT_PATH}' (for
-    ctags) or '#{Starscope::Export::CSCOPE_DEFAULT_PATH}' (for cscope) in the current directory.
+    you don't specify a path, the output is written to the file '#{Starscope::Exportable::CTAGS_DEFAULT_PATH}' (for
+    ctags) or '#{Starscope::Exportable::CSCOPE_DEFAULT_PATH}' (for cscope) in the current directory.
 END
 
 end.parse!
@@ -165,7 +165,7 @@ end
 def export(db, param)
   format, path = param.split(',', 2)
   db.export(format.to_sym, path)
-rescue Starscope::Export::UnknownExportFormatError
+rescue Starscope::Exportable::UnknownExportFormatError
   $stderr.puts "Unrecognized export format \"#{format}\""
 end
 
