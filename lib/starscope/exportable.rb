@@ -1,4 +1,4 @@
-module Starscope::Export
+module Starscope::Exportable
 
   CTAGS_DEFAULT_PATH='tags'
   CSCOPE_DEFAULT_PATH='cscope.out'

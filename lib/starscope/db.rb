@@ -4,8 +4,8 @@ require 'oj'
 require 'set'
 require 'zlib'
 
-require 'starscope/export'
-require 'starscope/matcher'
+require 'starscope/exportable'
+require 'starscope/queryable'
 require 'starscope/output'
 
 # dynamically load all our language extractors
@@ -21,7 +21,8 @@ end
 
 class Starscope::DB
 
-  include Starscope::Export
+  include Starscope::Exportable
+  include Starscope::Queryable
 
   DB_FORMAT = 5
 
@@ -104,19 +105,6 @@ class Starscope::DB
     @output.finish_pbar
 
     true
-  end
-
-  def query(tables, value)
-    tables = [tables] if tables.is_a?(Symbol)
-    tables.each { |t| raise NoTableError, "Table '#{t}' not found" unless @tables[t] }
-    input = Enumerator.new do |y|
-      tables.each do |t|
-        @tables[t].each do |elem|
-          y << elem
-        end
-      end
-    end
-    Starscope::Matcher.new(value, input).query
   end
 
   def line_for_record(rec)

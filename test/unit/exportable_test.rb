@@ -1,6 +1,6 @@
 require File.expand_path('../../test_helper', __FILE__)
 
-describe Starscope::Export do
+describe Starscope::Exportable do
 
   before do
     @db = Starscope::DB.new(Starscope::Output.new(:quiet))
