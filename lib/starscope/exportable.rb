@@ -144,13 +144,7 @@ END
       # use the column if we have it, otherwise fall back to scanning
       index = record[:col] || line.index(key)
 
-      # keep scanning if our current index doesn't actually match the key, or if
-      # either the preceeding or succeeding character is a word character
-      # (meaning we've accidentally matched the middle of some other token)
-      while index &&
-        ((line[index, key.length] != key) ||
-         (index > 0 && line[index-1] =~ /\w/) ||
-         (index+key.length < line.length && line[index+key.length] =~ /\w/))
+      while index && !valid_index?(line, index, key)
         index = line.index(key, index+1)
       end
 
@@ -180,20 +174,21 @@ END
       buf << CSCOPE_GLOBAL_HACK_STOP
     end
 
-    tokens = record[:name][0...-1].map {|x| x.to_s.sub(/\W+$/, '')}.select {|x| !x.empty?}.join("|")
-    if !tokens.empty?
+    record[:name][0...-1].each do |key|
       # output previous components of the name (ie the Foo in Foo::bar) as unmarked symbols
-      rxp = Regexp.new("\\W(#{tokens})\\W")
-      index = line.index(rxp, prev)
+      key = key.to_s.sub(/\W+$/, '')
+      next if key.empty?
 
-      while index
-        tok = rxp.match(line[index..-1])[1]
-        index += 1
-        break if index+tok.length > offset
+      index = line.index(key, prev)
+
+      while index && index+key.length < offset && !valid_index?(line, index, key)
+        index = line.index(key, index+1)
+      end
+
+      if index && index+key.length < offset
         buf << cscope_plaintext(line, prev, index) << "\n"
-        buf << "#{tok}\n"
-        prev = index + tok.length
-        index = line.index(rxp, prev)
+        buf << "#{key}\n"
+        prev = index + key.length
       end
     end
 
@@ -205,6 +200,13 @@ END
   rescue ArgumentError
     # invalid utf-8 byte sequence in the line, oh well
     line
+  end
+
+  def valid_index?(line, index, key)
+    # index is valid if the key exists at it, and the prev/next chars are not word characters
+    ((line[index, key.length] == key) &&
+     (index == 0 || line[index-1] !~ /\w/) &&
+     (index+key.length == line.length || line[index+key.length] !~ /\w/))
   end
 
   def cscope_plaintext(line, start, stop)
