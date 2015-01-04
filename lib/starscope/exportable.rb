@@ -174,7 +174,11 @@ END
 
   def cscope_output(line, prev, offset, record)
     buf = ""
-    buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
+
+    if record[:type] == :func && record[:tbl] == :defs
+      buf << " " if prev > 0 # urgh cscope
+      buf << CSCOPE_GLOBAL_HACK_STOP
+    end
 
     tokens = record[:name][0...-1].map {|x| x.to_s.sub(/\W+$/, '')}.select {|x| !x.empty?}.join("|")
     if !tokens.empty?
