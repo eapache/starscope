@@ -78,10 +78,16 @@ module Starscope::Lang
         yield :reads, name, :line_no => loc.line, :col => loc.name.column
 
       when :lvar, :ivar, :cvar, :gvar
-        yield :reads, scope + [node.children[0]], :line_no => loc.line, :col => loc.expression.column
+        yield :reads, scope + [node.children[0]], :line_no => loc.line, :col => loc.name.column
 
       when :sym
-        yield :sym, [node.children[0]], :line_no => loc.line, :col => loc.expression.column
+        # handle `:foo` vs `foo: 1`
+        col = if loc.begin
+                loc.begin.column+1
+              else
+                loc.expression.column
+              end
+        yield :sym, [node.children[0]], :line_no => loc.line, :col => col
       end
     end
 
