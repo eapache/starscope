@@ -110,9 +110,9 @@ Queries
 -------
 
 To query the starscope database, pass the `-q` or `--query` flag with an
-argument in the following format: `TABLE,QUERY`. For example, `-q calls,new`
-would list all callers of `new` and `-q defs,bar` would list places that define
-a method or class named `bar`. See the [language support
+argument in the following format: `[FILTERS],TABLE,QUERY`. For example,
+`-q calls,new` would list all callers of `new` and `-q defs,bar` would list
+places that define a method or class named `bar`. See the [language support
 documentation](LANGUAGE_SUPPORT.md) for a list of the most common tables, or use
 the `--summary` flag to list all the tables in the current database. Pass `*` as
 the table name to query all tables.
@@ -124,6 +124,11 @@ for uses another character like a dot. So, for example, `-q calls,MyClass::new`.
 Queries using regular expressions are generally supported, and will be tried
 against both the base name and the fully-qualified name (again using `::` as the
 scope separator).
+
+You can optionally filter records based on their metadata prior to the actual
+query, by prefixing comma-separated `KEY:VALUE` pairs to the query string. A
+common use of this is to restrict a query to files of a given language, for
+example with `-q lang:ruby,calls,new`.
 
 Exporting
 ---------
@@ -149,9 +154,9 @@ Line-Mode
 
 Specifying `-l` or `--line-mode` places you into line-oriented mode, letting you
 run multiple queries without reloading the database each time. In line mode,
-input is normally a query of the form `TABLE QUERY`, or a special command
-starting with a `!`. Recognized special commands generally map to non-line-mode
-options:
+input is normally a query of the form `[FILTERS] TABLE QUERY`, or a special
+command starting with a `!`. Recognized special commands generally map to
+non-line-mode options:
  * `!dump [TABLE]` - same as the `--dump` flag
  * `!export FORMAT[,PATH]` - same as the `--export` flag
  * `!summary` - same as the `--summary` flag
