@@ -36,6 +36,7 @@ class Starscope::DB
     @tables = {}
   end
 
+  # returns true iff the database was already in the most recent format
   def load(filename)
     @output.extra("Reading database from `#{filename}`... ")
     current_fmt = open_db(filename)

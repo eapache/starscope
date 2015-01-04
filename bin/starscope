@@ -193,7 +193,8 @@ db = Starscope::DB.new(output)
 db_exists = File.exists?(options[:db])
 
 if options[:read] && db_exists
-  new_data = db.load(options[:db])
+  # we consider it 'new data' if the db was upconverted from an old format
+  new_data = !db.load(options[:db])
 else
   # no need to run an update if we didn't read any old data
   options[:update] = false
