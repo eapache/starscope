@@ -3,9 +3,9 @@ require File.expand_path('../../test_helper', __FILE__)
 describe Starscope::Queryable do
 
   SAMPLE_RECORDS = [
-    {:name => [:"[abc"]},
-    {:name => [:"not a match"]},
-    {:name => [:a, :b, :c, :d]},
+    {:name => [:"[abc"], :foo => "baz"},
+    {:name => [:"not a match"], :foo => "bar", :x => "y"},
+    {:name => [:a, :b, :c, :d], :file => :somefile},
   ]
 
   class MockQuerable
@@ -14,6 +14,13 @@ describe Starscope::Queryable do
       @tables = {
         :mytable => SAMPLE_RECORDS,
         :empty_table => []
+      }
+      @meta = {
+        :files => {
+          :somefile => {
+            :lang => :ruby
+          }
+        }
       }
     end
   end
@@ -40,4 +47,16 @@ describe Starscope::Queryable do
     @mock.query(:mytable, "[abc").must_equal [SAMPLE_RECORDS[0]]
   end
 
+  it "must handle simple filters" do
+    @mock.query(:mytable, ".*", :foo => "bar").must_equal [SAMPLE_RECORDS[1]]
+  end
+
+  it "must handle multiple filters" do
+    @mock.query(:mytable, ".*", :foo => "bar", :x => "y").must_equal [SAMPLE_RECORDS[1]]
+    @mock.query(:mytable, ".*", :foo => "bar", :x => "nope").must_be_empty
+  end
+
+  it "must handle filters on file properties" do
+    @mock.query(:mytable, ".*", :lang => "ruby").must_equal [SAMPLE_RECORDS[2]]
+  end
 end

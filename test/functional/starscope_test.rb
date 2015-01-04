@@ -30,6 +30,14 @@ describe "starscope executable script" do
     `#{EXTRACT} -q calls,add_file`.each_line do |line|
       line.split[0..2].must_equal ["Starscope", "DB", "add_file"]
     end
+
+    `#{EXTRACT} -q lang:ruby,calls,add_file`.each_line do |line|
+      line.split[0..2].must_equal ["Starscope", "DB", "add_file"]
+    end
+
+    `#{EXTRACT} -q lang:go,calls,add_file`.each_line do |line|
+      line.must_equal "No results found.\n"
+    end
   end
 
   it "must correctly export to cscope" do
@@ -43,7 +51,7 @@ describe "starscope executable script" do
     end
   end
 
-  it "Must correctly export to ctags" do
+  it "must correctly export to ctags" do
     file = Tempfile.new('starscope_test')
     begin
       `#{EXTRACT} -e ctags,#{file.path()}`

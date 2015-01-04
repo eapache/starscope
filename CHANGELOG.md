@@ -6,6 +6,7 @@ v1.3.0 (trunk)
 
 New Features:
  * Give `*` as the table name in order to query all tables at once (#58).
+ * Specify filters for your queries for example `lang:ruby,calls,new` (#24).
 
 Bug Fixes:
  * Simplify query logic to match user expectations (#91)
