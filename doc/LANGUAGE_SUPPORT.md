@@ -61,6 +61,8 @@ belongs (basically its type). Current tables already include:
  * `assigns` for variable assignment
  * `requires` for required files in Ruby
  * `imports` for imported packages in Golang
+ * `reads` for reading of variables, constants etc. (e.g. use in an expression)
+ * `sym` for Ruby symbols
 
 Try to use pre-existing tables where possible, but feel free to add more if the
 language has some weird feature that doesn't map to any of the above. You don't

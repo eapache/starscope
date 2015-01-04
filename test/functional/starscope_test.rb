@@ -17,7 +17,7 @@ describe "starscope executable script" do
 
   it "must produce a valid database summary" do
     lines = `#{EXTRACT} -s`.lines.to_a
-    lines.length.must_equal 6
+    lines.length.must_equal 8
   end
 
   it "must produce a valid database dump" do
