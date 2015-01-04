@@ -66,12 +66,22 @@ module Starscope::Lang
         yield :end, :end, :line_no => loc.end.line, :type => node.type, :col => loc.end.column
 
       when :casgn
-        fqn = scoped_name(node, scope)
-        yield :assigns, fqn, :line_no => loc.line, :col => loc.name.column
-        yield :defs, fqn, :line_no => loc.line, :col => loc.name.column
+        name = scoped_name(node, scope)
+        yield :assigns, name, :line_no => loc.line, :col => loc.name.column
+        yield :defs, name, :line_no => loc.line, :col => loc.name.column
 
       when :lvasgn, :ivasgn, :cvasgn, :gvasgn
         yield :assigns, scope + [node.children[0]], :line_no => loc.line, :col => loc.name.column
+
+      when :const
+        name = scoped_name(node, scope)
+        yield :reads, name, :line_no => loc.line, :col => loc.name.column
+
+      when :lvar, :ivar, :cvar, :gvar
+        yield :reads, scope + [node.children[0]], :line_no => loc.line, :col => loc.expression.column
+
+      when :sym
+        yield :sym, [node.children[0]], :line_no => loc.line, :col => loc.expression.column
       end
     end
 
