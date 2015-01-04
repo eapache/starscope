@@ -95,11 +95,7 @@ END
             end
           end
 
-          buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
-          buf << cscope_plaintext(line, prev, offset) << "\n"
-          buf << cscope_mark(record[:tbl], record) << record[:key] << "\n"
-          buf << CSCOPE_GLOBAL_HACK_START if record[:type] == :func && record[:tbl] == :end
-
+          buf << cscope_output(line, prev, offset, record)
           prev = offset + record[:key].length
 
         end
@@ -151,7 +147,7 @@ END
       # keep scanning if our current index doesn't actually match the key, or if
       # either the preceeding or succeeding character is a word character
       # (meaning we've accidentally matched the middle of some other token)
-      while !index.nil? &&
+      while index &&
         ((line[index, key.length] != key) ||
          (index > 0 && line[index-1] =~ /\w/) ||
          (index+key.length < line.length && line[index+key.length] =~ /\w/))
@@ -176,6 +172,37 @@ END
     return toks.sort
   end
 
+  def cscope_output(line, prev, offset, record)
+    buf = ""
+    buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
+
+    tokens = record[:name][0...-1].map {|x| x.to_s.sub(/\W+$/, '')}.select {|x| !x.empty?}.join("|")
+    if !tokens.empty?
+      # output previous components of the name (ie the Foo in Foo::bar) as unmarked symbols
+      rxp = Regexp.new("\\W(#{tokens})\\W")
+      index = line.index(rxp, prev)
+
+      while index
+        tok = rxp.match(line[index..-1])[1]
+        index += 1
+        break if index+tok.length > offset
+        buf << cscope_plaintext(line, prev, index) << "\n"
+        buf << "#{tok}\n"
+        prev = index + tok.length
+        index = line.index(rxp, prev)
+      end
+    end
+
+    buf << cscope_plaintext(line, prev, offset) << "\n"
+    buf << cscope_mark(record) << record[:key] << "\n"
+
+    buf << CSCOPE_GLOBAL_HACK_START if record[:type] == :func && record[:tbl] == :end
+    buf
+  rescue ArgumentError
+    # invalid utf-8 byte sequence in the line, oh well
+    line
+  end
+
   def cscope_plaintext(line, start, stop)
     ret = line.slice(start, stop-start)
     ret.lstrip! if start == 0
@@ -186,8 +213,8 @@ END
     line
   end
 
-  def cscope_mark(tbl, rec)
-    case tbl
+  def cscope_mark(rec)
+    case rec[:tbl]
     when :end
       case rec[:type]
       when :func
