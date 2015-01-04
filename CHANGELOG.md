@@ -15,6 +15,7 @@ New Features:
 Bug Fixes:
  * Simplify query logic to match user expectations (#91)
  * Cscope: fix export of inline function definitions.
+ * DB: fix saving of upconverted databases in rare circumstances.
 
 v1.2.0 (2014-09-02)
 --------------------
