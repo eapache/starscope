@@ -40,8 +40,8 @@ module Starscope::Exportable
   # calls must occur in a function, but in ruby et al. it is perfectly legal to
   # write normal code outside the "scope" of a function definition - we insert a
   # fake shim "global" function everywhere we can to work around this
-  CSCOPE_GLOBAL_HACK_START = "\n\t$-\n"
-  CSCOPE_GLOBAL_HACK_STOP = "\n\t}\n"
+  CSCOPE_GLOBAL_HACK_START = " \n\t$-\n"
+  CSCOPE_GLOBAL_HACK_STOP = " \n\t}\n"
 
   def export_ctags(file)
     file.puts <<END
@@ -168,11 +168,7 @@ END
 
   def cscope_output(line, prev, offset, record)
     buf = ""
-
-    if record[:type] == :func && record[:tbl] == :defs
-      buf << " " if prev > 0 # urgh cscope
-      buf << CSCOPE_GLOBAL_HACK_STOP
-    end
+    buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
 
     record[:name][0...-1].each do |key|
       # output previous components of the name (ie the Foo in Foo::bar) as unmarked symbols
