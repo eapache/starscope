@@ -13,7 +13,7 @@ New Features:
    integration with cscope's "find this C symbol" (#60).
 
 Bug Fixes:
- * Simplify query logic to match user expectations (#91)
+ * Simplify query logic to match user expectations (#91).
  * Cscope: fix export of inline function definitions.
  * DB: fix saving of upconverted databases in rare circumstances.
 
