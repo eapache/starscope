@@ -110,13 +110,31 @@ def format_record(db, rec)
   "#{rec[:name].join " "} -- #{rec[:file]}:#{rec[:line_no]} (#{db.line_for_record(rec).strip})"
 end
 
-def run_query(db, table, value)
-  if !value
+def run_query(db, query, separator)
+  table = nil
+  match = []
+  filters = {}
+  query.split(separator).each do |tok|
+    unless table.nil?
+      match << tok
+      next
+    end
+
+    k, v = tok.split(':', 2)
+    if v.nil?
+      table = tok
+    else
+      filters[k.to_sym] = v
+    end
+  end
+  match = match.join(separator)
+
+  if !match
     $stderr.puts "Invalid input - no query found."
     return false
   end
   tables = (table == '*' ? db.tables : table.to_sym)
-  results = db.query(tables, value)
+  results = db.query(tables, match, filters)
   if !results || results.empty?
     puts "No results found."
   else
@@ -204,10 +222,7 @@ db.save(options[:db]) if options[:write] && (new_data || !db_exists)
 
 options[:export].each { |target| export(db, target) }
 
-if options[:query]
-  table, query = options[:query].split(',', 2)
-  run_query(db, table, query)
-end
+run_query(db, options[:query], ',') if options[:query]
 
 print_summary(db) if options[:summary]
 
@@ -265,7 +280,7 @@ if options[:linemode]
           puts "Unknown command: '#{input}', try '!help'."
         end
       else
-        success = run_query(db, cmd, param)
+        success = run_query(db, input, ' ')
         puts "Try '!help'." unless success
       end
     end
