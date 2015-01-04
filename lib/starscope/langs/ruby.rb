@@ -2,7 +2,7 @@ require "parser/current"
 
 module Starscope::Lang
   module Ruby
-    VERSION = 1
+    VERSION = 2
 
     def self.match_file(name)
       return true if name.end_with?(".rb")
