@@ -1,6 +1,8 @@
+require 'starscope/matcher'
+
 module Starscope::Queryable
 
-  def query(tables, value)
+  def query(tables, value, filters={})
     tables = [tables] if tables.is_a?(Symbol)
     tables.each { |t| raise NoTableError, "Table '#{t}' not found" unless @tables[t] }
     input = Enumerator.new do |y|
@@ -11,39 +13,35 @@ module Starscope::Queryable
       end
     end
 
-    run_query(value, input)
+    run_query(value, input, filters)
   end
 
   private
 
-  MATCH_TYPES = [:literal_match, :regexp_match]
+  def run_query(query, input, filters)
+    query = Starscope::Matcher.new(query)
+    filters.each {|k,v| filters[k] = Starscope::Matcher.new(v)}
 
-  def run_query(query, input)
-    begin
-      regexp = Regexp.new(query, Regexp::IGNORECASE)
-    rescue RegexpError
-      # not a regex, oh well
+    results = input.select {|x| filter(x, filters)}.group_by {|x| match(x, query)}
+
+    Starscope::Matcher::MATCH_TYPES.each do |type|
+      next if results[type].nil? || results[type].empty?
+      return results[type]
     end
 
-    results = input.group_by {|x| match(x, query, regexp)}
-
-    MATCH_TYPES.each do |type|
-       next if results[type].nil? or results[type].empty?
-       return results[type]
-     end
-
-     return []
+    []
   end
 
-  def match(record, query, regexp)
+  def filter(record, filters)
+    filters.all? do |key, filter|
+      target = record[key] || (@meta[:files][record[:file]] || {})[key]
+      target && filter.match(target.to_s)
+    end
+  end
+
+  def match(record, query)
     name = record[:name].map {|x| x.to_s}.join('::')
 
-    case
-    when name.end_with?(query)
-      :literal_match
-    when regexp && regexp.match(name)
-      :regexp_match
-    end
+    query.match(name)
   end
-
 end
