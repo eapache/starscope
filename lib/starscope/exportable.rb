@@ -205,8 +205,8 @@ END
   def valid_index?(line, index, key)
     # index is valid if the key exists at it, and the prev/next chars are not word characters
     ((line[index, key.length] == key) &&
-     (index == 0 || line[index-1] =~ /\W/) &&
-     (index+key.length == line.length || line[index+key.length] =~ /\W/))
+     (index == 0 || line[index-1] !~ /\w/) &&
+     (index+key.length == line.length || line[index+key.length] !~ /\w/))
   end
 
   def cscope_plaintext(line, start, stop)
