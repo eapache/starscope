@@ -110,7 +110,7 @@ Queries
 -------
 
 To query the starscope database, pass the `-q` or `--query` flag with an
-argument in the following format: `[FILTERS],TABLE,QUERY`. For example,
+argument in the following format: `[FILTERS,]TABLE,QUERY`. For example,
 `-q calls,new` would list all callers of `new` and `-q defs,bar` would list
 places that define a method or class named `bar`. See the [language support
 documentation](LANGUAGE_SUPPORT.md) for a list of the most common tables, or use
@@ -154,7 +154,7 @@ Line-Mode
 
 Specifying `-l` or `--line-mode` places you into line-oriented mode, letting you
 run multiple queries without reloading the database each time. In line mode,
-input is normally a query of the form `[FILTERS] TABLE QUERY`, or a special
+input is normally a query of the form `[FILTERS ]TABLE QUERY`, or a special
 command starting with a `!`. Recognized special commands generally map to
 non-line-mode options:
  * `!dump [TABLE]` - same as the `--dump` flag
