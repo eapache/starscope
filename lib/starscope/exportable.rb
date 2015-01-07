@@ -35,14 +35,6 @@ module Starscope::Exportable
 
   private
 
-  # cscope has this funky issue where it refuses to recognize function calls that
-  # happen outside of a function definition - this isn't an issue in C, where all
-  # calls must occur in a function, but in ruby et al. it is perfectly legal to
-  # write normal code outside the "scope" of a function definition - we insert a
-  # fake shim "global" function everywhere we can to work around this
-  CSCOPE_GLOBAL_HACK_START = " \n\t$-\n"
-  CSCOPE_GLOBAL_HACK_STOP = " \n\t}\n"
-
   def export_ctags(file)
     file.puts <<END
 !_TAG_FILE_FORMAT	2	/extended format/
@@ -57,6 +49,44 @@ END
       file.puts ctag_line(record, @meta[:files][record[:file]])
     end
   end
+
+  def ctag_line(rec, file)
+    ret = "#{rec[:name][-1]}\t#{rec[:file]}\t/^#{line_for_record(rec)}$/"
+
+    ext = ctag_ext_tags(rec, file)
+    if not ext.empty?
+      ret << ";\""
+      ext.sort.each do |k, v|
+        ret << "\t#{k}:#{v}"
+      end
+    end
+
+    ret
+  end
+
+  def ctag_ext_tags(rec, file)
+    tag = {}
+
+    # these extensions are documented at http://ctags.sourceforge.net/FORMAT
+    case rec[:type]
+    when :func
+      tag["kind"] = "f"
+    when :module, :class
+      tag["kind"] = "c"
+    end
+
+    tag["language"] = file[:lang]
+
+    tag
+  end
+
+  # cscope has this funky issue where it refuses to recognize function calls that
+  # happen outside of a function definition - this isn't an issue in C, where all
+  # calls must occur in a function, but in ruby et al. it is perfectly legal to
+  # write normal code outside the "scope" of a function definition - we insert a
+  # fake shim "global" function everywhere we can to work around this
+  CSCOPE_GLOBAL_HACK_START = " \n\t$-\n"
+  CSCOPE_GLOBAL_HACK_STOP = " \n\t}\n"
 
   # ftp://ftp.eeng.dcu.ie/pub/ee454/cygwin/usr/share/doc/mlcscope-14.1.8/html/cscope.html
   def export_cscope(file)
@@ -132,7 +162,7 @@ END
         db[record[:file]][record[:line_no]] << record
       end
     end
-    return db
+    db
   end
 
   def tokenize_line(line, records)
@@ -160,10 +190,9 @@ END
 
       record[:key] = key
       toks[index] = record
-
     end
 
-    return toks.sort
+    toks.sort
   end
 
   def cscope_output(line, prev, offset, record)
@@ -249,37 +278,6 @@ END
       return ""
     end
 
-    return "\t" + ret
+    "\t" + ret
   end
-
-  def ctag_line(rec, file)
-    ret = "#{rec[:name][-1]}\t#{rec[:file]}\t/^#{line_for_record(rec)}$/"
-
-    ext = ctag_ext_tags(rec, file)
-    if not ext.empty?
-      ret << ";\""
-      ext.sort.each do |k, v|
-        ret << "\t#{k}:#{v}"
-      end
-    end
-
-    ret
-  end
-
-  def ctag_ext_tags(rec, file)
-    tag = {}
-
-    # these extensions are documented at http://ctags.sourceforge.net/FORMAT
-    case rec[:type]
-    when :func
-      tag["kind"] = "f"
-    when :module, :class
-      tag["kind"] = "c"
-    end
-
-    tag["language"] = file[:lang]
-
-    tag
-  end
-
 end
