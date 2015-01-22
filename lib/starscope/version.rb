@@ -1,3 +1,3 @@
 module Starscope
-  VERSION = "1.4.0-alpha1"
+  VERSION = "1.3.1"
 end

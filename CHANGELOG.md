@@ -1,10 +1,12 @@
 Changelog
 =========
 
-v1.4.0 (trunk)
+v1.3.1 (trunk)
 --------------------
 
-No changes yet.
+Bug Fixes:
+ * Fix parsing of certain queries containing `:`.
+ * Fix alignment of summaries on large DBs.
 
 v1.3.0 (2015-01-04)
 --------------------
