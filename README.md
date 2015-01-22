@@ -1,7 +1,7 @@
 Starscope
 =========
 
-[![Gem Version](https://badge.fury.io/rb/starscope.png)](http://badge.fury.io/rb/starscope)
+[![Gem Version](https://badge.fury.io/rb/starscope.svg)](http://badge.fury.io/rb/starscope)
 [![Build Status](https://travis-ci.org/eapache/starscope.svg?branch=master)](https://travis-ci.org/eapache/starscope)
 
 Anyone who has done much programming in C (or C++) on a Unix-based OS has come
