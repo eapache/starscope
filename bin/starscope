@@ -129,7 +129,7 @@ def run_query(db, query, separator)
   end
   match = match.join(separator)
 
-  if !match
+  if match.empty?
     $stderr.puts "Invalid input - no query found."
     return false
   end
