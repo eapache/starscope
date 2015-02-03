@@ -242,7 +242,7 @@ class Starscope::DB
       begin
         next unless extractor.match_file file
       rescue => e
-        @output.normal("#{extractor} raised #{e} while matching #{file}")
+        @output.normal("#{extractor} raised \"#{e}\" while matching #{file}")
         next
       end
 
