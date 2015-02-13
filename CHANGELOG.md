@@ -4,7 +4,10 @@ Changelog
 v1.3.2 (trunk)
 --------------------
 
-No changes yet.
+Bug Fixes:
+ * Forcefully require latest ruby parser gem to pull in the fix for
+   https://github.com/whitequark/parser/issues/186
+ * Wrap reported exceptions in quotes for clarity.
 
 v1.3.1 (2015-01-22)
 --------------------
