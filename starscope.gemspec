@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 1.8.7'
 
   gem.add_dependency 'oj', '~> 2.9'
-  gem.add_dependency 'parser', '~> 2.1'
+  gem.add_dependency 'parser', '~> 2.2.0.3'
   gem.add_dependency 'ruby-progressbar', '~> 1.5'
   gem.add_dependency 'backports', '~> 3.6'
   gem.add_development_dependency 'bundler', '~> 1.5'
