@@ -275,7 +275,7 @@ class Starscope::DB
     end
 
   rescue => e
-    @output.normal("#{extractor} raised #{e} while extracting #{file}")
+    @output.normal("#{extractor} raised \"#{e}\" while extracting #{file}")
   end
 
   def file_changed(name)
