@@ -4,7 +4,8 @@ Changelog
 v1.3.3 (trunk)
 --------------------
 
-No changes yet.
+Improvements:
+ * Recognize rake tasks as ruby files.
 
 v1.3.2 (2015-02-13)
 --------------------
