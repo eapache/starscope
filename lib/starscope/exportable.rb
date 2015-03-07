@@ -51,7 +51,8 @@ END
   end
 
   def ctag_line(rec, file)
-    ret = "#{rec[:name][-1]}\t#{rec[:file]}\t/^#{line_for_record(rec)}$/"
+    line = line_for_record(rec).gsub('/', '\/')
+    ret = "#{rec[:name][-1]}\t#{rec[:file]}\t/^#{line}$/"
 
     ext = ctag_ext_tags(rec, file)
     if not ext.empty?

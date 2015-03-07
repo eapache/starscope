@@ -4,6 +4,11 @@ Changelog
 v1.3.3 (trunk)
 --------------------
 
+Bug Fixes:
+ * Escape '/' characters in the line 'pattern' component of ctags records, since
+   otherwise they terminate that component when it is read as a vim search
+   command.
+
 Improvements:
  * Recognize rake tasks as ruby files.
 
