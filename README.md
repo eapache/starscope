@@ -46,5 +46,7 @@ More Documentation
 Other Uses
 ----------
 
-Starscope is a supported backend for
+- Starscope is a supported backend for
 [CodeQuery](https://github.com/ruben2020/codequery).
+- Starscope has been [packaged for Arch
+  Linux](https://aur.archlinux.org/packages/ruby-starscope/).
