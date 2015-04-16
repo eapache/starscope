@@ -3,6 +3,7 @@ Starscope
 
 [![Gem Version](https://badge.fury.io/rb/starscope.svg)](http://badge.fury.io/rb/starscope)
 [![Build Status](https://travis-ci.org/eapache/starscope.svg?branch=master)](https://travis-ci.org/eapache/starscope)
+[![Code of Conduct](https://img.shields.io/badge/code%20of%20conduct-active-blue.svg)](https://eapache.github.io/conduct.html)
 
 Anyone who has done much programming in C (or C++) on a Unix-based OS has come
 across the fantastic [Cscope](http://cscope.sourceforge.net/) tool. Sadly, it
