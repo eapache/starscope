@@ -148,9 +148,9 @@ rescue Starscope::DB::NoTableError
 end
 
 def dump_table(db, table)
-  records = db.records(table).sort {|a, b|
+  records = db.records(table).sort do |a, b|
     a[:name][-1].to_s.downcase <=> b[:name][-1].to_s.downcase
-  }
+  end
 
   puts "== Table: #{table} =="
   puts 'No records' if records.empty?
