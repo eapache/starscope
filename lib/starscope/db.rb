@@ -20,7 +20,6 @@ Starscope::Lang.constants.each do |lang|
 end
 
 class Starscope::DB
-
   include Starscope::Exportable
   include Starscope::Queryable
 
@@ -31,8 +30,8 @@ class Starscope::DB
 
   def initialize(output)
     @output = output
-    @meta = {:paths => [], :files => {}, :excludes => [],
-             :langs => LANGS, :version => Starscope::VERSION}
+    @meta = { :paths => [], :files => {}, :excludes => [],
+              :langs => LANGS, :version => Starscope::VERSION }
     @tables = {}
   end
 
@@ -63,43 +62,43 @@ class Starscope::DB
 
   def add_excludes(paths)
     @output.extra("Excluding files in paths #{paths}...")
-    @meta[:paths] -= paths.map {|p| self.class.normalize_glob(p)}
-    paths = paths.map {|p| self.class.normalize_fnmatch(p)}
+    @meta[:paths] -= paths.map { |p| self.class.normalize_glob(p) }
+    paths = paths.map { |p| self.class.normalize_fnmatch(p) }
     @meta[:excludes] += paths
     @meta[:excludes].uniq!
 
-    excluded = @meta[:files].keys.select {|name| matches_exclude?(name, paths)}
+    excluded = @meta[:files].keys.select { |name| matches_exclude?(name, paths) }
     remove_files(excluded)
   end
 
   def add_paths(paths)
     @output.extra("Adding files in paths #{paths}...")
-    @meta[:excludes] -= paths.map {|p| self.class.normalize_fnmatch(p)}
-    paths = paths.map {|p| self.class.normalize_glob(p)}
+    @meta[:excludes] -= paths.map { |p| self.class.normalize_fnmatch(p) }
+    paths = paths.map { |p| self.class.normalize_glob(p) }
     @meta[:paths] += paths
     @meta[:paths].uniq!
-    files = Dir.glob(paths).select {|f| File.file? f}
-    files.delete_if {|f| matches_exclude?(f)}
+    files = Dir.glob(paths).select { |f| File.file? f }
+    files.delete_if { |f| matches_exclude?(f) }
     return if files.empty?
-    @output.new_pbar("Building", files.length)
+    @output.new_pbar('Building', files.length)
     add_files(files)
     @output.finish_pbar
   end
 
   def update
-    changes = @meta[:files].keys.group_by {|name| file_changed(name)}
+    changes = @meta[:files].keys.group_by { |name| file_changed(name) }
     changes[:modified] ||= []
     changes[:deleted] ||= []
 
-    new_files = (Dir.glob(@meta[:paths]).select {|f| File.file? f}) - @meta[:files].keys
-    new_files.delete_if {|f| matches_exclude?(f)}
+    new_files = (Dir.glob(@meta[:paths]).select { |f| File.file? f }) - @meta[:files].keys
+    new_files.delete_if { |f| matches_exclude?(f) }
 
     if changes[:deleted].empty? && changes[:modified].empty? && new_files.empty?
-      @output.normal("No changes detected.")
+      @output.normal('No changes detected.')
       return false
     end
 
-    @output.new_pbar("Updating", changes[:modified].length + new_files.length)
+    @output.new_pbar('Updating', changes[:modified].length + new_files.length)
     remove_files(changes[:deleted])
     update_files(changes[:modified])
     add_files(new_files)
@@ -113,7 +112,7 @@ class Starscope::DB
 
     file = @meta[:files][rec[:file]]
 
-    return file[:lines][rec[:line_no]-1] if file[:lines]
+    return file[:lines][rec[:line_no] - 1] if file[:lines]
   end
 
   def tables
@@ -121,15 +120,15 @@ class Starscope::DB
   end
 
   def records(table)
-    raise NoTableError if not @tables[table]
+    fail NoTableError unless @tables[table]
 
     @tables[table]
   end
 
-  def metadata(key=nil)
+  def metadata(key = nil)
     return @meta.keys if key.nil?
 
-    raise NoTableError unless @meta[key]
+    fail NoTableError unless @meta[key]
 
     @meta[key]
   end
@@ -163,10 +162,10 @@ class Starscope::DB
     when 0..2
       # Old format (pre-json), so read the directories segment then rebuild
       len = stream.gets.to_i
-      add_paths(Marshal::load(stream.read(len)))
+      add_paths(Marshal.load(stream.read(len)))
       return false
     else
-      raise UnknownDBFormatError
+      fail UnknownDBFormatError
     end
   rescue Oj::ParseError
     stream.rewind
@@ -174,7 +173,7 @@ class Starscope::DB
     # try reading as formated json, which is much slower, but it is sometimes
     # useful to be able to directly read your db
     objects = []
-    Oj.load(stream) {|obj| objects << obj}
+    Oj.load(stream) { |obj| objects << obj }
     @meta, @tables = objects
     return true
   end
@@ -186,10 +185,10 @@ class Starscope::DB
 
   # File.fnmatch treats a "**" to match files and directories recursively
   def self.normalize_fnmatch(path)
-    if path == "."
-      "**"
+    if path == '.'
+      '**'
     elsif File.directory?(path)
-      File.join(path, "**")
+      File.join(path, '**')
     else
       path
     end
@@ -198,17 +197,17 @@ class Starscope::DB
   # Dir.glob treats a "**" to only match directories recursively; you need
   # "**/*" to match all files recursively
   def self.normalize_glob(path)
-    if path == "."
-      File.join("**", "*")
+    if path == '.'
+      File.join('**', '*')
     elsif File.directory?(path)
-      File.join(path, "**", "*")
+      File.join(path, '**', '*')
     else
       path
     end
   end
 
   def matches_exclude?(file, patterns = @meta[:excludes])
-    patterns.map {|p| File.fnmatch(p, file)}.any?
+    patterns.map { |p| File.fnmatch(p, file) }.any?
   end
 
   def add_files(files)
@@ -226,7 +225,7 @@ class Starscope::DB
     end
     files = files.to_set
     @tables.each do |name, tbl|
-      tbl.delete_if {|val| files.include?(val[:file])}
+      tbl.delete_if { |val| files.include?(val[:file]) }
     end
   end
 
@@ -236,7 +235,7 @@ class Starscope::DB
   end
 
   def parse_file(file)
-    @meta[:files][file] = {:last_updated => File.mtime(file).to_i}
+    @meta[:files][file] = { :last_updated => File.mtime(file).to_i }
 
     EXTRACTORS.each do |extractor|
       begin
@@ -263,7 +262,7 @@ class Starscope::DB
       if args[:line_no]
         line_cache ||= File.readlines(file)
         lines ||= Array.new(line_cache.length)
-        lines[args[:line_no]-1] = line_cache[args[:line_no]-1].chomp
+        lines[args[:line_no] - 1] = line_cache[args[:line_no] - 1].chomp
       end
     end
 
@@ -280,7 +279,7 @@ class Starscope::DB
 
   def file_changed(name)
     file_meta = @meta[:files][name]
-    if !File.exists?(name) || !File.file?(name)
+    if !File.exist?(name) || !File.file?(name)
       :deleted
     elsif (file_meta[:last_updated] < File.mtime(name).to_i) ||
           (file_meta[:lang] && (@meta[:langs][file_meta[:lang]] || 0) < LANGS[file_meta[:lang]])
@@ -294,12 +293,11 @@ class Starscope::DB
     args[:file] = file
 
     if name.is_a? Array
-      args[:name] = name.map {|x| x.to_sym}
+      args[:name] = name.map(&:to_sym)
     else
       args[:name] = [name.to_sym]
     end
 
     args
   end
-
 end

@@ -1,25 +1,24 @@
 module Starscope::Exportable
-
-  CTAGS_DEFAULT_PATH='tags'
-  CSCOPE_DEFAULT_PATH='cscope.out'
+  CTAGS_DEFAULT_PATH = 'tags'
+  CSCOPE_DEFAULT_PATH = 'cscope.out'
 
   class UnknownExportFormatError < StandardError; end
 
-  def export(format, path=nil)
+  def export(format, path = nil)
     case format
     when :ctags
       path ||= CTAGS_DEFAULT_PATH
     when :cscope
       path ||= CSCOPE_DEFAULT_PATH
     else
-      raise UnknownExportFormatError
+      fail UnknownExportFormatError
     end
 
     @output.normal("Exporting to '#{path}' in format '#{format}'...")
     File.open(path, 'w') do |file|
       export_to(format, file)
     end
-    @output.normal("Export complete.")
+    @output.normal('Export complete.')
   end
 
   def export_to(format, io)
@@ -29,7 +28,7 @@ module Starscope::Exportable
     when :cscope
       export_cscope(io)
     else
-      raise UnknownExportFormatError
+      fail UnknownExportFormatError
     end
   end
 
@@ -44,7 +43,7 @@ module Starscope::Exportable
 !_TAG_PROGRAM_URL	https://github.com/eapache/starscope //
 !_TAG_PROGRAM_VERSION	#{Starscope::VERSION}	//
 END
-    defs = (@tables[:defs] || {}).sort_by {|x| x[:name][-1].to_s}
+    defs = (@tables[:defs] || {}).sort_by { |x| x[:name][-1].to_s }
     defs.each do |record|
       file.puts ctag_line(record, @meta[:files][record[:file]])
     end
@@ -55,7 +54,7 @@ END
     ret = "#{rec[:name][-1]}\t#{rec[:file]}\t/^#{line}$/"
 
     ext = ctag_ext_tags(rec, file)
-    if not ext.empty?
+    unless ext.empty?
       ret << ";\""
       ext.sort.each do |k, v|
         ret << "\t#{k}:#{v}"
@@ -71,12 +70,12 @@ END
     # these extensions are documented at http://ctags.sourceforge.net/FORMAT
     case rec[:type]
     when :func
-      tag["kind"] = "f"
+      tag['kind'] = 'f'
     when :module, :class
-      tag["kind"] = "c"
+      tag['kind'] = 'c'
     end
 
-    tag["language"] = file[:lang]
+    tag['language'] = file[:lang]
 
     tag
   end
@@ -91,9 +90,9 @@ END
 
   # ftp://ftp.eeng.dcu.ie/pub/ee454/cygwin/usr/share/doc/mlcscope-14.1.8/html/cscope.html
   def export_cscope(file)
-    buf = ""
+    buf = ''
     files = []
-    db_by_line().each do |filename, lines|
+    db_by_line.each do |filename, lines|
       next if lines.empty?
 
       buf << "\t@#{filename}\n\n"
@@ -107,9 +106,8 @@ END
         next if toks.empty?
 
         prev = 0
-        buf << line_no.to_s << " "
+        buf << line_no.to_s << ' '
         toks.each do |offset, record|
-
           next if offset < prev # this probably indicates an extractor bug
 
           # Don't export nested functions, cscope barfs on them since C doesn't
@@ -128,7 +126,6 @@ END
 
           buf << cscope_output(line, prev, offset, record)
           prev = offset + record[:key].length
-
         end
         buf << cscope_plaintext(line, prev, line.length) << "\n\n"
       end
@@ -144,19 +141,19 @@ END
     file.print(buf)
 
     file.print("#{@meta[:paths].length}\n")
-    @meta[:paths].each {|p| file.print("#{p}\n")}
+    @meta[:paths].each { |p| file.print("#{p}\n") }
     file.print("0\n")
     file.print("#{files.length}\n")
-    buf = ""
-    files.each {|f| buf << f + "\n"}
+    buf = ''
+    files.each { |f| buf << f + "\n" }
     file.print("#{buf.length}\n#{buf}")
   end
 
-  def db_by_line()
+  def db_by_line
     db = {}
     @tables.each do |tbl, records|
       records.each do |record|
-        next if not record[:line_no]
+        next unless record[:line_no]
         record[:tbl] = tbl
         db[record[:file]] ||= {}
         db[record[:file]][record[:line_no]] ||= []
@@ -176,7 +173,7 @@ END
       index = record[:col] || line.index(key)
 
       while index && !valid_index?(line, index, key)
-        index = line.index(key, index+1)
+        index = line.index(key, index + 1)
       end
 
       next if index.nil?
@@ -197,7 +194,7 @@ END
   end
 
   def cscope_output(line, prev, offset, record)
-    buf = ""
+    buf = ''
     buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
 
     record[:name][0...-1].each do |key|
@@ -207,11 +204,11 @@ END
 
       index = line.index(key, prev)
 
-      while index && index+key.length < offset && !valid_index?(line, index, key)
-        index = line.index(key, index+1)
+      while index && index + key.length < offset && !valid_index?(line, index, key)
+        index = line.index(key, index + 1)
       end
 
-      if index && index+key.length < offset
+      if index && index + key.length < offset
         buf << cscope_plaintext(line, prev, index) << "\n"
         buf << "#{key}\n"
         prev = index + key.length
@@ -231,12 +228,12 @@ END
   def valid_index?(line, index, key)
     # index is valid if the key exists at it, and the prev/next chars are not word characters
     ((line[index, key.length] == key) &&
-     (index == 0 || line[index-1] !~ /\w/) &&
-     (index+key.length == line.length || line[index+key.length] !~ /\w/))
+     (index == 0 || line[index - 1] !~ /\w/) &&
+     (index + key.length == line.length || line[index + key.length] !~ /\w/))
   end
 
   def cscope_plaintext(line, start, stop)
-    ret = line.slice(start, stop-start)
+    ret = line.slice(start, stop - start)
     ret.lstrip! if start == 0
     ret.rstrip! if stop == line.length
     ret.gsub(/\s+/, ' ')
@@ -250,33 +247,33 @@ END
     when :end
       case rec[:type]
       when :func
-        ret = "}"
+        ret = '}'
       else
-        return ""
+        return ''
       end
     when :file
-      ret = "@"
+      ret = '@'
     when :defs
       case rec[:type]
       when :func
-        ret = "$"
+        ret = '$'
       when :class, :module
-        ret = "c"
+        ret = 'c'
       when :type
-        ret = "t"
+        ret = 't'
       else
-        ret = "g"
+        ret = 'g'
       end
     when :calls
-      ret = "`"
+      ret = '`'
     when :requires
       ret = "~\""
     when :imports
-      ret = "~<"
+      ret = '~<'
     when :assigns
-      ret = "="
+      ret = '='
     else
-      return ""
+      return ''
     end
 
     "\t" + ret

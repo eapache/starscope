@@ -1,2 +1,2 @@
-require "starscope/version"
-require "starscope/db"
+require 'starscope/version'
+require 'starscope/db'

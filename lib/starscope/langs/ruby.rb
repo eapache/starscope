@@ -1,15 +1,15 @@
-require "parser/current"
+require 'parser/current'
 
 module Starscope::Lang
   module Ruby
     VERSION = 2
 
     def self.match_file(name)
-      return true if name.end_with?(".rb") || name.end_with?(".rake")
+      return true if name.end_with?('.rb') || name.end_with?('.rake')
       File.open(name) do |f|
         head = f.read(2)
-        return false if head.nil? || !head.start_with?("#!")
-        return f.readline.include?("ruby")
+        return false if head.nil? || !head.start_with?('#!')
+        return f.readline.include?('ruby')
       end
     end
 
@@ -29,7 +29,7 @@ module Starscope::Lang
         scope += new_scope
       end
 
-      tree.children.each {|node| extract_tree(node, scope, &block) if node.is_a? AST::Node}
+      tree.children.each { |node| extract_tree(node, scope, &block) if node.is_a? AST::Node }
 
       scope.pop(new_scope.count)
     end
@@ -45,8 +45,8 @@ module Starscope::Lang
         if name.last.to_s =~ /\w+=$/
           name[-1] = name.last.to_s.chop.to_sym
           yield :assigns, name, :line_no => loc.line, :col => loc.column
-        elsif node.children[0].nil? and node.children[1] == :require and node.children[2].type == :str
-          yield :requires, node.children[2].children[0].split("/"),
+        elsif node.children[0].nil? && node.children[1] == :require && node.children[2].type == :str
+          yield :requires, node.children[2].children[0].split('/'),
             :line_no => loc.line, :col => loc.column
         end
 
@@ -83,7 +83,7 @@ module Starscope::Lang
       when :sym
         # handle `:foo` vs `foo: 1`
         col = if loc.begin
-                loc.begin.column+1
+                loc.begin.column + 1
               else
                 loc.expression.column
               end

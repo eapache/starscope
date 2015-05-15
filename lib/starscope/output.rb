@@ -1,10 +1,9 @@
 require 'ruby-progressbar'
 
 class Starscope::Output
-
   PBAR_FORMAT = '%t: %c/%C %E ||%b>%i||'
 
-  def initialize(level, out=STDOUT)
+  def initialize(level, out = STDOUT)
     @out = out
     @level = level
     @pbar = nil
@@ -13,8 +12,8 @@ class Starscope::Output
   def new_pbar(title, num_items)
     if @level != :quiet
       @pbar = ProgressBar.create(:title => title, :total => num_items,
-                                :format => PBAR_FORMAT, :length => 80,
-                                :out => @out)
+                                 :format => PBAR_FORMAT, :length => 80,
+                                 :out => @out)
     end
   end
 
@@ -46,5 +45,4 @@ class Starscope::Output
       @out.puts msg
     end
   end
-
 end

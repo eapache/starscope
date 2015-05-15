@@ -1,0 +1,8 @@
+Lint/UnusedBlockArgument:
+  Enabled: false
+
+Lint/UnusedMethodArgument:
+  Enabled: false
+
+Style/HashSyntax:
+  EnforcedStyle: hash_rockets
