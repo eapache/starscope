@@ -2,18 +2,17 @@ require File.expand_path('../../test_helper', __FILE__)
 require 'tempfile'
 
 describe Starscope::DB do
-
   before do
     @db = Starscope::DB.new(Starscope::Output.new(:quiet))
   end
 
-  it "must raise on invalid tables" do
+  it 'must raise on invalid tables' do
     proc {
       @db.records(:foo)
     }.must_raise Starscope::DB::NoTableError
   end
 
-  it "must add paths" do
+  it 'must add paths' do
     paths = [GOLANG_SAMPLE, "#{FIXTURES}/**/*"]
     @db.add_paths(paths)
 
@@ -21,7 +20,7 @@ describe Starscope::DB do
     validate(@db)
   end
 
-  it "must add excludes" do
+  it 'must add excludes' do
     paths = [GOLANG_SAMPLE, "#{FIXTURES}/**/*"]
     @db.add_paths(paths)
     @db.add_excludes(["#{FIXTURES}/**"])
@@ -33,14 +32,14 @@ describe Starscope::DB do
     @db.records(:end).must_be_empty
   end
 
-  it "must pick up new files in old paths" do
+  it 'must pick up new files in old paths' do
     @db.load("#{FIXTURES}/db_added_files.json")
     @db.update
 
     validate(@db)
   end
 
-  it "must remove old files in existing paths" do
+  it 'must remove old files in existing paths' do
     @db.load("#{FIXTURES}/db_removed_files.json")
     @db.update
     @db.metadata(:files).keys.wont_include "#{FIXTURES}/foo"
@@ -62,7 +61,7 @@ describe Starscope::DB do
     @db.records(:calls).wont_be_empty
   end
 
-  it "must update unchanged existing files with old extractor versions" do
+  it 'must update unchanged existing files with old extractor versions' do
     @db.load("#{FIXTURES}/db_old_extractor.json")
 
     cur_mtime = @db.metadata(:files)[GOLANG_SAMPLE][:last_updated]
@@ -77,22 +76,22 @@ describe Starscope::DB do
     @db.records(:calls).wont_be_empty
   end
 
-  it "must not update file with up-to-date time and extractor" do
+  it 'must not update file with up-to-date time and extractor' do
     @db.load("#{FIXTURES}/db_up_to_date.json")
     @db.update
 
     file = @db.metadata(:files)[GOLANG_SAMPLE]
-    file[:last_updated].must_equal 10000000000
+    file[:last_updated].must_equal 10_000_000_000
     @db.tables.must_be_empty
   end
 
-  it "must load an old DB file" do
+  it 'must load an old DB file' do
     @db.load("#{FIXTURES}/db_old.json.gz")
     @db.metadata(:paths).must_equal ["#{FIXTURES}/**/*"]
     validate(@db)
   end
 
-  it "must round-trip a database" do
+  it 'must round-trip a database' do
     file = Tempfile.new('starscope_test')
     begin
       @db.add_paths([FIXTURES])
@@ -106,34 +105,34 @@ describe Starscope::DB do
     end
   end
 
-  it "must run queries" do
+  it 'must run queries' do
     @db.add_paths([FIXTURES])
-    @db.query(:calls, "abc").must_equal []
-    @db.query(:defs, "xyz").must_equal []
-    @db.query(:calls, "add_file").length.must_equal 3
+    @db.query(:calls, 'abc').must_equal []
+    @db.query(:defs, 'xyz').must_equal []
+    @db.query(:calls, 'add_file').length.must_equal 3
   end
 
-  it "must run queries on multiple tables" do
+  it 'must run queries on multiple tables' do
     @db.add_paths([FIXTURES])
-    ret = @db.query([:calls, :defs], "foo")
+    ret = @db.query([:calls, :defs], 'foo')
     ret.length.must_equal 1
     ret.first[:name].last.must_equal :foo
   end
 
-  it "must symbolize compound name" do
-    rec = Starscope::DB.normalize_record(:foo, ["a", :b], {})
+  it 'must symbolize compound name' do
+    rec = Starscope::DB.normalize_record(:foo, ['a', :b], {})
     rec[:name].must_equal [:a, :b]
   end
 
-  it "must symbolize and array-wrap simple name" do
-    rec = Starscope::DB.normalize_record(:foo, "a", {})
+  it 'must symbolize and array-wrap simple name' do
+    rec = Starscope::DB.normalize_record(:foo, 'a', {})
     rec[:name].must_equal [:a]
   end
 
-  it "must store extractor metadata returned from the `extract` call" do
+  it 'must store extractor metadata returned from the `extract` call' do
     extractor = mock('extractor')
     extractor.expects(:match_file).with(GOLANG_SAMPLE).returns(true)
-    extractor.expects(:extract).with(GOLANG_SAMPLE).returns({:a => 1})
+    extractor.expects(:extract).with(GOLANG_SAMPLE).returns(:a => 1)
     extractor.expects(:name).returns('Foo')
     EXTRACTORS.stubs(:each).yields(extractor)
 
@@ -156,5 +155,4 @@ describe Starscope::DB do
     db.records(:imports).wont_be_empty
     db.records(:requires).wont_be_empty
   end
-
 end

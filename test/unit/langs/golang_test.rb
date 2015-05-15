@@ -9,18 +9,18 @@ describe Starscope::Lang::Go do
     end
   end
 
-  it "must match golang files" do
+  it 'must match golang files' do
     Starscope::Lang::Go.match_file(GOLANG_SAMPLE).must_equal true
   end
 
-  it "must not match non-golang files" do
+  it 'must not match non-golang files' do
     Starscope::Lang::Go.match_file(RUBY_SAMPLE).must_equal false
     Starscope::Lang::Go.match_file(EMPTY_FILE).must_equal false
   end
 
-  it "must identify definitions" do
+  it 'must identify definitions' do
     @db.keys.must_include :defs
-    defs = @db[:defs].map {|x| x[:name][-1]}
+    defs = @db[:defs].map { |x| x[:name][-1] }
 
     defs.must_include :a
     defs.must_include :b
@@ -40,14 +40,14 @@ describe Starscope::Lang::Go do
     defs.wont_include :"0x03"
   end
 
-  it "must identify endings" do
+  it 'must identify endings' do
     @db.keys.must_include :end
     @db[:end].count.must_equal 7
   end
 
-  it "must identify function calls" do
+  it 'must identify function calls' do
     @db.keys.must_include :calls
-    calls = @db[:calls].group_by {|x| x[:name][-1]}
+    calls = @db[:calls].group_by { |x| x[:name][-1] }
 
     calls.keys.must_include :a
     calls.keys.must_include :b
@@ -62,9 +62,9 @@ describe Starscope::Lang::Go do
     calls[:Errorf].count.must_equal 1
   end
 
-  it "must identify variable assignments" do
+  it 'must identify variable assignments' do
     @db.keys.must_include :assigns
-    assigns = @db[:assigns].group_by {|x| x[:name][-1]}
+    assigns = @db[:assigns].group_by { |x| x[:name][-1] }
 
     assigns.keys.must_include :x
     assigns.keys.must_include :y
@@ -80,14 +80,14 @@ describe Starscope::Lang::Go do
     assigns[:m].count.must_equal 2
   end
 
-  it "must identify imports" do
+  it 'must identify imports' do
     @db.keys.must_include :imports
-    imports = @db[:imports].group_by {|x| x[:name][-1]}
+    imports = @db[:imports].group_by { |x| x[:name][-1] }
 
     imports.keys.must_include :fmt
   end
 
-  it "must correctly find the end of string constants" do
+  it 'must correctly find the end of string constants' do
     Starscope::Lang::Go.find_end_of_string('"123"foo', 0).must_equal 4
     Starscope::Lang::Go.find_end_of_string('a"123"foo', 0).must_equal 1
     Starscope::Lang::Go.find_end_of_string('a"123"foo', 1).must_equal 5

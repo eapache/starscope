@@ -3,7 +3,7 @@ module Starscope::Lang
     VERSION = 0
 
     def self.match_file(name)
-      name.end_with?(".coffee")
+      name.end_with?('.coffee')
     end
 
     def self.extract(file)
