@@ -247,7 +247,7 @@ class Starscope::DB
 
       extract_file(extractor, file)
 
-      return
+      break
     end
   end
 

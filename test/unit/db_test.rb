@@ -7,9 +7,7 @@ describe Starscope::DB do
   end
 
   it 'must raise on invalid tables' do
-    proc {
-      @db.records(:foo)
-    }.must_raise Starscope::DB::NoTableError
+    proc { @db.records(:foo) }.must_raise Starscope::DB::NoTableError
   end
 
   it 'must add paths' do

@@ -20,19 +20,19 @@ module Starscope::Lang
         line_no += 1 # zero-index to one-index
 
         # strip single-line comments like // foo
-        match = /\/\//.match(line)
+        match = %r{//}.match(line)
         line = match.pre_match if match
         # strip single-line comments like foo /* foo */ foo
-        match = /\/\*.*\*\//.match(line)
+        match = %r{/\*.*\*/}.match(line)
         line = match.pre_match + match.post_match if match
         # strip end-of-line comment starters like foo /* foo \n
-        match = /\/\*/.match(line)
+        match = %r{/\*}.match(line)
         line = match.pre_match if match
         ends_with_comment = !match.nil?
 
         # if we're in a block comment, wait for it to end
         if stack[-1] == :comment
-          match = /\*\/(.*)/.match(line)
+          match = %r{\*/(.*)}.match(line)
           next unless match
           line = match[1]
           stack.pop
