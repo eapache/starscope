@@ -67,7 +67,7 @@ belongs (basically its type). Current tables already include:
 Try to use pre-existing tables where possible, but feel free to add more if the
 language has some weird feature that doesn't map to any of the above. You don't
 have to do anything special to create a new table, just yield the appropriate
-symbol.
+symbol. Table names cannot begin with exclamation points (`!`).
 
 The second yielded argument is the name (string or symbol) of the token that
 you want to add: the name of the function being called, or the name of the class

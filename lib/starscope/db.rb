@@ -256,6 +256,7 @@ class Starscope::DB
     line_cache = nil
 
     extractor_metadata = extractor.extract(file) do |tbl, name, args|
+      raise NoTableError if tbl.to_s.start_with?('!')
       @tables[tbl] ||= []
       @tables[tbl] << self.class.normalize_record(file, name, args)
 
