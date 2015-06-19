@@ -248,13 +248,16 @@ class Starscope::DB
         next
       end
 
-      extract_file(extractor, file)
+      line_cache = File.readlines(file)
+      lines = Array.new(line_cache.length)
+      @meta[:files][file][:sublangs] = []
+      extract_file(extractor, file, line_cache, lines)
 
       break
     end
   end
 
-  def extract_file(extractor, file, line_cache = File.readlines(file), lines = Array.new(line_cache.length))
+  def extract_file(extractor, file, line_cache, lines)
     fragment_cache = {}
 
     extractor_metadata = extractor.extract(file, File.read(file)) do |tbl, name, args|
@@ -276,6 +279,7 @@ class Starscope::DB
 
     fragment_cache.each do |lang, frags|
       extract_file(Starscope::FragmentExtractor.new(lang, frags), file, line_cache, lines)
+      @meta[:files][file][:sublangs] << lang
     end
 
     @meta[:files][file][:lang] = extractor.name.split('::').last.to_sym
@@ -294,11 +298,16 @@ class Starscope::DB
     if !File.exist?(name) || !File.file?(name)
       :deleted
     elsif (file_meta[:last_updated] < File.mtime(name).to_i) ||
-          (file_meta[:lang] && (@meta[:langs][file_meta[:lang]] || 0) < LANGS[file_meta[:lang]])
+          language_out_of_date(file_meta[:lang]) ||
+          (file_meta[:sublangs] || []).any? { |lang| language_out_of_date(lang) }
       :modified
     else
       :unchanged
     end
+  end
+
+  def language_out_of_date(lang)
+    lang && (@meta[:langs][lang] || 0) < LANGS[lang]
   end
 
   def self.normalize_record(file, name, args)
