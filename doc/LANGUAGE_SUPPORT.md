@@ -28,7 +28,7 @@ module Starscope::Lang
       name.end_with?(".mylang")
     end
 
-    def self.extract(file)
+    def self.extract(path, contents)
       # TODO
     end
   end
@@ -45,9 +45,10 @@ methods:
    written in MyLanguage or not. This can be as simple as checking the file
    extension (which the sample code does) or looking for a shell #! line, or
    anything you want.
- * `extract` takes a readable file handle pointing to the file, and must parse
-   the file, `yield`ing records as it finds function definitions and the like.
-   It may also return a final hash of file-wide metadata to store.
+ * `extract` takes the path to the file and a string containing the contents of
+   the file, and must parse the text, `yield`ing records as it finds function
+   definitions and the like. It may also return a final hash of file-wide
+   metadata to store.
 
 The record requirements are pretty straight-forward:
 ```ruby
