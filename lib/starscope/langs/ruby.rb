@@ -13,8 +13,8 @@ module Starscope::Lang
       end
     end
 
-    def self.extract(file, &block)
-      ast = Parser::CurrentRuby.parse_file(file)
+    def self.extract(path, contents, &block)
+      ast = Parser::CurrentRuby.parse(contents)
       extract_tree(ast, [], &block) unless ast.nil?
     end
 

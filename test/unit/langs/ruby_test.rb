@@ -3,7 +3,7 @@ require File.expand_path('../../../test_helper', __FILE__)
 describe Starscope::Lang::Ruby do
   before do
     @db = {}
-    Starscope::Lang::Ruby.extract(RUBY_SAMPLE) do |tbl, name, args|
+    Starscope::Lang::Ruby.extract(RUBY_SAMPLE, File.read(RUBY_SAMPLE)) do |tbl, name, args|
       @db[tbl] ||= []
       @db[tbl] << Starscope::DB.normalize_record(RUBY_SAMPLE, name, args)
     end

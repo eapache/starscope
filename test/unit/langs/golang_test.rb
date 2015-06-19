@@ -3,7 +3,7 @@ require File.expand_path('../../../test_helper', __FILE__)
 describe Starscope::Lang::Go do
   before do
     @db = {}
-    Starscope::Lang::Go.extract(GOLANG_SAMPLE) do |tbl, name, args|
+    Starscope::Lang::Go.extract(GOLANG_SAMPLE, File.read(GOLANG_SAMPLE)) do |tbl, name, args|
       @db[tbl] ||= []
       @db[tbl] << Starscope::DB.normalize_record(GOLANG_SAMPLE, name, args)
     end

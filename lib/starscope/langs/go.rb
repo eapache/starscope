@@ -13,10 +13,10 @@ module Starscope::Lang
       name.end_with?('.go')
     end
 
-    def self.extract(file, &block)
+    def self.extract(path, contents, &block)
       stack = []
       scope = []
-      File.readlines(file).each_with_index do |line, line_no|
+      contents.lines.each_with_index do |line, line_no|
         line_no += 1 # zero-index to one-index
 
         # strip single-line comments like // foo
