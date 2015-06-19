@@ -8,6 +8,9 @@ New Features:
  * Implement support for files with multiple nested languages (#61).
  * Implement support for extracting ruby inside ERB files (#120).
 
+Bug Fixes:
+ * Correctly handle the removal of language extractors (#122).
+
 Misc:
  * Preliminary use of Rubocop for more consistent code style.
  * Document the fact that `!` can't be used at the beginning of table names.
