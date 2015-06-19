@@ -1,7 +1,7 @@
 Starscope
 =========
 
-[![Gem Version](https://badge.fury.io/rb/starscope.svg)](https://badge.fury.io/rb/starscope)
+[![Gem Version](https://img.shields.io/badge/gem%20version-1.4.0-green.svg)](https://rubygems.org/gems/starscope)
 [![Build Status](https://travis-ci.org/eapache/starscope.svg?branch=master)](https://travis-ci.org/eapache/starscope)
 [![Code of Conduct](https://img.shields.io/badge/code%20of%20conduct-active-blue.svg)](https://eapache.github.io/conduct.html)
 
