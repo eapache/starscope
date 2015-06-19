@@ -16,12 +16,12 @@ on anything language-specific, they just read the internal database record
 format.
 
 For this doc, we're going to pretend to add support for a language called
-"MyLanguage". Create a file called `mylanguage.rb` in `lib/starscope/langs/` and
-drop the following template in:
+"MyLanguage". Create a file called `my_language.rb` in `lib/starscope/langs/`
+and drop the following template in:
 
 ```ruby
 module Starscope::Lang
-  module Mylanguage
+  module MyLanguage
     VERSION = 1
 
     def self.match_file(name)
@@ -36,14 +36,14 @@ end
 ```
 
 This code is pretty simple: we define a module called
-`Starscope::Lang::Mylanguage` and give it one constant and two public module
+`Starscope::Lang::MyLanguage` and give it one constant and two public module
 methods:
  * `VERSION` is a constant integer defining the current version of the
    extractor. It should be incremented when the extractor has changed enough
    that any existing files should be re-parsed with the new version.
  * `match_file` takes the name of the file and returns a boolean if that file is
    written in MyLanguage or not. This can be as simple as checking the file
-   extension (which the sample code does) or looking for a shell #! line, or
+   extension (which the sample code does) or looking for a shell `#!` line, or
    anything you want.
  * `extract` takes the path to the file and a string containing the contents of
    the file, and must parse the text, `yield`ing records as it finds function
@@ -86,3 +86,19 @@ And that's it! Parse your files, yield your records, and the Starscope engine
 takes care of everything else for you. If you've added support for a language
 that you think others might find useful, please contribute it (with tests!) via
 pull request.
+
+Sublanguages and Fragments
+--------------------------
+
+Some languages (such as ERB and Markdown) include support for nesting chunks of
+other languages inside. If your extractor comes across a fragment of another
+language while it is parsing, it can pass that off to the correct sub-extractor
+by yielding to the special `FRAGMENT` table, with the name of the language as
+the name, and a `frag` argument containing the actual raw text. For example:
+
+```ruby
+yield FRAGMENT, :Ruby, :frag => my_extracted_ruby_code, :line_no => line_no
+```
+
+Fragments will be accumulated by the database and passed to the appropriate
+extractor when the current file has been completely parsed.
