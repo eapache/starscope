@@ -90,6 +90,21 @@ describe Starscope::DB do
     @db.records(:calls).wont_be_empty
   end
 
+  it 'must update unchanged existing files when the extractor has been removed' do
+    @db.load("#{FIXTURES}/db_missing_language.json")
+
+    cur_mtime = @db.metadata(:files)[GOLANG_SAMPLE][:last_updated]
+    File.expects(:mtime).twice.returns(cur_mtime)
+    @db.update
+
+    file = @db.metadata(:files)[GOLANG_SAMPLE]
+    file[:last_updated].must_equal cur_mtime
+    file[:lang].must_equal :Go
+    file[:lines].wont_be_empty
+    @db.records(:defs).wont_be_empty
+    @db.records(:calls).wont_be_empty
+  end
+
   it 'must not update file with up-to-date time and extractor' do
     @db.load("#{FIXTURES}/db_up_to_date.json")
     @db.update

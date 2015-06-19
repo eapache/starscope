@@ -307,7 +307,9 @@ class Starscope::DB
   end
 
   def language_out_of_date(lang)
-    lang && (@meta[:langs][lang] || 0) < LANGS[lang]
+    return false unless lang
+    return true unless LANGS[lang]
+    (@meta[:langs][lang] || 0) < LANGS[lang]
   end
 
   def self.normalize_record(file, name, args)
