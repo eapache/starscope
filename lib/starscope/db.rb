@@ -5,6 +5,7 @@ require 'set'
 require 'zlib'
 
 require 'starscope/exportable'
+require 'starscope/fragment_extractor'
 require 'starscope/queryable'
 require 'starscope/output'
 
@@ -18,6 +19,8 @@ Starscope::Lang.constants.each do |lang|
   EXTRACTORS << extractor
   LANGS[lang.to_sym] = extractor.const_get(:VERSION)
 end
+
+FRAGMENT = :'!fragment'
 
 class Starscope::DB
   include Starscope::Exportable
@@ -251,20 +254,28 @@ class Starscope::DB
     end
   end
 
-  def extract_file(extractor, file)
-    lines = nil
-    line_cache = nil
+  def extract_file(extractor, file, line_cache = File.readlines(file), lines = Array.new(line_cache.length))
+    fragment_cache = {}
 
     extractor_metadata = extractor.extract(file, File.read(file)) do |tbl, name, args|
-      raise NoTableError if tbl.to_s.start_with?('!')
-      @tables[tbl] ||= []
-      @tables[tbl] << self.class.normalize_record(file, name, args)
+      case tbl
+      when FRAGMENT
+        fragment_cache[name] ||= []
+        fragment_cache[name] << args
+      else
+        @tables[tbl] ||= []
+        @tables[tbl] << self.class.normalize_record(file, name, args)
 
-      if args[:line_no]
-        line_cache ||= File.readlines(file)
-        lines ||= Array.new(line_cache.length)
-        lines[args[:line_no] - 1] = line_cache[args[:line_no] - 1].chomp
+        if args[:line_no]
+          line_cache ||= File.readlines(file)
+          lines ||= Array.new(line_cache.length)
+          lines[args[:line_no] - 1] = line_cache[args[:line_no] - 1].chomp
+        end
       end
+    end
+
+    fragment_cache.each do |lang, frags|
+      extract_file(Starscope::FragmentExtractor.new(lang, frags), file, line_cache, lines)
     end
 
     @meta[:files][file][:lang] = extractor.name.split('::').last.to_sym
