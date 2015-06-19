@@ -1,0 +1,17 @@
+5
+{
+    ":paths": [],
+    ":excludes": [],
+    ":langs": {
+        ":Go": 1234,
+        ":Ruby": 0
+    },
+    ":files": {
+        "test/fixtures/sample_golang.go": {
+            ":last_updated": 10000000000,
+            ":lang": ":Go",
+            ":sublangs": [":Ruby"]
+        }
+    }
+}
+{}

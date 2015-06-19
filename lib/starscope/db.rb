@@ -5,6 +5,7 @@ require 'set'
 require 'zlib'
 
 require 'starscope/exportable'
+require 'starscope/fragment_extractor'
 require 'starscope/queryable'
 require 'starscope/output'
 
@@ -18,6 +19,8 @@ Starscope::Lang.constants.each do |lang|
   EXTRACTORS << extractor
   LANGS[lang.to_sym] = extractor.const_get(:VERSION)
 end
+
+FRAGMENT = :'!fragment'
 
 class Starscope::DB
   include Starscope::Exportable
@@ -245,26 +248,38 @@ class Starscope::DB
         next
       end
 
-      extract_file(extractor, file)
+      line_cache = File.readlines(file)
+      lines = Array.new(line_cache.length)
+      @meta[:files][file][:sublangs] = []
+      extract_file(extractor, file, line_cache, lines)
 
       break
     end
   end
 
-  def extract_file(extractor, file)
-    lines = nil
-    line_cache = nil
+  def extract_file(extractor, file, line_cache, lines)
+    fragment_cache = {}
 
     extractor_metadata = extractor.extract(file, File.read(file)) do |tbl, name, args|
-      raise NoTableError if tbl.to_s.start_with?('!')
-      @tables[tbl] ||= []
-      @tables[tbl] << self.class.normalize_record(file, name, args)
+      case tbl
+      when FRAGMENT
+        fragment_cache[name] ||= []
+        fragment_cache[name] << args
+      else
+        @tables[tbl] ||= []
+        @tables[tbl] << self.class.normalize_record(file, name, args)
 
-      if args[:line_no]
-        line_cache ||= File.readlines(file)
-        lines ||= Array.new(line_cache.length)
-        lines[args[:line_no] - 1] = line_cache[args[:line_no] - 1].chomp
+        if args[:line_no]
+          line_cache ||= File.readlines(file)
+          lines ||= Array.new(line_cache.length)
+          lines[args[:line_no] - 1] = line_cache[args[:line_no] - 1].chomp
+        end
       end
+    end
+
+    fragment_cache.each do |lang, frags|
+      extract_file(Starscope::FragmentExtractor.new(lang, frags), file, line_cache, lines)
+      @meta[:files][file][:sublangs] << lang
     end
 
     @meta[:files][file][:lang] = extractor.name.split('::').last.to_sym
@@ -283,11 +298,16 @@ class Starscope::DB
     if !File.exist?(name) || !File.file?(name)
       :deleted
     elsif (file_meta[:last_updated] < File.mtime(name).to_i) ||
-          (file_meta[:lang] && (@meta[:langs][file_meta[:lang]] || 0) < LANGS[file_meta[:lang]])
+          language_out_of_date(file_meta[:lang]) ||
+          (file_meta[:sublangs] || []).any? { |lang| language_out_of_date(lang) }
       :modified
     else
       :unchanged
     end
+  end
+
+  def language_out_of_date(lang)
+    lang && (@meta[:langs][lang] || 0) < LANGS[lang]
   end
 
   def self.normalize_record(file, name, args)
