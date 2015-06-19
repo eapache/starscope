@@ -1,6 +1,6 @@
 module Starscope::Lang
   module ERB
-    VERSION = 0
+    VERSION = 1
 
     ERB_START = /<%(?:-|={1,4})?/
     ERB_END = /-?%>/
