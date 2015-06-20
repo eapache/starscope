@@ -5,14 +5,25 @@ Starscope
 [![Build Status](https://travis-ci.org/eapache/starscope.svg?branch=master)](https://travis-ci.org/eapache/starscope)
 [![Code of Conduct](https://img.shields.io/badge/code%20of%20conduct-active-blue.svg)](https://eapache.github.io/conduct.html)
 
-Anyone who has done much programming in C (or C++) on a Unix-based OS has come
-across the fantastic [Cscope](http://cscope.sourceforge.net/) tool. Sadly, it
-only works for C (and sort of works for C++).
+Starscope is a code indexer, search and navigation tool for
+[Ruby](https://www.ruby-lang.org/) and [Golang](https://golang.org/), with a
+design intended to make it easy to add
+[support for other languages](doc/LANGUAGE_SUPPORT.md).
 
-Starscope is a similar tool for [Ruby](https://www.ruby-lang.org/) and
-[Golang](https://golang.org/), with a design intended to make it easy to add
-[support for other languages](doc/LANGUAGE_SUPPORT.md) within the same framework
-(thus the name Starscope, i.e. \*scope).
+Inspired by the extremely popular [Ctags](https://en.wikipedia.org/wiki/Ctags)
+and [Cscope](http://cscope.sourceforge.net/) utilities, Starscope can answer a
+lot of questions about your code. It can tell you:
+ - where methods are defined
+ - where methods are called
+ - where variables are assigned
+ - where symbols are used
+ - where files and libraries are imported or required
+
+While Ctags already supports Ruby and Go, it can only tell you where things are
+defined. Cscope can answer a lot more of your questions, but it is limited to
+just the C language family. Starscope was written to combine the power of
+Cscope with the flexibility of Ctags, bringing full code indexing to as many
+developers as possible.
 
 Install it as a gem:
 ```
