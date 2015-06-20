@@ -3,8 +3,12 @@ require File.expand_path('../lib/starscope/version.rb', __FILE__)
 Gem::Specification.new do |gem|
   gem.name          = 'starscope'
   gem.version       = Starscope::VERSION
-  gem.summary       = 'A code indexer and analyzer'
-  gem.description   = 'A tool like the venerable cscope, but for ruby, golang and other languages'
+  gem.summary       = 'Smart code search and indexing'
+  gem.description   = <<-EOF
+  Starscope is a code indexer, search and navigation tool for Ruby and Go.
+  Inspired by the extremely popular Ctags and Cscope utilities, Starscope can
+  answer a lot of questions about a lot of code.
+  EOF
   gem.authors       = ['Evan Huus']
   gem.homepage      = 'https://github.com/eapache/starscope'
   gem.email         = 'eapache@gmail.com'
