@@ -25,6 +25,9 @@ just the C language family. Starscope was written to combine the power of
 Cscope with the flexibility of Ctags, bringing full code indexing to as many
 developers as possible.
 
+Quick Start
+-----------
+
 Install it as a gem:
 ```
 $ gem install starscope
