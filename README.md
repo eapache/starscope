@@ -51,9 +51,9 @@ More Documentation
 ------------------
 
  * [User Guide](doc/USER_GUIDE.md)
- * [Database Format](doc/DB_FORMAT.md)
- * [Language Support](doc/LANGUAGE_SUPPORT.md)
  * [Version History](CHANGELOG.md)
+ * [Language Support](doc/LANGUAGE_SUPPORT.md)
+ * [Database Format](doc/DB_FORMAT.md)
 
 Other Uses
 ----------
