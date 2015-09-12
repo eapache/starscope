@@ -26,19 +26,19 @@ module Starscope::Lang
           end
         end
 
-        unless multiline
-          line.scan(/#{ERB_START}(.*?)#{ERB_END}/) do |match|
-            yield FRAGMENT, :Ruby, :frag => match[0], :line_no => line_no
-          end
+        next if multiline
 
-          line.gsub!(/<%.*?%>/, '')
-
-          match = /#{ERB_START}(.*)$/.match(line)
-          if match
-            yield FRAGMENT, :Ruby, :frag => match[1], :line_no => line_no
-            multiline = true
-          end
+        line.scan(/#{ERB_START}(.*?)#{ERB_END}/) do |match|
+          yield FRAGMENT, :Ruby, :frag => match[0], :line_no => line_no
         end
+
+        line.gsub!(/<%.*?%>/, '')
+
+        match = /#{ERB_START}(.*)$/.match(line)
+        next unless match
+
+        yield FRAGMENT, :Ruby, :frag => match[1], :line_no => line_no
+        multiline = true
       end
     end
   end

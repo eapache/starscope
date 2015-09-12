@@ -4,10 +4,10 @@ Lint/UnusedBlockArgument:
 Lint/UnusedMethodArgument:
   Enabled: false
 
-Style/HashSyntax:
-  EnforcedStyle: hash_rockets
-
 Metrics/AbcSize:
+  Enabled: false
+
+Metrics/BlockNesting:
   Enabled: false
 
 Metrics/ClassLength:
@@ -22,8 +22,24 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Enabled: false
 
+Metrics/ModuleLength:
+  Enabled: false
+
 Metrics/PerceivedComplexity:
   Enabled: false
 
+Style/ClassAndModuleChildren:
+  Enabled: false
+
 Style/Documentation:
+  Enabled: false
+
+Style/HashSyntax:
+  EnforcedStyle: hash_rockets
+
+Style/Next:
+  Exclude:
+    - 'test/fixtures/sample_ruby.rb'
+
+Style/SpecialGlobalVars:
   Enabled: false

@@ -10,11 +10,10 @@ class Starscope::Output
   end
 
   def new_pbar(title, num_items)
-    if @level != :quiet
-      @pbar = ProgressBar.create(:title => title, :total => num_items,
-                                 :format => PBAR_FORMAT, :length => 80,
-                                 :out => @out)
-    end
+    return if @level == :quiet
+    @pbar = ProgressBar.create(:title => title, :total => num_items,
+                               :format => PBAR_FORMAT, :length => 80,
+                               :out => @out)
   end
 
   def inc_pbar

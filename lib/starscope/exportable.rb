@@ -134,7 +134,7 @@ END
     buf << "\t@\n"
 
     header = "cscope 15 #{Dir.pwd} -c "
-    offset = "%010d\n" % (header.length + 11 + buf.bytes.count)
+    offset = format("%010d\n", header.length + 11 + buf.bytes.count)
 
     file.print(header)
     file.print(offset)
@@ -208,11 +208,11 @@ END
         index = line.index(key, index + 1)
       end
 
-      if index && index + key.length < offset
-        buf << cscope_plaintext(line, prev, index) << "\n"
-        buf << "#{key}\n"
-        prev = index + key.length
-      end
+      next unless index && index + key.length < offset
+
+      buf << cscope_plaintext(line, prev, index) << "\n"
+      buf << "#{key}\n"
+      prev = index + key.length
     end
 
     buf << cscope_plaintext(line, prev, offset) << "\n"
