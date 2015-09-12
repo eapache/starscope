@@ -4,7 +4,10 @@ Changelog
 v1.4.1 (trunk)
 --------------------
 
-No changes yet.
+Misc:
+ * Minor code style cleanups and documentation improvements.
+ * Bumped a few dependencies.
+ * Official support for ruby 2.2 although it already worked.
 
 v1.4.0 (2015-06-19)
 --------------------
