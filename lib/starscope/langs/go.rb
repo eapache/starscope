@@ -41,7 +41,7 @@ module Starscope::Lang
         if stack[-1] != :import && !line.start_with?('import')
           # strip string literals like "foo" unless they're part of an import
           pos = 0
-          while match = STRING_LITERAL.match(line[pos..-1])
+          while (match = STRING_LITERAL.match(line[pos..-1]))
             eos = find_end_of_string(line, match.begin(0))
             line = line[0..match.begin(0)] + line[eos..-1]
             pos += match.begin(0) + 2
