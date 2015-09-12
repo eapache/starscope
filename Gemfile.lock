@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    starscope (1.4.1)
+    starscope (1.4.2)
       backports (~> 3.6)
       oj (~> 2.9)
       parser (~> 2.2.2)
