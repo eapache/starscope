@@ -42,7 +42,7 @@ module Starscope::Lang
         name = scoped_name(node, scope)
         yield :calls, name, line_no: loc.line, col: loc.column
 
-        if name.last.to_s =~ /\w+=$/
+        if name.last =~ /\w+=$/
           name[-1] = name.last.to_s.chop.to_sym
           yield :assigns, name, line_no: loc.line, col: loc.column
         elsif node.children[0].nil? && node.children[1] == :require && node.children[2].type == :str
