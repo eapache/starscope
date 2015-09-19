@@ -195,7 +195,7 @@ END
 
   def cscope_output(line, prev, offset, record)
     buf = ''
-    buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
+    # buf << CSCOPE_GLOBAL_HACK_STOP if record[:type] == :func && record[:tbl] == :defs
 
     record[:name][0...-1].each do |key|
       # output previous components of the name (ie the Foo in Foo::bar) as unmarked symbols
