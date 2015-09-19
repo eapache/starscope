@@ -1,10 +1,14 @@
 Changelog
 =========
 
-v1.4.2 (trunk)
+v1.5.0 (trunk)
 --------------------
 
-No changes yet.
+New Features:
+ * Javascript support, including basic ES6/ES7 and JSX (via Babel).
+
+Misc:
+ * Drop support for ruby 1.8.7, it was getting annoying and is long unsupported.
 
 v1.4.1 (2015-09-12)
 --------------------
