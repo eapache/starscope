@@ -40,11 +40,6 @@ describe Starscope::Lang::Javascript do
     defs.wont_include :navigator
   end
 
-  it 'must identify endings' do
-    @db.keys.must_include :end
-    @db[:end].count.must_equal 8
-  end
-
   it 'must identify function calls' do
     @db.keys.must_include :calls
     calls = @db[:calls].group_by { |x| x[:name][-1] }
@@ -54,6 +49,7 @@ describe Starscope::Lang::Javascript do
     calls.keys.must_include :pop
     calls.keys.must_include :fetchData
     calls.keys.must_include :setState
+    calls.keys.must_include :func1
 
     calls[:pop].count.must_equal 1
     calls[:_tabItem].count.must_equal 3

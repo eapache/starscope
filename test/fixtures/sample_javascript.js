@@ -17,6 +17,10 @@ var styles = StyleSheet.create({
   },
 });
 
+var func1 = () => {
+  return 1;
+};
+
 StatusBarIOS.setStyle(1);
 Router.routes = routes;
 
@@ -48,6 +52,7 @@ class Navigation extends Component {
   constructor(props) {
     super(props);
     this.state = {key: 'foo', selectedTab: 'foo'};
+    func1();
 
   }
 
