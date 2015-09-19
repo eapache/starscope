@@ -1,4 +1,3 @@
-require 'backports'
 require 'date'
 require 'oj'
 require 'set'
