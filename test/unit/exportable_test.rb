@@ -10,14 +10,14 @@ describe Starscope::Exportable do
   it 'must export to ctags' do
     @db.export_to(:ctags, @buf)
     @buf.rewind
-    lines = @buf.lines.to_a
+    lines = @buf.each_line.to_a
     lines.must_include "NoTableError\t#{FIXTURES}/sample_ruby.rb\t/^  class NoTableError < StandardError; end$/;\"\tkind:c\tlanguage:Ruby\n"
   end
 
   it 'must export to cscope' do
     @db.export_to(:cscope, @buf)
     @buf.rewind
-    lines = @buf.lines.to_a
+    lines = @buf.each_line.to_a
 
     lines.must_include "\t@#{FIXTURES}/sample_golang.go\n"
     lines.must_include "\tgSunday\n"
