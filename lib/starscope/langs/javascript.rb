@@ -34,7 +34,6 @@ module Starscope::Lang
             range = prop.value.function_body.range
             next unless lines[range.from.line - 1].include? name
             yield :defs, name, line_no: range.from.line, type: :func
-            yield :end, '}', line_no: range.to.line, type: :func
             found[name] ||= Set.new
             found[name].add(range.from.line)
           end
