@@ -22,6 +22,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'oj', '~> 2.9'
   gem.add_dependency 'parser', '~> 2.2.2'
   gem.add_dependency 'ruby-progressbar', '~> 1.5'
+  gem.add_dependency 'rkelly-remix', '~> 0.0.7'
+  gem.add_dependency 'babel-transpiler', '~> 0.7'
   gem.add_development_dependency 'bundler', '~> 1.5'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'pry'
