@@ -9,12 +9,12 @@ require 'starscope'
 
 DEFAULT_DB = '.starscope.db'
 
-options = { :read => true,
-            :write => true,
-            :update => true,
-            :output => :normal,
-            :export => [],
-            :db => DEFAULT_DB
+options = { read: true,
+            write: true,
+            update: true,
+            output: :normal,
+            export: [],
+            db: DEFAULT_DB
 }
 
 # Options Parsing

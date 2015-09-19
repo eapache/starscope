@@ -62,7 +62,7 @@ module Starscope::Lang
           when END_OF_BLOCK
             end_block(line_no, scope, stack, &block)
           when /(\w+)\(.*\)\s+/
-            yield :defs, scope + [Regexp.last_match(1)], :line_no => line_no
+            yield :defs, scope + [Regexp.last_match(1)], line_no: line_no
           end
         when :def
           case line
@@ -80,12 +80,12 @@ module Starscope::Lang
             stack.pop
           when /"(.+)"/
             name = Regexp.last_match(1).split('/')
-            yield :imports, name, :line_no => line_no
+            yield :imports, name, line_no: line_no
           end
         when :func
           case line
           when /^\}/
-            yield :end, '}', :line_no => line_no, :type => :func
+            yield :end, '}', line_no: line_no, type: :func
             stack.pop
           else
             parse_new_line(line, line_no, scope, stack, &block)
@@ -104,38 +104,38 @@ module Starscope::Lang
     def self.parse_new_line(line, line_no, scope, stack, &block)
       case line
       when /^func\s+(\w+)\(/
-        yield :defs, scope + [Regexp.last_match(1)], :line_no => line_no, :type => :func
+        yield :defs, scope + [Regexp.last_match(1)], line_no: line_no, type: :func
         stack.push(:func)
       when /^func\s+\(\w+\s+\*?(\w+)\)\s*(\w+)\(/
-        yield :defs, scope + [Regexp.last_match(1), Regexp.last_match(2)], :line_no => line_no, :type => :func
+        yield :defs, scope + [Regexp.last_match(1), Regexp.last_match(2)], line_no: line_no, type: :func
         stack.push(:func)
       when /^package\s+(\w+)/
         scope.push(Regexp.last_match(1))
-        yield :defs, scope, :line_no => line_no, :type => :package
+        yield :defs, scope, line_no: line_no, type: :package
       when /^type\s+(\w+)\s+struct\s*\{/
         scope.push(Regexp.last_match(1))
         stack.push(:struct)
-        yield :defs, scope, :line_no => line_no, :type => :class
+        yield :defs, scope, line_no: line_no, type: :class
       when /^type\s+(\w+)\s+interface\s*\{/
         scope.push(Regexp.last_match(1))
         stack.push(:interface)
-        yield :defs, scope, :line_no => line_no, :type => :class
+        yield :defs, scope, line_no: line_no, type: :class
       when /^type\s+(\w+)/
-        yield :defs, scope + [Regexp.last_match(1)], :line_no => line_no, :type => :type
+        yield :defs, scope + [Regexp.last_match(1)], line_no: line_no, type: :type
       when /^import\s+"(.+)"/
         name = Regexp.last_match(1).split('/')
-        yield :imports, name, :line_no => line_no
+        yield :imports, name, line_no: line_no
       when /^import\s+\(/
         stack.push(:import)
       when /^var\s+\(/
         stack.push(:def)
       when /^var\s+(\w+)\s/
-        yield :defs, scope + [Regexp.last_match(1)], :line_no => line_no
+        yield :defs, scope + [Regexp.last_match(1)], line_no: line_no
         parse_call(line, line_no, scope, &block)
       when /^const\s+\(/
         stack.push(:def)
       when /^const\s+(\w+)\s/
-        yield :defs, scope + [Regexp.last_match(1)], :line_no => line_no
+        yield :defs, scope + [Regexp.last_match(1)], line_no: line_no
         parse_call(line, line_no, scope, &block)
       when /^\s+(.*?) :?=[^=]/
         Regexp.last_match(1).split(' ').each do |var|
@@ -143,9 +143,9 @@ module Starscope::Lang
           name = var.delete(',').split('.')
           next if name[0] == '_' # assigning to _ is a discard in golang
           if name.length == 1
-            yield :assigns, scope + [name[0]], :line_no => line_no
+            yield :assigns, scope + [name[0]], line_no: line_no
           else
-            yield :assigns, name, :line_no => line_no
+            yield :assigns, name, line_no: line_no
           end
         end
         parse_call(line, line_no, scope, &block)
@@ -160,12 +160,12 @@ module Starscope::Lang
         if name.length == 1
           next if name[0] == 'func'
           if BUILTIN_FUNCS.include?(name[0])
-            yield :calls, name[0], :line_no => line_no
+            yield :calls, name[0], line_no: line_no
           else
-            yield :calls, scope + [name[0]], :line_no => line_no
+            yield :calls, scope + [name[0]], line_no: line_no
           end
         else
-          yield :calls, name, :line_no => line_no
+          yield :calls, name, line_no: line_no
         end
       end
     end
@@ -176,13 +176,13 @@ module Starscope::Lang
       return unless line =~ /^\s*[[:alpha:]_]/
 
       line.split.each do |var|
-        yield :defs, scope + [var.delete(',')], :line_no => line_no
+        yield :defs, scope + [var.delete(',')], line_no: line_no
         break unless var.end_with?(',')
       end
     end
 
     def self.end_block(line_no, scope, stack)
-      yield :end, scope + ['}'], :line_no => line_no, :type => :class
+      yield :end, scope + ['}'], line_no: line_no, type: :class
       stack.pop
       scope.pop
     end

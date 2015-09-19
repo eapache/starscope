@@ -40,45 +40,45 @@ module Starscope::Lang
       case node.type
       when :send
         name = scoped_name(node, scope)
-        yield :calls, name, :line_no => loc.line, :col => loc.column
+        yield :calls, name, line_no: loc.line, col: loc.column
 
         if name.last.to_s =~ /\w+=$/
           name[-1] = name.last.to_s.chop.to_sym
-          yield :assigns, name, :line_no => loc.line, :col => loc.column
+          yield :assigns, name, line_no: loc.line, col: loc.column
         elsif node.children[0].nil? && node.children[1] == :require && node.children[2].type == :str
           yield :requires, node.children[2].children[0].split('/'),
-            :line_no => loc.line, :col => loc.column
+            line_no: loc.line, col: loc.column
         end
 
       when :def
         yield :defs, scope + [node.children[0]],
-          :line_no => loc.line, :type => :func, :col => loc.name.column
-        yield :end, :end, :line_no => loc.end.line, :type => :func, :col => loc.end.column
+          line_no: loc.line, type: :func, col: loc.name.column
+        yield :end, :end, line_no: loc.end.line, type: :func, col: loc.end.column
 
       when :defs
         yield :defs, scope + [node.children[1]],
-          :line_no => loc.line, :type => :func, :col => loc.name.column
-        yield :end, :end, :line_no => loc.end.line, :type => :func, :col => loc.end.column
+          line_no: loc.line, type: :func, col: loc.name.column
+        yield :end, :end, line_no: loc.end.line, type: :func, col: loc.end.column
 
       when :module, :class
         yield :defs, scope + scoped_name(node.children[0], scope),
-          :line_no => loc.line, :type => node.type, :col => loc.name.column
-        yield :end, :end, :line_no => loc.end.line, :type => node.type, :col => loc.end.column
+          line_no: loc.line, type: node.type, col: loc.name.column
+        yield :end, :end, line_no: loc.end.line, type: node.type, col: loc.end.column
 
       when :casgn
         name = scoped_name(node, scope)
-        yield :assigns, name, :line_no => loc.line, :col => loc.name.column
-        yield :defs, name, :line_no => loc.line, :col => loc.name.column
+        yield :assigns, name, line_no: loc.line, col: loc.name.column
+        yield :defs, name, line_no: loc.line, col: loc.name.column
 
       when :lvasgn, :ivasgn, :cvasgn, :gvasgn
-        yield :assigns, scope + [node.children[0]], :line_no => loc.line, :col => loc.name.column
+        yield :assigns, scope + [node.children[0]], line_no: loc.line, col: loc.name.column
 
       when :const
         name = scoped_name(node, scope)
-        yield :reads, name, :line_no => loc.line, :col => loc.name.column
+        yield :reads, name, line_no: loc.line, col: loc.name.column
 
       when :lvar, :ivar, :cvar, :gvar
-        yield :reads, scope + [node.children[0]], :line_no => loc.line, :col => loc.name.column
+        yield :reads, scope + [node.children[0]], line_no: loc.line, col: loc.name.column
 
       when :sym
         # handle `:foo` vs `foo: 1`
@@ -87,7 +87,7 @@ module Starscope::Lang
               else
                 loc.expression.column
               end
-        yield :sym, [node.children[0]], :line_no => loc.line, :col => col
+        yield :sym, [node.children[0]], line_no: loc.line, col: col
       end
     end
 

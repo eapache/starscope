@@ -26,7 +26,7 @@ class Starscope::DB
         if format == DB_FORMAT
           @paths  = Oj.load(stream.gets)
           @files  = Oj.load(stream.gets)
-          @tables = Oj.load(stream.gets, :symbol_keys => true)
+          @tables = Oj.load(stream.gets, symbol_keys: true)
         elsif format <= 2
           # Old format (pre-json), so read the directories segment then rebuild
           len = stream.gets.to_i
@@ -59,7 +59,7 @@ class Starscope::DB
     files = paths.map { |p| self.class.files_from_path(p) }.flatten
     return if files.empty?
     if @progress
-      pbar = ProgressBar.create(:title => 'Building', :total => files.length, :format => PBAR_FORMAT, :length => 80)
+      pbar = ProgressBar.create(title: 'Building', total: files.length, format: PBAR_FORMAT, length: 80)
     end
     files.each do |f|
       add_file(f)
@@ -70,7 +70,7 @@ class Starscope::DB
   def update
     new_files = (@paths.map { |p| self.class.files_from_path(p) }.flatten) - @files.keys
     if @progress
-      pbar = ProgressBar.create(:title => 'Updating', :total => new_files.length + @files.length, :format => PBAR_FORMAT, :length => 80)
+      pbar = ProgressBar.create(title: 'Updating', total: new_files.length + @files.length, format: PBAR_FORMAT, length: 80)
     end
     changed = @files.keys.map do |f|
       changed = update_file(f)
@@ -114,7 +114,7 @@ class Starscope::DB
           if entry[:line_no]
             tmpdb[entry[:file]] ||= {}
             tmpdb[entry[:file]][entry[:line_no]] ||= []
-            tmpdb[entry[:file]][entry[:line_no]] << { :tbl => tbl, :key => key, :entry => entry }
+            tmpdb[entry[:file]][entry[:line_no]] << { tbl: tbl, key: key, entry: entry }
           end
         end
       end
