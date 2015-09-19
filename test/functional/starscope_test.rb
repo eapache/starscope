@@ -1,4 +1,4 @@
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 describe 'starscope executable script' do
   BASE = 'bundle exec bin/starscope --quiet'

@@ -1,7 +1,7 @@
 require 'minitest/autorun'
 require 'minitest/pride'
 require 'mocha/mini_test'
-require File.expand_path('../../lib/starscope.rb', __FILE__)
+require_relative '../lib/starscope'
 
 FIXTURES = 'test/fixtures'
 
