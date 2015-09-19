@@ -1,4 +1,4 @@
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 require 'tempfile'
 
 describe Starscope::DB do
@@ -161,7 +161,7 @@ describe Starscope::DB do
   it 'must store extractor metadata returned from the `extract` call' do
     extractor = mock('extractor')
     extractor.expects(:match_file).with(GOLANG_SAMPLE).returns(true)
-    extractor.expects(:extract).with(GOLANG_SAMPLE, File.read(GOLANG_SAMPLE)).returns(:a => 1)
+    extractor.expects(:extract).with(GOLANG_SAMPLE, File.read(GOLANG_SAMPLE)).returns(a: 1)
     extractor.expects(:name).returns('Foo')
     EXTRACTORS.stubs(:each).yields(extractor)
 

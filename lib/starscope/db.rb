@@ -1,4 +1,3 @@
-require 'backports'
 require 'date'
 require 'oj'
 require 'set'
@@ -33,8 +32,8 @@ class Starscope::DB
 
   def initialize(output)
     @output = output
-    @meta = { :paths => [], :files => {}, :excludes => [],
-              :langs => LANGS, :version => Starscope::VERSION }
+    @meta = { paths: [], files: {}, excludes: [],
+              langs: LANGS, version: Starscope::VERSION }
     @tables = {}
   end
 
@@ -238,7 +237,7 @@ class Starscope::DB
   end
 
   def parse_file(file)
-    @meta[:files][file] = { :last_updated => File.mtime(file).to_i }
+    @meta[:files][file] = { last_updated: File.mtime(file).to_i }
 
     EXTRACTORS.each do |extractor|
       begin

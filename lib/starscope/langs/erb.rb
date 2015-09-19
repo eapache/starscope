@@ -18,18 +18,18 @@ module Starscope::Lang
         if multiline
           term = line.index(ERB_END)
           if term
-            yield FRAGMENT, :Ruby, :frag => line[0...term], :line_no => line_no
+            yield FRAGMENT, :Ruby, frag: line[0...term], line_no: line_no
             line = line[term + 1..-1]
             multiline = false
           else
-            yield FRAGMENT, :Ruby, :frag => line, :line_no => line_no
+            yield FRAGMENT, :Ruby, frag: line, line_no: line_no
           end
         end
 
         next if multiline
 
         line.scan(/#{ERB_START}(.*?)#{ERB_END}/) do |match|
-          yield FRAGMENT, :Ruby, :frag => match[0], :line_no => line_no
+          yield FRAGMENT, :Ruby, frag: match[0], line_no: line_no
         end
 
         line.gsub!(/<%.*?%>/, '')
@@ -37,7 +37,7 @@ module Starscope::Lang
         match = /#{ERB_START}(.*)$/.match(line)
         next unless match
 
-        yield FRAGMENT, :Ruby, :frag => match[1], :line_no => line_no
+        yield FRAGMENT, :Ruby, frag: match[1], line_no: line_no
         multiline = true
       end
     end
