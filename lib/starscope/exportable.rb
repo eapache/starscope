@@ -236,7 +236,8 @@ END
     ret = line.slice(start, stop - start)
     ret.lstrip! if start == 0
     ret.rstrip! if stop == line.length
-    ret.gsub(/\s+/, ' ')
+    ret.gsub!(/\s+/, ' ')
+    ret.empty? ? ' ' : ret
   rescue ArgumentError
     # invalid utf-8 byte sequence in the line, oh well
     line
