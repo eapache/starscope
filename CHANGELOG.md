@@ -7,6 +7,9 @@ v1.5.0 (trunk)
 New Features:
  * Javascript support, including basic ES6/ES7 and JSX (via Babel).
 
+Bug Fixes:
+ * Fixed a really weird corruption in certain rare cscope export cases (#129).
+
 Misc:
  * Drop support for ruby 1.8.7, it was getting annoying and is long unsupported.
 
