@@ -49,6 +49,7 @@ describe Starscope::Lang::Javascript do
     calls.keys.must_include :pop
     calls.keys.must_include :fetchData
     calls.keys.must_include :setState
+    calls.keys.must_include :func1
 
     calls[:pop].count.must_equal 1
     calls[:_tabItem].count.must_equal 3
