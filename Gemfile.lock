@@ -47,9 +47,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 1.5)
-  minitest
-  mocha
-  pry
-  rake
+  bundler (~> 1.7)
+  minitest (~> 5.8)
+  mocha (~> 1.1)
+  pry (~> 0.10.1)
+  rake (~> 10.4)
   starscope!

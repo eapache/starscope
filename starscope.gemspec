@@ -26,9 +26,10 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'babel-transpiler', '~> 0.7'
   gem.add_dependency 'sourcemap', '~> 0.1'
   gem.add_dependency 'therubyracer', '~> 0.12.2'
-  gem.add_development_dependency 'bundler', '~> 1.5'
-  gem.add_development_dependency 'rake'
-  gem.add_development_dependency 'pry'
-  gem.add_development_dependency 'minitest'
-  gem.add_development_dependency 'mocha'
+
+  gem.add_development_dependency 'bundler', '~> 1.7'
+  gem.add_development_dependency 'rake', '~> 10.4'
+  gem.add_development_dependency 'pry', '~> 0.10.1'
+  gem.add_development_dependency 'minitest', '~> 5.8'
+  gem.add_development_dependency 'mocha', '~> 1.1'
 end
