@@ -26,6 +26,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'babel-transpiler', '~> 0.7'
   gem.add_dependency 'sourcemap', '~> 0.1'
   gem.add_dependency 'therubyracer', '~> 0.12.2'
+  gem.add_dependency 'coffee-script', '~> 2.4'
 
   gem.add_development_dependency 'bundler', '~> 1.7'
   gem.add_development_dependency 'rake', '~> 10.4'
