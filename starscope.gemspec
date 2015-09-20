@@ -5,7 +5,7 @@ Gem::Specification.new do |gem|
   gem.version       = Starscope::VERSION
   gem.summary       = 'Smart code search and indexing'
   gem.description   = <<-EOF
-  Starscope is a code indexer, search and navigation tool for Ruby and Go.
+  Starscope is a code indexer, search and navigation tool for Ruby, Golang, and JavaScript.
   Inspired by the extremely popular Ctags and Cscope utilities, Starscope can
   answer a lot of questions about a lot of code.
   EOF
