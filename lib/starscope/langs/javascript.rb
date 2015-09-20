@@ -1,5 +1,6 @@
 require 'rkelly'
 require 'babel/transpiler'
+require 'sourcemap'
 
 module Starscope::Lang
   module Javascript
@@ -10,7 +11,12 @@ module Starscope::Lang
     end
 
     def self.extract(path, contents, &block)
-      transform = Babel::Transpiler.transform(contents, 'optional' => ['es7.functionBind'], 'retainLines' => true)
+      transform = Babel::Transpiler.transform(contents,
+                                              'optional' => ['es7.functionBind'],
+                                              'externalHelpers' => true,
+                                              'compact' => false,
+                                              'sourceMaps' => true)
+      map = SourceMap::Map.from_hash(transform['map'])
       ast = RKelly::Parser.new.parse(transform['code'])
       lines = contents.lines.to_a
       found = {}
@@ -18,10 +24,13 @@ module Starscope::Lang
       ast.each do |node|
         case node
         when RKelly::Nodes::VarDeclNode
-          next unless lines[node.line - 1].include? node.name
-          yield :defs, node.name, line_no: node.line
+          mapping = map.bsearch(SourceMap::Offset.new(node.range.from.line, node.range.from.char))
+          next unless mapping
+          source = mapping.original
+          next unless lines[source.line - 1].include? node.name
+          yield :defs, node.name, line_no: source.line
           found[node.name] ||= Set.new
-          found[node.name].add(node.line)
+          found[node.name].add(source.line)
         when RKelly::Nodes::ObjectLiteralNode
           node.value.each_with_index do |prop, i|
             next unless prop.value.is_a? RKelly::Nodes::FunctionExprNode
@@ -32,10 +41,16 @@ module Starscope::Lang
             end
 
             range = prop.value.function_body.range
-            next unless lines[range.from.line - 1].include? name
-            yield :defs, name, line_no: range.from.line, type: :func
+            mapping = map.bsearch(SourceMap::Offset.new(range.from.line, range.from.char))
+            next unless mapping
+            source = mapping.original
+            next unless lines[source.line - 1].include? name
+            yield :defs, name, line_no: source.line, type: :func
             found[name] ||= Set.new
-            found[name].add(range.from.line)
+            found[name].add(source.line)
+
+            mapping = map.bsearch(SourceMap::Offset.new(range.to.line, range.to.char))
+            yield :end, :'}', line_no: mapping.original.line, type: :func
           end
         when RKelly::Nodes::FunctionCallNode
           case node.value
@@ -46,10 +61,13 @@ module Starscope::Lang
           else
             next
           end
-          next unless lines[node.range.from.line - 1].include? name
-          yield :calls, name, line_no: node.range.from.line
+          mapping = map.bsearch(SourceMap::Offset.new(node.range.from.line, node.range.from.char))
+          next unless mapping
+          source = mapping.original
+          next unless lines[source.line - 1].include? name
+          yield :calls, name, line_no: source.line
           found[name] ||= Set.new
-          found[name].add(node.range.from.line)
+          found[name].add(source.line)
         end
       end
 
@@ -65,10 +83,12 @@ module Starscope::Lang
           next
         end
 
-        line = node.range.from.line
-        next if found[name] && found[name].include?(line)
-        next unless lines[line - 1].include? name
-        yield :reads, name, line_no: line
+        mapping = map.bsearch(SourceMap::Offset.new(node.range.from.line, node.range.from.char))
+        next unless mapping
+        source = mapping.original
+        next if found[name] && found[name].include?(source.line)
+        next unless lines[source.line - 1].include? name
+        yield :reads, name, line_no: source.line
       end
     end
   end

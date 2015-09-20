@@ -7,12 +7,13 @@ PATH
       parser (~> 2.2.2)
       rkelly-remix (~> 0.0.7)
       ruby-progressbar (~> 1.5)
+      sourcemap (~> 0.1)
 
 GEM
   remote: https://rubygems.org/
   specs:
     ast (2.1.0)
-    babel-source (5.8.25)
+    babel-source (5.8.26)
     babel-transpiler (0.7.0)
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
@@ -34,6 +35,7 @@ GEM
     rkelly-remix (0.0.7)
     ruby-progressbar (1.7.5)
     slop (3.6.0)
+    sourcemap (0.1.1)
 
 PLATFORMS
   ruby
