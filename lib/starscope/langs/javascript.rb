@@ -1,23 +1,31 @@
 require 'rkelly'
 require 'babel/transpiler'
 require 'sourcemap'
+require 'coffee-script'
 
 module Starscope::Lang
   module Javascript
     VERSION = 0
 
     def self.match_file(name)
-      name.end_with?('.js')
+      name.end_with?('.js') || name.end_with?('.coffee')
     end
 
     def self.extract(path, contents, &block)
-      transform = Babel::Transpiler.transform(contents,
-                                              'optional' => ['es7.functionBind'],
-                                              'externalHelpers' => true,
-                                              'compact' => false,
-                                              'sourceMaps' => true)
-      map = SourceMap::Map.from_hash(transform['map'])
-      ast = RKelly::Parser.new.parse(transform['code'])
+      if path.end_with?('.coffee')
+        transform = CoffeeScript.compile(contents, 'sourceMap' => true)
+        map = SourceMap::Map.from_json(transform['v3SourceMap'])
+        ast = RKelly::Parser.new.parse(transform['js'])
+      else
+        transform = Babel::Transpiler.transform(contents,
+                                                'optional' => ['es7.functionBind'],
+                                                'externalHelpers' => true,
+                                                'compact' => false,
+                                                'sourceMaps' => true)
+        map = SourceMap::Map.from_hash(transform['map'])
+        ast = RKelly::Parser.new.parse(transform['code'])
+      end
+
       lines = contents.lines.to_a
       found = {}
 
