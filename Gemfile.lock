@@ -8,6 +8,7 @@ PATH
       rkelly-remix (~> 0.0.7)
       ruby-progressbar (~> 1.5)
       sourcemap (~> 0.1)
+      therubyracer (~> 0.12.2)
 
 GEM
   remote: https://rubygems.org/
@@ -19,6 +20,7 @@ GEM
       execjs (~> 2.0)
     coderay (1.1.0)
     execjs (2.6.0)
+    libv8 (3.16.14.11)
     metaclass (0.0.4)
     method_source (0.8.2)
     minitest (5.8.0)
@@ -32,10 +34,14 @@ GEM
       method_source (~> 0.8.1)
       slop (~> 3.4)
     rake (10.4.2)
+    ref (2.0.0)
     rkelly-remix (0.0.7)
     ruby-progressbar (1.7.5)
     slop (3.6.0)
     sourcemap (0.1.1)
+    therubyracer (0.12.2)
+      libv8 (~> 3.16.14.0)
+      ref
 
 PLATFORMS
   ruby
