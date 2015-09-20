@@ -6,6 +6,8 @@ Already Supported
 
  * [Ruby](https://www.ruby-lang.org/)
  * [Golang](https://golang.org/)
+ * [JavaScript](https://en.wikipedia.org/wiki/JavaScript)
+   (including ES6/ES7 and JSX via [Babel](https://babeljs.io/))
 
 How to Add Another Language
 ---------------------------

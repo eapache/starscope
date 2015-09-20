@@ -6,9 +6,9 @@ Starscope
 [![Code of Conduct](https://img.shields.io/badge/code%20of%20conduct-active-blue.svg)](https://eapache.github.io/conduct.html)
 
 Starscope is a code indexer, search and navigation tool for
-[Ruby](https://www.ruby-lang.org/) and [Golang](https://golang.org/), with a
-design intended to make it easy to add
-[support for other languages](doc/LANGUAGE_SUPPORT.md).
+[Ruby](https://www.ruby-lang.org/), [Golang](https://golang.org/), and
+[JavaScript](https://en.wikipedia.org/wiki/JavaScript) with a design intended
+to make it easy to add [support for other languages](doc/LANGUAGE_SUPPORT.md).
 
 Inspired by the extremely popular [Ctags](https://en.wikipedia.org/wiki/Ctags)
 and [Cscope](http://cscope.sourceforge.net/) utilities, Starscope can answer a
@@ -19,9 +19,9 @@ lot of questions about your code. It can tell you:
  - where symbols are used
  - where files and libraries are imported or required
 
-While Ctags already supports Ruby and Go, it can only tell you where things are
-defined. Cscope can answer a lot more of your questions, but it is limited to
-just the C language family. Starscope was written to combine the power of
+While Ctags already supports many languages, it can only tell you where things
+are defined. Cscope can answer a lot more of your questions, but it is limited
+to just the C language family. Starscope was written to combine the power of
 Cscope with the flexibility of Ctags, bringing full code indexing to as many
 developers as possible.
 
