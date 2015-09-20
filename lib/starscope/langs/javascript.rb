@@ -24,10 +24,9 @@ module Starscope::Lang
       ast.each do |node|
         case node
         when RKelly::Nodes::VarDeclNode
-          mapping = map.bsearch(SourceMap::Offset.new(node.range.from.line, node.range.from.char))
-          next unless mapping
-          source = mapping.original
-          next unless lines[source.line - 1].include? node.name
+          source = find_source(node.range.from, map, lines, node.name)
+          next unless source
+
           yield :defs, node.name, line_no: source.line
           found[node.name] ||= Set.new
           found[node.name].add(source.line)
@@ -41,10 +40,9 @@ module Starscope::Lang
             end
 
             range = prop.value.function_body.range
-            mapping = map.bsearch(SourceMap::Offset.new(range.from.line, range.from.char))
-            next unless mapping
-            source = mapping.original
-            next unless lines[source.line - 1].include? name
+            source = find_source(range.from, map, lines, name)
+            next unless source
+
             yield :defs, name, line_no: source.line, type: :func
             found[name] ||= Set.new
             found[name].add(source.line)
@@ -53,18 +51,12 @@ module Starscope::Lang
             yield :end, :'}', line_no: mapping.original.line, type: :func
           end
         when RKelly::Nodes::FunctionCallNode
-          case node.value
-          when RKelly::Nodes::DotAccessorNode
-            name = node.value.accessor
-          when RKelly::Nodes::ResolveNode
-            name = node.value.value
-          else
-            next
-          end
-          mapping = map.bsearch(SourceMap::Offset.new(node.range.from.line, node.range.from.char))
-          next unless mapping
-          source = mapping.original
-          next unless lines[source.line - 1].include? name
+          name = node_name(node.value)
+          next unless name
+
+          source = find_source(node.range.from, map, lines, name)
+          next unless source
+
           yield :calls, name, line_no: source.line
           found[name] ||= Set.new
           found[name].add(source.line)
@@ -72,24 +64,31 @@ module Starscope::Lang
       end
 
       ast.each do |node|
-        name = ''
+        name = node_name(node)
+        next unless name
 
-        case node
-        when RKelly::Nodes::DotAccessorNode
-          name = node.accessor
-        when RKelly::Nodes::ResolveNode
-          name = node.value
-        else
-          next
-        end
+        source = find_source(node.range.from, map, lines, name)
+        next unless source
 
-        mapping = map.bsearch(SourceMap::Offset.new(node.range.from.line, node.range.from.char))
-        next unless mapping
-        source = mapping.original
         next if found[name] && found[name].include?(source.line)
-        next unless lines[source.line - 1].include? name
         yield :reads, name, line_no: source.line
       end
+    end
+
+    def self.node_name(node)
+      case node
+      when RKelly::Nodes::DotAccessorNode
+        node.accessor
+      when RKelly::Nodes::ResolveNode
+        node.value
+      end
+    end
+
+    def self.find_source(from, map, lines, name)
+      mapping = map.bsearch(SourceMap::Offset.new(from.line, from.char))
+      return unless mapping
+      return unless lines[mapping.original.line - 1].include? name
+      mapping.original
     end
   end
 end
