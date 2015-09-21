@@ -18,8 +18,6 @@ module Starscope::Lang
       extract_tree(ast, [], &block) unless ast.nil?
     end
 
-    private
-
     def self.extract_tree(tree, scope, &block)
       extract_node(tree, scope, &block)
 
