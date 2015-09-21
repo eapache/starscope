@@ -12,12 +12,15 @@ module Starscope::Lang
 
     def self.extract(path, contents, &block)
       transform = Babel::Transpiler.transform(contents,
-                                              'optional' => ['es7.functionBind', 'es7.decorators'],
+                                              'stage' => 0,
+                                              'blacklist' => ['validation.react'],
                                               'externalHelpers' => true,
                                               'compact' => false,
                                               'sourceMaps' => true)
       map = SourceMap::Map.from_hash(transform['map'])
       ast = RKelly::Parser.new.parse(transform['code'])
+      return unless ast
+
       lines = contents.lines.to_a
       found = {}
 
