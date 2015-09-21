@@ -12,7 +12,7 @@ module Starscope::Lang
 
     def self.extract(path, contents, &block)
       transform = Babel::Transpiler.transform(contents,
-                                              'optional' => ['es7.functionBind'],
+                                              'optional' => ['es7.functionBind', 'es7.decorators'],
                                               'externalHelpers' => true,
                                               'compact' => false,
                                               'sourceMaps' => true)
