@@ -33,6 +33,7 @@ describe Starscope::Lang::Javascript do
     defs.must_include :render
     defs.must_include :setRef
     defs.must_include :route
+    defs.must_include :foo
 
     defs.wont_include :setStyle
     defs.wont_include :setState
@@ -42,7 +43,7 @@ describe Starscope::Lang::Javascript do
 
   it 'must identify endings' do
     @db.keys.must_include :end
-    @db[:end].count.must_equal 8
+    @db[:end].count.must_equal 9
   end
 
   it 'must identify function calls' do

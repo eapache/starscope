@@ -144,7 +144,7 @@ describe Starscope::DB do
   it 'must run queries on multiple tables' do
     @db.add_paths([FIXTURES])
     ret = @db.query([:calls, :defs], 'foo')
-    ret.length.must_equal 3
+    ret.length.must_equal 4
     ret.first[:name].last.must_equal :foo
   end
 
