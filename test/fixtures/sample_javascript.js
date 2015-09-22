@@ -21,6 +21,10 @@ var func1 = () => {
   return 1;
 };
 
+function foo() {
+  return bar;
+}
+
 StatusBarIOS.setStyle(1);
 Router.routes = routes;
 
