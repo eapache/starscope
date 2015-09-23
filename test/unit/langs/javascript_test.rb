@@ -26,7 +26,6 @@ describe Starscope::Lang::Javascript do
     defs.must_include :StyleSheet
     defs.must_include :styles
     defs.must_include :NavigatorRouteMapper
-    defs.must_include :Title
     defs.must_include :LeftButton
     defs.must_include :RightButton
     defs.must_include :_tabItem
@@ -34,6 +33,8 @@ describe Starscope::Lang::Javascript do
     defs.must_include :setRef
     defs.must_include :route
     defs.must_include :foo
+    defs.must_include :MyStat
+    defs.must_include :myStatFunc
 
     defs.wont_include :setStyle
     defs.wont_include :setState
@@ -41,9 +42,13 @@ describe Starscope::Lang::Javascript do
     defs.wont_include :navigator
   end
 
+  it 'must only tag static classes once' do
+    @db[:defs].count { |x| x[:name][-1] == :MyStat }.must_equal 1
+  end
+
   it 'must identify endings' do
     @db.keys.must_include :end
-    @db[:end].count.must_equal 9
+    @db[:end].count.must_equal 10
   end
 
   it 'must identify function calls' do
