@@ -45,26 +45,26 @@ module Starscope::Lang
             end
 
             range = prop.value.function_body.range
-            source = find_source(range.from, map, lines, name)
-            next unless source
+            line = find_line(range.from, map, lines, name)
+            next unless line
 
-            yield :defs, name, line_no: source.line, type: :func
+            yield :defs, name, line_no: line, type: :func
             found[name] ||= Set.new
-            found[name].add(source.line)
+            found[name].add(line)
 
             mapping = map.bsearch(SourceMap::Offset.new(range.to.line, range.to.char))
             yield :end, :'}', line_no: mapping.original.line, type: :func
           end
         when RKelly::Nodes::FunctionDeclNode
-          source = find_source(node.range.from, map, lines, node.value)
-          next unless source
+          line = find_line(node.range.from, map, lines, node.value)
+          next unless line
 
           type = :func
-          type = :class if lines[source.line - 1].include?("class #{node.value}")
+          type = :class if lines[line - 1].include?("class #{node.value}")
 
-          yield :defs, node.value, line_no: source.line, type: type
+          yield :defs, node.value, line_no: line, type: type
           found[node.value] ||= Set.new
-          found[node.value].add(source.line)
+          found[node.value].add(line)
 
           mapping = map.bsearch(SourceMap::Offset.new(node.range.to.line, node.range.to.char))
           yield :end, :'}', line_no: mapping.original.line, type: type
@@ -72,12 +72,12 @@ module Starscope::Lang
           name = node_name(node.value)
           next unless name
 
-          source = find_source(node.range.from, map, lines, name)
-          next unless source
+          line = find_line(node.range.from, map, lines, name)
+          next unless line
 
-          yield :calls, name, line_no: source.line
+          yield :calls, name, line_no: line
           found[name] ||= Set.new
-          found[name].add(source.line)
+          found[name].add(line)
         end
       end
 
@@ -88,13 +88,13 @@ module Starscope::Lang
       ast.each do |node|
         next unless node.is_a? RKelly::Nodes::VarDeclNode
 
-        source = find_source(node.range.from, map, lines, node.name)
-        next unless source
+        line = find_line(node.range.from, map, lines, node.name)
+        next unless line
 
-        next if found[node.name] && found[node.name].include?(source.line)
-        yield :defs, node.name, line_no: source.line
+        next if found[node.name] && found[node.name].include?(line)
+        yield :defs, node.name, line_no: line
         found[node.name] ||= Set.new
-        found[node.name].add(source.line)
+        found[node.name].add(line)
       end
 
       found
@@ -105,11 +105,11 @@ module Starscope::Lang
         name = node_name(node)
         next unless name
 
-        source = find_source(node.range.from, map, lines, name)
-        next unless source
+        line = find_line(node.range.from, map, lines, name)
+        next unless line
 
-        next if found[name] && found[name].include?(source.line)
-        yield :reads, name, line_no: source.line
+        next if found[name] && found[name].include?(line)
+        yield :reads, name, line_no: line
       end
     end
 
@@ -122,11 +122,11 @@ module Starscope::Lang
       end
     end
 
-    def self.find_source(from, map, lines, name)
+    def self.find_line(from, map, lines, name)
       mapping = map.bsearch(SourceMap::Offset.new(from.line, from.char))
       return unless mapping
       return unless lines[mapping.original.line - 1].include? name
-      mapping.original
+      mapping.original.line
     end
   end
 end
