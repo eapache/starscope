@@ -59,12 +59,15 @@ module Starscope::Lang
           source = find_source(node.range.from, map, lines, node.value)
           next unless source
 
-          yield :defs, node.value, line_no: source.line, type: :func
+          type = :func
+          type = :class if lines[source.line - 1].include?("class #{node.value}")
+
+          yield :defs, node.value, line_no: source.line, type: type
           found[node.value] ||= Set.new
           found[node.value].add(source.line)
 
           mapping = map.bsearch(SourceMap::Offset.new(node.range.to.line, node.range.to.char))
-          yield :end, :'}', line_no: mapping.original.line, type: :func
+          yield :end, :'}', line_no: mapping.original.line, type: type
         when RKelly::Nodes::FunctionCallNode
           name = node_name(node.value)
           next unless name
