@@ -19,20 +19,22 @@ module Starscope::Lang
                                               'sourceMaps' => true)
       map = SourceMap::Map.from_hash(transform['map'])
       ast = RKelly::Parser.new.parse(transform['code'])
+      lines = contents.lines.to_a
+
       return unless ast
 
-      lines = contents.lines.to_a
+      found = extract_methods(ast, map, lines, &block)
+
+      found = extract_var_decls(ast, map, lines, found, &block)
+
+      extract_var_reads(ast, map, lines, found, &block)
+    end
+
+    def self.extract_methods(ast, map, lines, &block)
       found = {}
 
       ast.each do |node|
         case node
-        when RKelly::Nodes::VarDeclNode
-          source = find_source(node.range.from, map, lines, node.name)
-          next unless source
-
-          yield :defs, node.name, line_no: source.line
-          found[node.name] ||= Set.new
-          found[node.name].add(source.line)
         when RKelly::Nodes::ObjectLiteralNode
           node.value.each_with_index do |prop, i|
             next unless prop.value.is_a? RKelly::Nodes::FunctionExprNode
@@ -76,6 +78,26 @@ module Starscope::Lang
         end
       end
 
+      found
+    end
+
+    def self.extract_var_decls(ast, map, lines, found, &block)
+      ast.each do |node|
+        next unless node.is_a? RKelly::Nodes::VarDeclNode
+
+        source = find_source(node.range.from, map, lines, node.name)
+        next unless source
+
+        next if found[node.name] && found[node.name].include?(source.line)
+        yield :defs, node.name, line_no: source.line
+        found[node.name] ||= Set.new
+        found[node.name].add(source.line)
+      end
+
+      found
+    end
+
+    def self.extract_var_reads(ast, map, lines, found, &block)
       ast.each do |node|
         name = node_name(node)
         next unless name

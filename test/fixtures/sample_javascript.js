@@ -28,15 +28,11 @@ function foo() {
 StatusBarIOS.setStyle(1);
 Router.routes = routes;
 
-var NavigatorRouteMapper = {
-  Title({route}) {
-    return (
-      <View style={styles.navigatorBar}>
-        <Text style={{color: Branding.white, fontFamily: Branding.fontBold, fontSize: 16}}>{route.title}</Text>
-      </View>
-    );
-  },
+class MyStat {
+  static myStatFunc() {}
+}
 
+var NavigatorRouteMapper = {
   LeftButton({route}, navigator, index) {
     if (!index) { return null; } // Nothing below in stack.
 
@@ -62,8 +58,6 @@ class Navigation extends Component {
 
   _tabItem(routeName: string, params: Object, badgeCount?: number) : PropTypes.element {
     var route = routes[routeName];
-    var title = route.title;
-    var icon = route.icon;
 
     var onTabPress = () => {
       if (this.state.selectedTab === routeName) {
@@ -79,8 +73,6 @@ class Navigation extends Component {
 
     return (
       <TabBarIOS.Item
-        icon={icon}
-        title={title}
         badge={badgeCount}
         selected={this.state.selectedTab === routeName}
         onPress={onTabPress}
