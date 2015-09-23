@@ -44,7 +44,7 @@ module Starscope::Lang
               name = node.value[i - 1].value.value[1...-1]
             end
 
-            range = prop.value.function_body.range
+            range = prop.value.range
             line = find_line(range.from, map, lines, name)
             next unless line
 

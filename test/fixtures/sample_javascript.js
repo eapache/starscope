@@ -29,7 +29,10 @@ StatusBarIOS.setStyle(1);
 Router.routes = routes;
 
 class MyStat {
-  static myStatFunc() {}
+  static myStatFunc(
+    title
+  ): void {
+  }
 }
 
 var NavigatorRouteMapper = {
