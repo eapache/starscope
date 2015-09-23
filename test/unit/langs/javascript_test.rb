@@ -48,7 +48,7 @@ describe Starscope::Lang::Javascript do
 
   it 'must identify endings' do
     @db.keys.must_include :end
-    @db[:end].count.must_equal 10
+    @db[:end].count.must_equal 11
   end
 
   it 'must identify function calls' do

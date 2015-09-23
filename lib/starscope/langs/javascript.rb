@@ -35,27 +35,7 @@ module Starscope::Lang
 
       ast.each do |node|
         case node
-        when RKelly::Nodes::ObjectLiteralNode
-          node.value.each_with_index do |prop, i|
-            next unless prop.value.is_a? RKelly::Nodes::FunctionExprNode
-
-            name = prop.name
-            if name == 'value' && i > 0 && node.value[i - 1].name == 'key'
-              name = node.value[i - 1].value.value[1...-1]
-            end
-
-            range = prop.value.range
-            line = find_line(range.from, map, lines, name)
-            next unless line
-
-            yield :defs, name, line_no: line, type: :func
-            found[name] ||= Set.new
-            found[name].add(line)
-
-            mapping = map.bsearch(SourceMap::Offset.new(range.to.line, range.to.char))
-            yield :end, :'}', line_no: mapping.original.line, type: :func
-          end
-        when RKelly::Nodes::FunctionDeclNode
+        when RKelly::Nodes::FunctionExprNode, RKelly::Nodes::FunctionDeclNode
           line = find_line(node.range.from, map, lines, node.value)
           next unless line
 
@@ -65,6 +45,8 @@ module Starscope::Lang
           yield :defs, node.value, line_no: line, type: type
           found[node.value] ||= Set.new
           found[node.value].add(line)
+
+          next if type == :class
 
           mapping = map.bsearch(SourceMap::Offset.new(node.range.to.line, node.range.to.char))
           yield :end, :'}', line_no: mapping.original.line, type: type
