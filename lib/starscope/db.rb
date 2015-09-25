@@ -135,6 +135,11 @@ class Starscope::DB
     @meta[key]
   end
 
+  def drop_all
+    @meta[:files] = {}
+    @tables = {}
+  end
+
   private
 
   def open_db(filename)
