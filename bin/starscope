@@ -68,6 +68,9 @@ END
   opts.on('--no-update', "Don't update the DB") do
     options[:update] = false
   end
+  opts.on('--force-update', 'Rebuild the DB by rescanning all files') do
+    options[:forceUpdate] = true
+  end
 
   opts.separator "\nMisc"
   opts.on('-v', '--version', 'Print the version number') do
@@ -201,6 +204,11 @@ end
 if options[:exclude]
   db.add_excludes(options[:exclude])
   new_data = true
+end
+
+if options[:forceUpdate]
+  db.drop_all
+  options[:update] = true
 end
 
 if !ARGV.empty?

@@ -80,7 +80,9 @@ to use another file, specify one with `-f` or `--file`.
 
 The default behaviour is always to read the database (if it exists), update it,
 and write out the updated version. You can control this behaviour by passing any
-of the `--no-read`, `--no-write` and `--no-update` flags.
+of the `--no-read`, `--no-write` and `--no-update` flags. If you pass the
+`--force-update` flag then all files and directories will be re-scanned, not
+just the ones that have changed.
 
 To get a summary of the current database contents, pass the `-s` or `--summary`
 flag.
