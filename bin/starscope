@@ -3,11 +3,14 @@
 lib = File.expand_path('../../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
+require 'oj'
 require 'optparse'
 require 'readline'
 require 'starscope'
 
 DEFAULT_DB = '.starscope.db'
+CONFIG_FILE = File.join(Dir.home, '.starscope.json')
+GLOBAL_CONFIG = File.exist?(CONFIG_FILE) ? Oj.load_file(CONFIG_FILE, symbol_keys: true) : {}
 
 options = { read: true,
             write: true,
@@ -189,7 +192,7 @@ rescue Starscope::Exportable::UnknownExportFormatError
 end
 
 output = Starscope::Output.new(options[:output])
-db = Starscope::DB.new(output)
+db = Starscope::DB.new(output, GLOBAL_CONFIG)
 
 db_exists = File.exist?(options[:db])
 
