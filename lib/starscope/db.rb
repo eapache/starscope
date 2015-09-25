@@ -30,11 +30,12 @@ class Starscope::DB
   class NoTableError < StandardError; end
   class UnknownDBFormatError < StandardError; end
 
-  def initialize(output)
+  def initialize(output, config = {})
     @output = output
     @meta = { paths: [], files: {}, excludes: [],
               langs: LANGS, version: Starscope::VERSION }
     @tables = {}
+    @config = config
   end
 
   # returns true iff the database was already in the most recent format
@@ -68,6 +69,7 @@ class Starscope::DB
     paths = paths.map { |p| self.class.normalize_fnmatch(p) }
     @meta[:excludes] += paths
     @meta[:excludes].uniq!
+    @all_excludes = nil # clear cache
 
     excluded = @meta[:files].keys.select { |name| matches_exclude?(name, paths) }
     remove_files(excluded)
@@ -76,6 +78,7 @@ class Starscope::DB
   def add_paths(paths)
     @output.extra("Adding files in paths #{paths}...")
     @meta[:excludes] -= paths.map { |p| self.class.normalize_fnmatch(p) }
+    @all_excludes = nil # clear cache
     paths = paths.map { |p| self.class.normalize_glob(p) }
     @meta[:paths] += paths
     @meta[:paths].uniq!
@@ -213,7 +216,11 @@ class Starscope::DB
     end
   end
 
-  def matches_exclude?(file, patterns = @meta[:excludes])
+  def all_excludes
+    @all_excludes ||= @meta[:excludes] + (@config[:excludes] || []).map { |x| self.class.normalize_fnmatch(x) }
+  end
+
+  def matches_exclude?(file, patterns = all_excludes)
     patterns.map { |p| File.fnmatch(p, file) }.any?
   end
 
@@ -299,7 +306,7 @@ class Starscope::DB
 
   def file_changed(name)
     file_meta = @meta[:files][name]
-    if !File.exist?(name) || !File.file?(name)
+    if matches_exclude?(name) || !File.exist?(name) || !File.file?(name)
       :deleted
     elsif (file_meta[:last_updated] < File.mtime(name).to_i) ||
           language_out_of_date(file_meta[:lang]) ||
