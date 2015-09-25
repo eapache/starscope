@@ -109,6 +109,15 @@ Excluded patterns are also remembered, and can be added at any time. If an
 existing file in the database matches a newly added exclusion rule, it will be
 removed.
 
+For commonly excluded files you can create a `~/.starscope.json` file with
+contents like:
+```json
+{
+  "excludes": ["foo", "bar"]
+}
+```
+Patterns listed there will be excluded from all starscope databases by default.
+
 Queries
 -------
 

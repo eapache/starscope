@@ -7,7 +7,9 @@ v1.5.0 (trunk)
 New Features:
  * Javascript support, including basic ES6/ES7 and JSX (via Babel).
  * Implemented `--force-update` flag to rescan all files even if they apparently
-   haven't changed.
+   haven't changed (#139).
+ * Added support for a shared configuration file in `~/starscope.json` (#140).
+   This is primarily useful for commonly excluded files (e.g. `cscope.out`).
 
 Bug Fixes:
  * Fixed a really weird corruption in certain rare cscope export cases (#129).
