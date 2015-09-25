@@ -1,7 +1,12 @@
 Changelog
 =========
 
-v1.5.0 (trunk)
+v1.5.1 (trunk)
+--------------------
+
+No changes yet.
+
+v1.5.0 (2015-09-24)
 --------------------
 
 New Features:
