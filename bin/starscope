@@ -295,7 +295,6 @@ if options[:linemode]
       end
     end
   rescue Interrupt
-    # just exit
-    return
+    exit
   end
 end
