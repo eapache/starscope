@@ -41,6 +41,7 @@ describe Starscope::Lang::Javascript do
     defs.wont_include :fontFamily
     defs.wont_include :navigator
     defs.wont_include :madness
+    defs.wont_include :React
   end
 
   it 'must only tag static classes once' do
@@ -72,5 +73,6 @@ describe Starscope::Lang::Javascript do
     requires = @db[:requires].group_by { |x| x[:name][-1] }
 
     requires.keys.must_include :'foo-bar'
+    requires.keys.must_include :'react-native'
   end
 end

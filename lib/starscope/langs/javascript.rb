@@ -54,6 +54,8 @@ module Starscope::Lang
           name = node_name(node.value)
           next unless name
 
+          node = node.arguments.value[0] if name == 'require'
+
           line = find_line(node.range.from, map, lines, name)
           next unless line
 
@@ -61,7 +63,7 @@ module Starscope::Lang
           found[name].add(line)
 
           if name == 'require'
-            yield :requires, node.arguments.value[0].value[1...-1], line_no: line
+            yield :requires, node.value[1...-1], line_no: line
           else
             yield :calls, name, line_no: line
           end
@@ -121,7 +123,10 @@ module Starscope::Lang
     def self.find_line(from, map, lines, name)
       mapping = map.bsearch(SourceMap::Offset.new(from.line, from.char))
       return unless mapping
-      return unless lines[mapping.original.line - 1].include? name
+
+      line = lines[mapping.original.line - 1]
+      return unless line.include?(name) || (name == 'require' && line.include?('import'))
+
       mapping.original.line
     end
   end
