@@ -35,6 +35,7 @@ describe Starscope::Lang::Javascript do
     defs.must_include :foo
     defs.must_include :MyStat
     defs.must_include :myStatFunc
+    defs.must_include :bracelessMethod
 
     defs.wont_include :setStyle
     defs.wont_include :setState
@@ -50,7 +51,12 @@ describe Starscope::Lang::Javascript do
 
   it 'must identify endings' do
     @db.keys.must_include :end
-    @db[:end].count.must_equal 11
+    @db[:end].count.must_equal 12
+
+    # bracelessMethod doesn't have a taggable end token so
+    # we have to do a little dancing with an empty name and a precise column
+    @db[:end][0][:name].must_equal [:'']
+    @db[:end][0][:col].must_equal 27
   end
 
   it 'must identify function calls' do
