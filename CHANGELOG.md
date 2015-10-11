@@ -4,8 +4,12 @@ Changelog
 v1.5.1 (trunk)
 --------------------
 
+Improvements:
+ * Support CommonJS require syntax and ES6 import syntax in JavaScript (#146).
+
 Bug Fixes:
  * Fix handling of Ctrl-C in line-mode to exit cleanly instead of crashing.
+ * Fix handling of braceless fat-arrow methods in JavaScript (#147).
 
 v1.5.0 (2015-09-24)
 --------------------
