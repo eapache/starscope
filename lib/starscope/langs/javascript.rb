@@ -49,7 +49,11 @@ module Starscope::Lang
           next if type == :class
 
           mapping = map.bsearch(SourceMap::Offset.new(node.range.to.line, node.range.to.char))
-          yield :end, :'}', line_no: mapping.original.line, type: type
+          if lines[mapping.original.line - 1].include? '}'
+            yield :end, '}', line_no: mapping.original.line, type: type
+          else
+            yield :end, '', line_no: mapping.original.line, type: type, col: mapping.original.column
+          end
         when RKelly::Nodes::FunctionCallNode
           name = node_name(node.value)
           next unless name

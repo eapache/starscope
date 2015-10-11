@@ -17,6 +17,7 @@ var styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  bracelessMethod: () => 42,
 });
 
 var func1 = () => {
