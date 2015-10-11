@@ -54,12 +54,19 @@ module Starscope::Lang
           name = node_name(node.value)
           next unless name
 
+          node = node.arguments.value[0] if name == 'require'
+
           line = find_line(node.range.from, map, lines, name)
           next unless line
 
-          yield :calls, name, line_no: line
           found[name] ||= Set.new
           found[name].add(line)
+
+          if name == 'require'
+            yield :requires, node.value[1...-1], line_no: line
+          else
+            yield :calls, name, line_no: line
+          end
         end
       end
 
@@ -72,6 +79,15 @@ module Starscope::Lang
 
         line = find_line(node.range.from, map, lines, node.name)
         next unless line
+
+        if node.value.is_a?(RKelly::Nodes::AssignExprNode) &&
+           node.value.value.is_a?(RKelly::Nodes::FunctionCallNode) &&
+           node.value.value.value.is_a?(RKelly::Nodes::ResolveNode) &&
+           node.value.value.value.value == 'require'
+          found[node.name] ||= Set.new
+          found[node.name].add(line)
+          next
+        end
 
         next if found[node.name] && found[node.name].include?(line)
         yield :defs, node.name, line_no: line
@@ -107,7 +123,10 @@ module Starscope::Lang
     def self.find_line(from, map, lines, name)
       mapping = map.bsearch(SourceMap::Offset.new(from.line, from.char))
       return unless mapping
-      return unless lines[mapping.original.line - 1].include? name
+
+      line = lines[mapping.original.line - 1]
+      return unless line.include?(name) || (name == 'require' && line.include?('import'))
+
       mapping.original.line
     end
   end

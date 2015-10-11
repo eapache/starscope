@@ -22,7 +22,9 @@ describe 'starscope executable script' do
   it 'must produce a valid database dump' do
     lines = `#{EXTRACT} -d requires`.lines.to_a
     lines[1].split.first.must_equal 'date'
-    lines[2].split.first.must_equal 'zlib'
+    lines[2].split.first.must_equal 'foo-bar'
+    lines[3].split.first.must_equal 'react-native'
+    lines[4].split.first.must_equal 'zlib'
   end
 
   it 'must correctly query the database' do

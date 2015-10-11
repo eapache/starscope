@@ -2,6 +2,8 @@
 
 import React from 'react-native';
 
+let madness = require('foo-bar');
+
 var {
   Component,
   StyleSheet,
