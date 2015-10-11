@@ -62,7 +62,7 @@ belongs (basically its type). Current tables already include:
  * `defs` for definitions of classes, functions, modules, etc.
  * `end` for the matching *end* of each definition
  * `assigns` for variable assignment
- * `requires` for required files in Ruby
+ * `requires` for required files in Ruby and JavaScript
  * `imports` for imported packages in Golang
  * `reads` for reading of variables, constants etc. (e.g. use in an expression)
  * `sym` for Ruby symbols
