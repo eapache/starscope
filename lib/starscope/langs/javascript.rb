@@ -4,7 +4,7 @@ require 'sourcemap'
 
 module Starscope::Lang
   module Javascript
-    VERSION = 0
+    VERSION = 1
 
     def self.match_file(name)
       name.end_with?('.js')
