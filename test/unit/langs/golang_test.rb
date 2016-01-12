@@ -1,21 +1,21 @@
 require_relative '../../test_helper'
 
-describe Starscope::Lang::Go do
+describe Starscope::Lang::Golang do
   before do
     @db = {}
-    Starscope::Lang::Go.extract(GOLANG_SAMPLE, File.read(GOLANG_SAMPLE)) do |tbl, name, args|
+    Starscope::Lang::Golang.extract(GOLANG_SAMPLE, File.read(GOLANG_SAMPLE)) do |tbl, name, args|
       @db[tbl] ||= []
       @db[tbl] << Starscope::DB.normalize_record(GOLANG_SAMPLE, name, args)
     end
   end
 
   it 'must match golang files' do
-    Starscope::Lang::Go.match_file(GOLANG_SAMPLE).must_equal true
+    Starscope::Lang::Golang.match_file(GOLANG_SAMPLE).must_equal true
   end
 
   it 'must not match non-golang files' do
-    Starscope::Lang::Go.match_file(RUBY_SAMPLE).must_equal false
-    Starscope::Lang::Go.match_file(EMPTY_FILE).must_equal false
+    Starscope::Lang::Golang.match_file(RUBY_SAMPLE).must_equal false
+    Starscope::Lang::Golang.match_file(EMPTY_FILE).must_equal false
   end
 
   it 'must identify definitions' do
@@ -88,11 +88,11 @@ describe Starscope::Lang::Go do
   end
 
   it 'must correctly find the end of string constants' do
-    Starscope::Lang::Go.find_end_of_string('"123"foo', 0).must_equal 4
-    Starscope::Lang::Go.find_end_of_string('a"123"foo', 0).must_equal 1
-    Starscope::Lang::Go.find_end_of_string('a"123"foo', 1).must_equal 5
-    Starscope::Lang::Go.find_end_of_string('"1\""foo', 0).must_equal 4
-    Starscope::Lang::Go.find_end_of_string('"1\\""foo', 0).must_equal 4
-    Starscope::Lang::Go.find_end_of_string('"1\\\\\"foo', 0).must_equal 9
+    Starscope::Lang::Golang.find_end_of_string('"123"foo', 0).must_equal 4
+    Starscope::Lang::Golang.find_end_of_string('a"123"foo', 0).must_equal 1
+    Starscope::Lang::Golang.find_end_of_string('a"123"foo', 1).must_equal 5
+    Starscope::Lang::Golang.find_end_of_string('"1\""foo', 0).must_equal 4
+    Starscope::Lang::Golang.find_end_of_string('"1\\""foo', 0).must_equal 4
+    Starscope::Lang::Golang.find_end_of_string('"1\\\\\"foo', 0).must_equal 9
   end
 end

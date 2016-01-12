@@ -45,7 +45,7 @@ describe Starscope::DB do
 
   it "must update stale existing files when extractor hasn't changed" do
     @db.load("#{FIXTURES}/db_out_of_date.json")
-    @db.metadata(:langs)[:Go].must_be :>=, LANGS[:Go]
+    @db.metadata(:langs)[:Golang].must_be :>=, LANGS[:Golang]
 
     cur_mtime = @db.metadata(:files)[GOLANG_SAMPLE][:last_updated]
     File.expects(:mtime).twice.returns(cur_mtime + 1)
@@ -53,7 +53,7 @@ describe Starscope::DB do
 
     file = @db.metadata(:files)[GOLANG_SAMPLE]
     file[:last_updated].must_equal cur_mtime + 1
-    file[:lang].must_equal :Go
+    file[:lang].must_equal :Golang
     file[:lines].wont_be_empty
     @db.records(:defs).wont_be_empty
     @db.records(:calls).wont_be_empty
@@ -68,7 +68,7 @@ describe Starscope::DB do
 
     file = @db.metadata(:files)[GOLANG_SAMPLE]
     file[:last_updated].must_equal cur_mtime
-    file[:lang].must_equal :Go
+    file[:lang].must_equal :Golang
     file[:lines].wont_be_empty
     @db.records(:defs).wont_be_empty
     @db.records(:calls).wont_be_empty
@@ -83,7 +83,7 @@ describe Starscope::DB do
 
     file = @db.metadata(:files)[GOLANG_SAMPLE]
     file[:last_updated].must_equal cur_mtime
-    file[:lang].must_equal :Go
+    file[:lang].must_equal :Golang
     file[:sublangs].must_be_empty
     file[:lines].wont_be_empty
     @db.records(:defs).wont_be_empty
@@ -99,7 +99,7 @@ describe Starscope::DB do
 
     file = @db.metadata(:files)[GOLANG_SAMPLE]
     file[:last_updated].must_equal cur_mtime
-    file[:lang].must_equal :Go
+    file[:lang].must_equal :Golang
     file[:lines].wont_be_empty
     @db.records(:defs).wont_be_empty
     @db.records(:calls).wont_be_empty
