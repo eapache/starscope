@@ -1,5 +1,5 @@
 module Starscope::Lang
-  module Go
+  module Golang
     VERSION = 1
 
     FUNC_CALL = /([\w\.]*?\w)\(/

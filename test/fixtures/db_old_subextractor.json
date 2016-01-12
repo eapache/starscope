@@ -3,13 +3,13 @@
     ":paths": [],
     ":excludes": [],
     ":langs": {
-        ":Go": 1234,
+        ":Golang": 1234,
         ":Ruby": 0
     },
     ":files": {
         "test/fixtures/sample_golang.go": {
             ":last_updated": 10000000000,
-            ":lang": ":Go",
+            ":lang": ":Golang",
             ":sublangs": [":Ruby"]
         }
     }
