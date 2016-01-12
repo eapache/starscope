@@ -4,7 +4,11 @@ Changelog
 v1.5.2 (trunk)
 --------------------
 
-No changes yet.
+Misc:
+ * Relax some dependencies to handle e.g. the upcoming parser release for Ruby
+   2.3 (#149).
+ * Rename the `Go` extractor to `Golang` so that it is named consistently
+   everywhere (#143).
 
 v1.5.1 (2015-10-14)
 --------------------
