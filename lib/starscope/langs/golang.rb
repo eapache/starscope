@@ -6,7 +6,8 @@ module Starscope::Lang
     END_OF_BLOCK = /^\s*\}\s*$/
     END_OF_GROUP = /^\s*\)\s*$/
     STRING_LITERAL = /".+?"/
-    BUILTIN_FUNCS = %w(new make len close copy delete int int8 int16 int32 int64 uint uint8 uint16 uint32 uint64 string byte).freeze
+    BUILTIN_FUNCS = %w(new make len close copy delete int int8 int16 int32 int64
+                       uint uint8 uint16 uint32 uint64 string byte).freeze
     CONTROL_KEYS = %w(if for switch case).freeze
 
     def self.match_file(name)

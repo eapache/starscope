@@ -70,7 +70,8 @@ class Starscope::DB
   def update
     new_files = @paths.map { |p| self.class.files_from_path(p) }.flatten - @files.keys
     if @progress
-      pbar = ProgressBar.create(title: 'Updating', total: new_files.length + @files.length, format: PBAR_FORMAT, length: 80)
+      pbar = ProgressBar.create(title: 'Updating', total: new_files.length + @files.length,
+                                format: PBAR_FORMAT, length: 80)
     end
     changed = @files.keys.map do |f|
       changed = update_file(f)
@@ -140,8 +141,8 @@ class Starscope::DB
 
   def remove_file(file)
     @files.delete(file)
-    @tables.each do |name, tbl|
-      tbl.each do |key, val|
+    @tables.each do |_, tbl|
+      tbl.each do |_, val|
         val.delete_if { |dat| dat[:file] == file }
       end
     end

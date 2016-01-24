@@ -216,7 +216,7 @@ class Starscope::DB
       @meta[:files].delete(file)
     end
     files = files.to_set
-    @tables.each do |name, tbl|
+    @tables.each do |_, tbl|
       tbl.delete_if { |val| files.include?(val[:file]) }
     end
   end
