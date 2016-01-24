@@ -8,24 +8,24 @@ require 'starscope/fragment_extractor'
 require 'starscope/queryable'
 require 'starscope/output'
 
-# dynamically load all our language extractors
-LANGS = {}
-EXTRACTORS = []
-Dir.glob("#{File.dirname(__FILE__)}/langs/*.rb").each { |path| require path }
-
-Starscope::Lang.constants.each do |lang|
-  extractor = Starscope::Lang.const_get(lang)
-  EXTRACTORS << extractor
-  LANGS[lang.to_sym] = extractor.const_get(:VERSION)
-end
-
-FRAGMENT = :'!fragment'
-
 class Starscope::DB
   include Starscope::Exportable
   include Starscope::Queryable
 
   DB_FORMAT = 5
+  FRAGMENT = :'!fragment'
+
+  LANGS = {}
+  EXTRACTORS = []
+
+  # dynamically load all our language extractors
+  Dir.glob("#{File.dirname(__FILE__)}/langs/*.rb").each { |path| require path }
+
+  Starscope::Lang.constants.each do |lang|
+    extractor = Starscope::Lang.const_get(lang)
+    EXTRACTORS << extractor
+    LANGS[lang.to_sym] = extractor.const_get(:VERSION)
+  end
 
   class NoTableError < StandardError; end
   class UnknownDBFormatError < StandardError; end

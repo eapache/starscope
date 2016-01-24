@@ -4,7 +4,7 @@ describe Starscope::Lang::ERB do
   before do
     @frags = []
     Starscope::Lang::ERB.extract(ERB_SAMPLE, File.read(ERB_SAMPLE)) do |tbl, name, args|
-      tbl.must_equal FRAGMENT
+      tbl.must_equal Starscope::DB::FRAGMENT
       name.must_equal :Ruby
       @frags << args
     end

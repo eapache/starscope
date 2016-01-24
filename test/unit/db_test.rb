@@ -45,7 +45,7 @@ describe Starscope::DB do
 
   it "must update stale existing files when extractor hasn't changed" do
     @db.load("#{FIXTURES}/db_out_of_date.json")
-    @db.metadata(:langs)[:Golang].must_be :>=, LANGS[:Golang]
+    @db.metadata(:langs)[:Golang].must_be :>=, Starscope::DB::LANGS[:Golang]
 
     cur_mtime = @db.metadata(:files)[GOLANG_SAMPLE][:last_updated]
     File.expects(:mtime).twice.returns(cur_mtime + 1)
@@ -163,7 +163,7 @@ describe Starscope::DB do
     extractor.expects(:match_file).with(GOLANG_SAMPLE).returns(true)
     extractor.expects(:extract).with(GOLANG_SAMPLE, File.read(GOLANG_SAMPLE)).returns(a: 1)
     extractor.expects(:name).returns('Foo')
-    EXTRACTORS.stubs(:each).yields(extractor)
+    Starscope::DB::EXTRACTORS.stubs(:each).yields(extractor)
 
     @db.add_paths([GOLANG_SAMPLE])
 
