@@ -5,7 +5,7 @@ describe Starscope::Queryable do
     { name: [:"[abc"], foo: 'baz' },
     { name: [:"not a match"], foo: 'bar', x: 'y' },
     { name: [:a, :b, :c, :d], file: :somefile }
-  ]
+  ].freeze
 
   class MockQuerable
     include Starscope::Queryable

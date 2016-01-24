@@ -1,6 +1,6 @@
 module Starscope::Exportable
-  CTAGS_DEFAULT_PATH = 'tags'
-  CSCOPE_DEFAULT_PATH = 'cscope.out'
+  CTAGS_DEFAULT_PATH = 'tags'.freeze
+  CSCOPE_DEFAULT_PATH = 'cscope.out'.freeze
 
   class UnknownExportFormatError < StandardError; end
 
@@ -55,7 +55,7 @@ END
 
     ext = ctag_ext_tags(rec, file)
     unless ext.empty?
-      ret << ";\""
+      ret << ';"'
       ext.sort.each do |k, v|
         ret << "\t#{k}:#{v}"
       end
@@ -85,8 +85,8 @@ END
   # calls must occur in a function, but in ruby et al. it is perfectly legal to
   # write normal code outside the "scope" of a function definition - we insert a
   # fake shim "global" function everywhere we can to work around this
-  CSCOPE_GLOBAL_HACK_START = " \n\t$-\n"
-  CSCOPE_GLOBAL_HACK_STOP = " \n\t}\n"
+  CSCOPE_GLOBAL_HACK_START = " \n\t$-\n".freeze
+  CSCOPE_GLOBAL_HACK_STOP = " \n\t}\n".freeze
 
   # ftp://ftp.eeng.dcu.ie/pub/ee454/cygwin/usr/share/doc/mlcscope-14.1.8/html/cscope.html
   def export_cscope(file)
@@ -268,7 +268,7 @@ END
     when :calls
       ret = '`'
     when :requires
-      ret = "~\""
+      ret = '~"'
     when :imports
       ret = '~<'
     when :assigns

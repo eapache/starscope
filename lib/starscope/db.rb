@@ -15,17 +15,18 @@ class Starscope::DB
   DB_FORMAT = 5
   FRAGMENT = :'!fragment'
 
-  LANGS = {}
-  EXTRACTORS = []
-
   # dynamically load all our language extractors
   Dir.glob("#{File.dirname(__FILE__)}/langs/*.rb").each { |path| require path }
 
+  langs = {}
+  extractors = []
   Starscope::Lang.constants.each do |lang|
     extractor = Starscope::Lang.const_get(lang)
-    EXTRACTORS << extractor
-    LANGS[lang.to_sym] = extractor.const_get(:VERSION)
+    extractors << extractor
+    langs[lang.to_sym] = extractor.const_get(:VERSION)
   end
+  LANGS = langs.freeze
+  EXTRACTORS = extractors.freeze
 
   class NoTableError < StandardError; end
   class UnknownDBFormatError < StandardError; end
@@ -33,7 +34,7 @@ class Starscope::DB
   def initialize(output, config = {})
     @output = output
     @meta = { paths: [], files: {}, excludes: [],
-              langs: LANGS, version: Starscope::VERSION }
+              langs: LANGS.dup, version: Starscope::VERSION }
     @tables = {}
     @config = config
   end
@@ -193,29 +194,6 @@ class Starscope::DB
     @meta[:langs] ||= {}
   end
 
-  # File.fnmatch treats a "**" to match files and directories recursively
-  def self.normalize_fnmatch(path)
-    if path == '.'
-      '**'
-    elsif File.directory?(path)
-      File.join(path, '**')
-    else
-      path
-    end
-  end
-
-  # Dir.glob treats a "**" to only match directories recursively; you need
-  # "**/*" to match all files recursively
-  def self.normalize_glob(path)
-    if path == '.'
-      File.join('**', '*')
-    elsif File.directory?(path)
-      File.join(path, '**', '*')
-    else
-      path
-    end
-  end
-
   def all_excludes
     @all_excludes ||= @meta[:excludes] + (@config[:excludes] || []).map { |x| self.class.normalize_fnmatch(x) }
   end
@@ -251,7 +229,7 @@ class Starscope::DB
   def parse_file(file)
     @meta[:files][file] = { last_updated: File.mtime(file).to_i }
 
-    EXTRACTORS.each do |extractor|
+    self.class.extractors.each do |extractor|
       begin
         next unless extractor.match_file file
       rescue => e
@@ -323,15 +301,38 @@ class Starscope::DB
     (@meta[:langs][lang] || 0) < LANGS[lang]
   end
 
-  def self.normalize_record(file, name, args)
-    args[:file] = file
-
-    if name.is_a? Array
-      args[:name] = name.map(&:to_sym)
-    else
-      args[:name] = [name.to_sym]
+  class << self
+    # File.fnmatch treats a "**" to match files and directories recursively
+    def normalize_fnmatch(path)
+      if path == '.'
+        '**'
+      elsif File.directory?(path)
+        File.join(path, '**')
+      else
+        path
+      end
     end
 
-    args
+    # Dir.glob treats a "**" to only match directories recursively; you need
+    # "**/*" to match all files recursively
+    def normalize_glob(path)
+      if path == '.'
+        File.join('**', '*')
+      elsif File.directory?(path)
+        File.join(path, '**', '*')
+      else
+        path
+      end
+    end
+
+    def normalize_record(file, name, args)
+      args[:file] = file
+      args[:name] = Array(name).map(&:to_sym)
+      args
+    end
+
+    def extractors # so we can stub it in tests
+      EXTRACTORS
+    end
   end
 end

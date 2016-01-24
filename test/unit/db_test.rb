@@ -163,7 +163,7 @@ describe Starscope::DB do
     extractor.expects(:match_file).with(GOLANG_SAMPLE).returns(true)
     extractor.expects(:extract).with(GOLANG_SAMPLE, File.read(GOLANG_SAMPLE)).returns(a: 1)
     extractor.expects(:name).returns('Foo')
-    Starscope::DB::EXTRACTORS.stubs(:each).yields(extractor)
+    Starscope::DB.stubs(:extractors).returns([extractor])
 
     @db.add_paths([GOLANG_SAMPLE])
 

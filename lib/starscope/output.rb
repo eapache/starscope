@@ -1,7 +1,7 @@
 require 'ruby-progressbar'
 
 class Starscope::Output
-  PBAR_FORMAT = '%t: %c/%C %E ||%b>%i||'
+  PBAR_FORMAT = '%t: %c/%C %E ||%b>%i||'.freeze
 
   def initialize(level, out = STDOUT)
     @out = out

@@ -4,11 +4,13 @@ describe Starscope::FragmentExtractor do
   module ::Starscope::Lang::Dummy; end
 
   before do
-    @extractor = Starscope::FragmentExtractor.new(:Dummy, [
-      { frag: "def foo; end\n", line_no: 12 },
-      { frag: "def bar\n", line_no: 15 },
-      { frag: "end\n", line_no: 29 }
-    ])
+    @extractor = Starscope::FragmentExtractor.new(
+      :Dummy,
+      [
+        { frag: "def foo; end\n", line_no: 12 },
+        { frag: "def bar\n", line_no: 15 },
+        { frag: "end\n", line_no: 29 }
+      ])
     @reconstructed = "def foo; end\ndef bar\nend"
   end
 

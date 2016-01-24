@@ -3,10 +3,10 @@ require 'minitest/pride'
 require 'mocha/mini_test'
 require_relative '../lib/starscope'
 
-FIXTURES = 'test/fixtures'
+FIXTURES = 'test/fixtures'.freeze
 
-GOLANG_SAMPLE = "#{FIXTURES}/sample_golang.go"
-JAVASCRIPT_EXAMPLE = "#{FIXTURES}/sample_javascript.js"
-RUBY_SAMPLE = "#{FIXTURES}/sample_ruby.rb"
-ERB_SAMPLE = "#{FIXTURES}/sample_erb.erb"
-EMPTY_FILE = "#{FIXTURES}/empty"
+GOLANG_SAMPLE = "#{FIXTURES}/sample_golang.go".freeze
+JAVASCRIPT_EXAMPLE = "#{FIXTURES}/sample_javascript.js".freeze
+RUBY_SAMPLE = "#{FIXTURES}/sample_ruby.rb".freeze
+ERB_SAMPLE = "#{FIXTURES}/sample_erb.erb".freeze
+EMPTY_FILE = "#{FIXTURES}/empty".freeze

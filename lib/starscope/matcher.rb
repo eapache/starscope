@@ -1,6 +1,6 @@
 module Starscope
   class Matcher
-    MATCH_TYPES = [:literal_match, :regexp_match]
+    MATCH_TYPES = [:literal_match, :regexp_match].freeze
 
     def initialize(query)
       @query = query

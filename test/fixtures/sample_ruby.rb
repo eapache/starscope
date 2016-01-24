@@ -4,10 +4,10 @@ require 'zlib'
 LANGS = [
   Starscope::Lang::Go,
   Starscope::Lang::Ruby
-]
+].freeze
 
 class Starscope::DB
-  PBAR_FORMAT = '%t: %c/%C %E ||%b>%i||'
+  PBAR_FORMAT = '%t: %c/%C %E ||%b>%i||'.freeze
 
   class NoTableError < StandardError; end
 
@@ -68,7 +68,7 @@ class Starscope::DB
   end
 
   def update
-    new_files = (@paths.map { |p| self.class.files_from_path(p) }.flatten) - @files.keys
+    new_files = @paths.map { |p| self.class.files_from_path(p) }.flatten - @files.keys
     if @progress
       pbar = ProgressBar.create(title: 'Updating', total: new_files.length + @files.length, format: PBAR_FORMAT, length: 80)
     end
@@ -94,8 +94,6 @@ class Starscope::DB
     ret
   end
 
-  private
-
   def self.files_from_path(path)
     if File.file?(path)
       [path]
@@ -105,6 +103,8 @@ class Starscope::DB
       []
     end
   end
+
+  private
 
   def db_by_line
     tmpdb = {}
