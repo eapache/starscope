@@ -99,7 +99,7 @@ by yielding to the special `FRAGMENT` table, with the name of the language as
 the name, and a `frag` argument containing the actual raw text. For example:
 
 ```ruby
-yield FRAGMENT, :Ruby, :frag => my_extracted_ruby_code, :line_no => line_no
+yield Starscope::DB::FRAGMENT, :Ruby, :frag => my_extracted_ruby_code, :line_no => line_no
 ```
 
 Fragments will be accumulated by the database and passed to the appropriate
