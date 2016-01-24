@@ -40,3 +40,6 @@ Style/Next:
 
 Style/SpecialGlobalVars:
   Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
