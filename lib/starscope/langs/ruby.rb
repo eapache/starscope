@@ -5,7 +5,7 @@ module Starscope::Lang
     VERSION = 2
 
     def self.match_file(name)
-      return true if name.end_with?('.rb') || name.end_with?('.rake')
+      return true if name.end_with?('.rb', '.rake')
       File.open(name) do |f|
         head = f.read(2)
         return false if head.nil? || !head.start_with?('#!')

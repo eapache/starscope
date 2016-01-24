@@ -1,8 +1,8 @@
 require_relative '../test_helper'
 
 describe 'starscope executable script' do
-  BASE = 'bundle exec bin/starscope --quiet'
-  EXTRACT = "#{BASE} --no-read --no-write #{FIXTURES}"
+  BASE = 'bundle exec bin/starscope --quiet'.freeze
+  EXTRACT = "#{BASE} --no-read --no-write #{FIXTURES}".freeze
 
   it 'must not produce help wider than 80 characters' do
     `#{BASE} -h`.each_line do |line|
