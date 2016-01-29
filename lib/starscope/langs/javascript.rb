@@ -11,6 +11,8 @@ module Starscope::Lang
     end
 
     def self.extract(path, contents, &block)
+      return if path.end_with?('.min.js')
+
       transform = Babel::Transpiler.transform(contents,
                                               'stage' => 0,
                                               'blacklist' => ['validation.react'],
