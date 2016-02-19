@@ -3,7 +3,7 @@ require 'starscope/matcher'
 module Starscope::Queryable
   def query(tables, value, filters = {})
     tables = [tables] if tables.is_a?(Symbol)
-    tables.each { |t| fail Starscope::DB::NoTableError, "Table '#{t}' not found" unless @tables[t] }
+    tables.each { |t| raise Starscope::DB::NoTableError, "Table '#{t}' not found" unless @tables[t] }
     input = Enumerator.new do |y|
       tables.each do |t|
         @tables[t].each do |elem|

@@ -11,7 +11,7 @@ module Starscope::Exportable
     when :cscope
       path ||= CSCOPE_DEFAULT_PATH
     else
-      fail UnknownExportFormatError
+      raise UnknownExportFormatError
     end
 
     @output.normal("Exporting to '#{path}' in format '#{format}'...")
@@ -28,7 +28,7 @@ module Starscope::Exportable
     when :cscope
       export_cscope(io)
     else
-      fail UnknownExportFormatError
+      raise UnknownExportFormatError
     end
   end
 
