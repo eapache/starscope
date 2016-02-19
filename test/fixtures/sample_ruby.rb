@@ -35,7 +35,7 @@ class Starscope::DB
           # Old format, so read the directories segment then rebuild
           add_paths(Oj.load(stream.gets))
         elsif format > DB_FORMAT
-          fail UnknownDBFormatError
+          raise UnknownDBFormatError
         end
       end
     end

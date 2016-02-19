@@ -126,7 +126,7 @@ class Starscope::DB
   end
 
   def records(table)
-    fail NoTableError unless @tables[table]
+    raise NoTableError unless @tables[table]
 
     @tables[table]
   end
@@ -134,7 +134,7 @@ class Starscope::DB
   def metadata(key = nil)
     return @meta.keys if key.nil?
 
-    fail NoTableError unless @meta[key]
+    raise NoTableError unless @meta[key]
 
     @meta[key]
   end
@@ -176,7 +176,7 @@ class Starscope::DB
       add_paths(Marshal.load(stream.read(len)))
       return false
     else
-      fail UnknownDBFormatError
+      raise UnknownDBFormatError
     end
   rescue Oj::ParseError
     stream.rewind
