@@ -60,7 +60,7 @@ module Starscope::Lang
           name = node_name(node.value)
           next unless name
 
-          node = node.arguments.value[0] if name == 'require'
+          node = node.arguments.value[0] if name == 'require' && !node.value.is_a?(RKelly::Nodes::DotAccessorNode)
 
           line = find_line(node.range.from, map, lines, name)
           next unless line
@@ -68,7 +68,7 @@ module Starscope::Lang
           found[name] ||= Set.new
           found[name].add(line)
 
-          if name == 'require'
+          if name == 'require' && node.is_a?(RKelly::Nodes::StringNode)
             yield :requires, node.value[1...-1], line_no: line
           else
             yield :calls, name, line_no: line
