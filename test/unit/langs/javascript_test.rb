@@ -80,5 +80,8 @@ describe Starscope::Lang::Javascript do
 
     requires.keys.must_include :'foo-bar'
     requires.keys.must_include :'react-native'
+    requires.keys.wont_include :NOPE
+    requires.keys.wont_include :true
+    requires.keys.wont_include :false
   end
 end

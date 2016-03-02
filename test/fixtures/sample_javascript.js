@@ -118,3 +118,6 @@ class Navigation extends Component {
 }
 
 export default Navigation;
+
+madness.require("NOPE")
+require(true || false);
