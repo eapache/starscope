@@ -7,6 +7,10 @@ Trunk
 Improvements:
  * Skip minified javascript files.
 
+Bug Fixes:
+ * Fix javascript parsing of `require` calls that are actually methods and not
+   CommonJS-style imports (#158).
+
 v1.5.2 (2016-01-12)
 --------------------
 
