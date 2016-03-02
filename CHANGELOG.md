@@ -4,6 +4,11 @@ Changelog
 Trunk
 --------------------
 
+No changes yet.
+
+v1.5.3 (2016-03-02)
+--------------------
+
 Improvements:
  * Skip minified javascript files.
 
