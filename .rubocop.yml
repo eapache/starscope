@@ -1,5 +1,6 @@
-Lint/UnusedMethodArgument:
-  Enabled: false
+AllCops:
+  Exclude:
+    - 'test/fixtures/sample_ruby.rb'
 
 Metrics/AbcSize:
   Enabled: false
@@ -25,15 +26,8 @@ Metrics/ModuleLength:
 Metrics/PerceivedComplexity:
   Enabled: false
 
-Style/ClassAndModuleChildren:
-  Enabled: false
-
 Style/Documentation:
   Enabled: false
-
-Style/Next:
-  Exclude:
-    - 'test/fixtures/sample_ruby.rb'
 
 Style/SpecialGlobalVars:
   Enabled: false

@@ -1,44 +1,46 @@
-module Starscope::Lang
-  module ERB
-    VERSION = 1
+module Starscope
+  module Lang
+    module ERB
+      VERSION = 1
 
-    ERB_START = /<%(?:-|={1,4})?/
-    ERB_END = /-?%>/
+      ERB_START = /<%(?:-|={1,4})?/
+      ERB_END = /-?%>/
 
-    def self.match_file(name)
-      name.end_with?('.erb')
-    end
+      def self.match_file(name)
+        name.end_with?('.erb')
+      end
 
-    def self.extract(path, contents, &block)
-      multiline = false # true when parsing a multiline <% ... %> block
+      def self.extract(_path, contents)
+        multiline = false # true when parsing a multiline <% ... %> block
 
-      contents.lines.each_with_index do |line, line_no|
-        line_no += 1 # zero-index to one-index
+        contents.lines.each_with_index do |line, line_no|
+          line_no += 1 # zero-index to one-index
 
-        if multiline
-          term = line.index(ERB_END)
-          if term
-            yield Starscope::DB::FRAGMENT, :Ruby, frag: line[0...term], line_no: line_no
-            line = line[term + 1..-1]
-            multiline = false
-          else
-            yield Starscope::DB::FRAGMENT, :Ruby, frag: line, line_no: line_no
+          if multiline
+            term = line.index(ERB_END)
+            if term
+              yield Starscope::DB::FRAGMENT, :Ruby, frag: line[0...term], line_no: line_no
+              line = line[term + 1..-1]
+              multiline = false
+            else
+              yield Starscope::DB::FRAGMENT, :Ruby, frag: line, line_no: line_no
+            end
           end
+
+          next if multiline
+
+          line.scan(/#{ERB_START}(.*?)#{ERB_END}/) do |match|
+            yield Starscope::DB::FRAGMENT, :Ruby, frag: match[0], line_no: line_no
+          end
+
+          line.gsub!(/<%.*?%>/, '')
+
+          match = /#{ERB_START}(.*)$/.match(line)
+          next unless match
+
+          yield Starscope::DB::FRAGMENT, :Ruby, frag: match[1], line_no: line_no
+          multiline = true
         end
-
-        next if multiline
-
-        line.scan(/#{ERB_START}(.*?)#{ERB_END}/) do |match|
-          yield Starscope::DB::FRAGMENT, :Ruby, frag: match[0], line_no: line_no
-        end
-
-        line.gsub!(/<%.*?%>/, '')
-
-        match = /#{ERB_START}(.*)$/.match(line)
-        next unless match
-
-        yield Starscope::DB::FRAGMENT, :Ruby, frag: match[1], line_no: line_no
-        multiline = true
       end
     end
   end

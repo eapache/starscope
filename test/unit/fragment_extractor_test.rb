@@ -1,7 +1,12 @@
 require_relative '../test_helper'
 
 describe Starscope::FragmentExtractor do
-  module ::Starscope::Lang::Dummy; end
+  module Starscope
+    module Lang
+      module Dummy
+      end
+    end
+  end
 
   before do
     @extractor = Starscope::FragmentExtractor.new(
