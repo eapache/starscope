@@ -1,47 +1,49 @@
 require 'ruby-progressbar'
 
-class Starscope::Output
-  PBAR_FORMAT = '%t: %c/%C %E ||%b>%i||'.freeze
+module Starscope
+  class Output
+    PBAR_FORMAT = '%t: %c/%C %E ||%b>%i||'.freeze
 
-  def initialize(level, out = STDOUT)
-    @out = out
-    @level = level
-    @pbar = nil
-  end
+    def initialize(level, out = STDOUT)
+      @out = out
+      @level = level
+      @pbar = nil
+    end
 
-  def new_pbar(title, num_items)
-    return if @level == :quiet
-    @pbar = ProgressBar.create(title: title, total: num_items,
-                               format: PBAR_FORMAT, length: 80,
-                               out: @out)
-  end
+    def new_pbar(title, num_items)
+      return if @level == :quiet
+      @pbar = ProgressBar.create(title: title, total: num_items,
+                                 format: PBAR_FORMAT, length: 80,
+                                 out: @out)
+    end
 
-  def inc_pbar
-    @pbar.increment if @pbar
-  end
+    def inc_pbar
+      @pbar.increment if @pbar
+    end
 
-  def finish_pbar
-    @pbar.finish if @pbar
-    @pbar = nil
-  end
+    def finish_pbar
+      @pbar.finish if @pbar
+      @pbar = nil
+    end
 
-  def extra(msg)
-    return unless @level == :verbose
-    output(msg)
-  end
+    def extra(msg)
+      return unless @level == :verbose
+      output(msg)
+    end
 
-  def normal(msg)
-    return if @level == :quiet
-    output(msg)
-  end
+    def normal(msg)
+      return if @level == :quiet
+      output(msg)
+    end
 
-  private
+    private
 
-  def output(msg)
-    if @pbar
-      @pbar.log(msg)
-    else
-      @out.puts msg
+    def output(msg)
+      if @pbar
+        @pbar.log(msg)
+      else
+        @out.puts msg
+      end
     end
   end
 end
