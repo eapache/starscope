@@ -172,6 +172,8 @@ def dump(db, table)
     db.tables.each { |t| dump_table(db, t) }
   when '_meta'
     puts db.metadata
+  when '_files'
+    puts db.metadata(:files).keys
   when /^_/
     puts db.metadata(table[1..-1].to_sym)
   else
