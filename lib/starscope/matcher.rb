@@ -8,8 +8,7 @@ module Starscope
       begin
         @regexp = Regexp.new(@query, Regexp::IGNORECASE)
       rescue RegexpError
-        # not a regex, oh well
-        return
+        @regexp = nil # not a regex, oh well
       end
     end
 
