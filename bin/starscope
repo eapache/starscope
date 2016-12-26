@@ -12,13 +12,12 @@ DEFAULT_DB = '.starscope.db'.freeze
 CONFIG_FILE = File.join(Dir.home, '.starscope.json')
 GLOBAL_CONFIG = File.exist?(CONFIG_FILE) ? Oj.load_file(CONFIG_FILE, symbol_keys: true) : {}
 
-options = {
-  read: true,
-  write: true,
-  update: true,
-  output: :normal,
-  export: [],
-  db: DEFAULT_DB
+options = { read: true,
+            write: true,
+            update: true,
+            output: :normal,
+            export: [],
+            db: DEFAULT_DB
 }
 
 # Options Parsing

@@ -121,7 +121,7 @@ END
                 next unless func_count == 1
               when :end
                 func_count -= 1
-                next unless func_count.zero?
+                next unless func_count == 0
               end
             end
 
@@ -229,13 +229,13 @@ END
     def valid_index?(line, index, key)
       # index is valid if the key exists at it, and the prev/next chars are not word characters
       ((line[index, key.length] == key) &&
-       (index.zero? || line[index - 1] !~ /[[:word:]]/) &&
+       (index == 0 || line[index - 1] !~ /[[:word:]]/) &&
        (index + key.length == line.length || line[index + key.length] !~ /[[:word:]]/))
     end
 
     def cscope_plaintext(line, start, stop)
       ret = line.slice(start, stop - start)
-      ret.lstrip! if start.zero?
+      ret.lstrip! if start == 0
       ret.rstrip! if stop == line.length
       ret.gsub!(/\s+/, ' ')
       ret.empty? ? ' ' : ret

@@ -13,9 +13,10 @@ module Starscope
     end
 
     def match(input)
-      if input.end_with?(@query)
+      case
+      when input.end_with?(@query)
         :literal_match
-      elsif @regexp && @regexp.match(input)
+      when @regexp && @regexp.match(input)
         :regexp_match
       end
     end
