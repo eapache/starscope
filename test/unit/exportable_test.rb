@@ -8,12 +8,25 @@ describe Starscope::Exportable do
   end
 
   it 'must export to ctags' do
-    @db.export_to(:ctags, @buf)
+    @db.export_to(:ctags, @buf, '.')
     @buf.rewind
     lines = @buf.each_line.to_a
     lines.must_include(
       "NoTableError\t" \
-      "#{FIXTURES}/sample_ruby.rb\t" \
+      "./#{FIXTURES}/sample_ruby.rb\t" \
+      "/^  class NoTableError < StandardError; end$/;\"\t" \
+      "kind:c\t" \
+      "language:Ruby\n"
+    )
+  end
+
+  it 'must export to ctags with different path prefixes' do
+    @db.export_to(:ctags, @buf, '../foo')
+    @buf.rewind
+    lines = @buf.each_line.to_a
+    lines.must_include(
+      "NoTableError\t" \
+      "../foo/#{FIXTURES}/sample_ruby.rb\t" \
       "/^  class NoTableError < StandardError; end$/;\"\t" \
       "kind:c\t" \
       "language:Ruby\n"
@@ -21,7 +34,7 @@ describe Starscope::Exportable do
   end
 
   it 'must export to cscope' do
-    @db.export_to(:cscope, @buf)
+    @db.export_to(:cscope, @buf, '.')
     @buf.rewind
     lines = @buf.each_line.to_a
 

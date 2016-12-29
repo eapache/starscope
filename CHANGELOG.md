@@ -4,7 +4,8 @@ Changelog
 Trunk
 --------------------
 
-No changes yet.
+Bug Fixes:
+ * Fix exporting ctags files to different output directories (#163).
 
 v1.5.3 (2016-03-02)
 --------------------
