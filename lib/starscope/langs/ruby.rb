@@ -3,6 +3,15 @@ require 'parser/current'
 module Starscope
   module Lang
     module Ruby
+      # This class exists solely to workaround/suppress issues from upstream's handling of invalid unicode.
+      # See https://github.com/whitequark/parser/issues/283; workaround borrowed from
+      # https://github.com/bbatsov/rubocop/commit/5e820eb5cfddf5e0f7efd2c0fa99e6b8a4c7b7e0
+      class Builder < Parser::Builders::Default
+        def string_value(token)
+          value(token)
+        end
+      end
+
       VERSION = 2
 
       def self.match_file(name)
@@ -14,8 +23,15 @@ module Starscope
         end
       end
 
-      def self.extract(_path, contents, &block)
-        ast = Parser::CurrentRuby.parse(contents)
+      def self.extract(path, contents, &block)
+        buffer = Parser::Source::Buffer.new(path, 1)
+        buffer.source = contents.force_encoding(Encoding::UTF_8)
+
+        parser = Parser::CurrentRuby.new(Builder.new)
+        parser.diagnostics.ignore_warnings = true
+        parser.diagnostics.all_errors_are_fatal = false
+
+        ast = parser.parse(buffer)
         extract_tree(ast, [], &block) unless ast.nil?
       end
 
