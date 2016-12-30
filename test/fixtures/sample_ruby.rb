@@ -8,6 +8,7 @@ LANGS = [
 
 class Starscope::DB
   PBAR_FORMAT = '%t: %c/%C %E ||%b>%i||'.freeze
+  SOME_INVALID_ENCODING = "\xff"
 
   class NoTableError < StandardError; end
 
