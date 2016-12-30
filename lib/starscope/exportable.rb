@@ -16,18 +16,19 @@ module Starscope
       end
 
       @output.normal("Exporting to '#{path}' in format '#{format}'...")
+      path_prefix = Pathname.getwd.relative_path_from(Pathname.new(path).dirname.expand_path)
       File.open(path, 'w') do |file|
-        export_to(format, file)
+        export_to(format, file, path_prefix)
       end
       @output.normal('Export complete.')
     end
 
-    def export_to(format, io)
+    def export_to(format, io, path_prefix)
       case format
       when :ctags
-        export_ctags(io)
+        export_ctags(io, path_prefix)
       when :cscope
-        export_cscope(io)
+        export_cscope(io, path_prefix)
       else
         raise UnknownExportFormatError
       end
@@ -35,7 +36,7 @@ module Starscope
 
     private
 
-    def export_ctags(file)
+    def export_ctags(file, path_prefix)
       file.puts <<END
 !_TAG_FILE_FORMAT	2	/extended format/
 !_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
@@ -46,13 +47,14 @@ module Starscope
 END
       defs = (@tables[:defs] || {}).sort_by { |x| x[:name][-1].to_s }
       defs.each do |record|
-        file.puts ctag_line(record, @meta[:files][record[:file]])
+        file.puts ctag_line(record, @meta[:files][record[:file]], path_prefix)
       end
     end
 
-    def ctag_line(rec, file)
+    def ctag_line(rec, file, path_prefix)
       line = line_for_record(rec).gsub('/', '\/')
-      ret = "#{rec[:name][-1]}\t#{rec[:file]}\t/^#{line}$/"
+      path = File.join(path_prefix, rec[:file])
+      ret = "#{rec[:name][-1]}\t#{path}\t/^#{line}$/"
 
       ext = ctag_ext_tags(rec, file)
       unless ext.empty?
@@ -90,7 +92,7 @@ END
     CSCOPE_GLOBAL_HACK_STOP = " \n\t}\n".freeze
 
     # ftp://ftp.eeng.dcu.ie/pub/ee454/cygwin/usr/share/doc/mlcscope-14.1.8/html/cscope.html
-    def export_cscope(file)
+    def export_cscope(file, _path_prefix)
       buf = ''
       files = []
       db_by_line.each do |filename, lines|
