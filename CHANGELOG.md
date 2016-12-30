@@ -1,8 +1,11 @@
 Changelog
 =========
 
-Trunk
+v1.5.4 (unreleased)
 --------------------
+
+Improvements:
+ * When dumping file metadata, don't include the file contents.
 
 Bug Fixes:
  * Fix parsing ruby files with invalidly-encoded literals (#160).
