@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v1.5.4 (unreleased)
+v1.5.4 (2017-01-01)
 --------------------
 
 Improvements:
