@@ -1,3 +1,5 @@
+require 'pathname'
+
 module Starscope
   module Exportable
     CTAGS_DEFAULT_PATH = 'tags'.freeze

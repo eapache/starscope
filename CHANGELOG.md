@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v1.5.5 (2017-01-02)
+--------------------
+
+Bug Fixes:
+ * Hotfix for missing `require` preventing export in v1.5.4.
+
 v1.5.4 (2017-01-01)
 --------------------
 
