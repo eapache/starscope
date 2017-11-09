@@ -20,7 +20,7 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 1.9.3'
 
   gem.add_dependency 'oj', '~> 3.3'
-  gem.add_dependency 'parser', '~> 2.3'
+  gem.add_dependency 'parser', '~> 2.4'
   gem.add_dependency 'ruby-progressbar', '~> 1.8'
   gem.add_dependency 'rkelly-remix', '~> 0.0.7'
   gem.add_dependency 'babel-transpiler', '~> 0.7'
