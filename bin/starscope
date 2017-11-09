@@ -17,8 +17,7 @@ options = { read: true,
             update: true,
             output: :normal,
             export: [],
-            db: DEFAULT_DB
-}
+            db: DEFAULT_DB }
 
 # Options Parsing
 OptionParser.new do |opts|
