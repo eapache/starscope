@@ -17,7 +17,7 @@ Gem::Specification.new do |gem|
   gem.executables   = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
   gem.test_files    = `git ls-files -- test/*`.split("\n")
   gem.require_paths = ['lib']
-  gem.required_ruby_version = '>= 1.9.3'
+  gem.required_ruby_version = '>= 2.0'
 
   gem.add_dependency 'oj', '~> 3.3'
   gem.add_dependency 'parser', '~> 2.4'
@@ -31,5 +31,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'pry', '~> 0.11'
   gem.add_development_dependency 'minitest', '~> 5.10'
   gem.add_development_dependency 'mocha', '~> 1.3'
-  gem.add_development_dependency 'rubocop', '~> 0.39.0'
+  gem.add_development_dependency 'rubocop', '~> 0.44.0'
 end
