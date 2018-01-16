@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v1.5.6 (2018-01-16)
+--------------------
+
+ * Be more lenient parsing ERB files: accept some of Erubi's expanded syntax.
+ * Drop support for ruby 1.9.3.
+ * Update some dependencies.
+
 v1.5.5 (2017-01-02)
 --------------------
 
