@@ -56,7 +56,7 @@ module Starscope
 
       @meta[:langs].merge!(LANGS)
 
-      File.open(filename, 'w') do |file|
+      File.open(filename, 'wb') do |file|
         Zlib::GzipWriter.wrap(file) do |stream|
           stream.puts DB_FORMAT
           stream.puts Oj.dump @meta
@@ -148,7 +148,7 @@ module Starscope
     private
 
     def open_db(filename)
-      File.open(filename, 'r') do |file|
+      File.open(filename, 'rb') do |file|
         begin
           Zlib::GzipReader.wrap(file) do |stream|
             parse_db(stream)
