@@ -19,14 +19,14 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.required_ruby_version = '>= 2.0'
 
-  gem.add_dependency 'oj', '~> 3.3'
-  gem.add_dependency 'parser', '~> 2.4'
+  gem.add_dependency 'oj', '~> 3.7'
+  gem.add_dependency 'parser', '~> 2.6'
   gem.add_dependency 'ruby-progressbar', '~> 1.9'
   gem.add_dependency 'rkelly-remix', '~> 0.0.7'
   gem.add_dependency 'babel-transpiler', '~> 0.7'
   gem.add_dependency 'sourcemap', '~> 0.1'
 
-  gem.add_development_dependency 'bundler', '~> 1.7'
+  gem.add_development_dependency 'bundler', '>= 1.7'
   gem.add_development_dependency 'rake', '~> 11.2'
   gem.add_development_dependency 'pry', '~> 0.11'
   gem.add_development_dependency 'minitest', '~> 5.10'
