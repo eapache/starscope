@@ -19,7 +19,7 @@ module Starscope
 
       @output.normal("Exporting to '#{path}' in format '#{format}'...")
       path_prefix = Pathname.getwd.relative_path_from(Pathname.new(path).dirname.expand_path)
-      File.open(path, 'w') do |file|
+      File.open(path, 'wb') do |file|
         export_to(format, file, path_prefix)
       end
       @output.normal('Export complete.')
