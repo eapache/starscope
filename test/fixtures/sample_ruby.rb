@@ -162,3 +162,5 @@ class Starscope::DB
     end
   end
 end
+
+puts __ENCODING__
