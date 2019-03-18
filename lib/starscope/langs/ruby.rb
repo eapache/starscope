@@ -90,7 +90,16 @@ module Starscope
 
         when :const
           name = scoped_name(node, scope)
-          yield :reads, name, line_no: loc.line, col: loc.name.column
+          # handle `__ENCODING__` and other weird quasi-constants
+          column = case loc
+                   when Parser::Source::Map::Constant
+                     loc.name.column
+                   when Parser::Source::Map
+                     loc.column
+                   when nil
+                     return
+                   end
+          yield :reads, name, line_no: loc.line, col: column
 
         when :lvar, :ivar, :cvar, :gvar
           yield :reads, scope + [node.children[0]], line_no: loc.line, col: loc.name.column
