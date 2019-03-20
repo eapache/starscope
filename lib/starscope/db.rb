@@ -272,15 +272,17 @@ module Starscope
         @meta[:files][file][:sublangs] << lang
       end
 
+    rescue => e
+      @output.normal("#{extractor} raised \"#{e}\" while extracting #{file}")
+    ensure
+      # metadata must be created for any record that was inserted into a tbl
+      # even if there was later a rescued exception
       @meta[:files][file][:lang] = extractor.name.split('::').last.to_sym
       @meta[:files][file][:lines] = lines
 
       if extractor_metadata.is_a? Hash
         @meta[:files][file] = extractor_metadata.merge!(@meta[:files][file])
       end
-
-    rescue => e
-      @output.normal("#{extractor} raised \"#{e}\" while extracting #{file}")
     end
 
     def file_changed(name)
