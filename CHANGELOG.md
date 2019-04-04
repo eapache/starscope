@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v1.5.7 (2019-04-04)
+--------------------
+
+ * Use binary mode for file writes to fix compatibility on MS Windows (#171).
+ * Make sure the database is still valid when a parse exception happens (#173).
+ * Fix handling of `__ENCODING__` literals in ruby parser (#174).
+ * Update some dependencies.
+
 v1.5.6 (2018-01-16)
 --------------------
 
