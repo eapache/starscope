@@ -9,7 +9,7 @@ require 'readline'
 require 'starscope'
 
 DEFAULT_DB = '.starscope.db'.freeze
-CONFIG_FILE = File.join(Dir.home, '.starscope.json')
+CONFIG_FILE = File.exist?('.starscope.json') ? '.starscope.json' : File.join(Dir.home, '.starscope.json')
 GLOBAL_CONFIG = File.exist?(CONFIG_FILE) ? Oj.load_file(CONFIG_FILE, symbol_keys: true) : {}
 
 options = { read: true,
