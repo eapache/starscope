@@ -16,9 +16,11 @@ module Starscope
 
       def self.match_file(name)
         return true if name.end_with?('.rb', '.rake')
+
         File.open(name) do |f|
           head = f.read(2)
           return false if head.nil? || !head.start_with?('#!')
+
           return f.readline.include?('ruby')
         end
       end
@@ -39,7 +41,7 @@ module Starscope
         extract_node(tree, scope, &block)
 
         new_scope = []
-        if [:class, :module].include? tree.type
+        if %i[class module].include? tree.type
           new_scope = scoped_name(tree.children[0], scope)
           scope += new_scope
         end
@@ -118,7 +120,7 @@ module Starscope
       def self.scoped_name(node, scope)
         if node.type == :block
           scoped_name(node.children[0], scope)
-        elsif [:lvar, :ivar, :cvar, :gvar, :const, :send, :casgn].include? node.type
+        elsif %i[lvar ivar cvar gvar const send casgn].include? node.type
           if node.children[0].is_a? Symbol
             [node.children[0]]
           elsif node.children[0].is_a? AST::Node

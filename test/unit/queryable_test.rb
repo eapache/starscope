@@ -1,29 +1,29 @@
 require_relative '../test_helper'
 
-describe Starscope::Queryable do
-  SAMPLE_RECORDS = [
-    { name: [:"[abc"], foo: 'baz' },
-    { name: [:"not a match"], foo: 'bar', x: 'y' },
-    { name: [:a, :b, :c, :d], file: :somefile }
-  ].freeze
+SAMPLE_RECORDS = [
+  { name: [:'[abc'], foo: 'baz' },
+  { name: [:'not a match'], foo: 'bar', x: 'y' },
+  { name: %i[a b c d], file: :somefile }
+].freeze
 
-  class MockQuerable
-    include Starscope::Queryable
-    def initialize
-      @tables = {
-        mytable: SAMPLE_RECORDS,
-        empty_table: []
-      }
-      @meta = {
-        files: {
-          somefile: {
-            lang: :ruby
-          }
+class MockQuerable
+  include Starscope::Queryable
+  def initialize
+    @tables = {
+      mytable: SAMPLE_RECORDS,
+      empty_table: []
+    }
+    @meta = {
+      files: {
+        somefile: {
+          lang: :ruby
         }
       }
-    end
+    }
   end
+end
 
+describe Starscope::Queryable do
   before do
     @mock = MockQuerable.new
   end

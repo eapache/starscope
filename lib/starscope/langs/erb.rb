@@ -3,8 +3,8 @@ module Starscope
     module ERB
       VERSION = 1
 
-      ERB_START = /<%(?:-|={1,4})?/
-      ERB_END = /[-=]?%>/
+      ERB_START = /<%(?:-|={1,4})?/.freeze
+      ERB_END = /[-=]?%>/.freeze
 
       def self.match_file(name)
         name.end_with?('.erb')

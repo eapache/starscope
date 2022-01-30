@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-lib = File.expand_path('../../lib', __FILE__)
+lib = File.expand_path('../lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require 'oj'
@@ -21,20 +21,20 @@ options = { read: true,
 
 # Options Parsing
 OptionParser.new do |opts|
-  opts.banner = <<END
-Usage: starscope [options] [PATHS]
+  opts.banner = <<~BANNER
+    Usage: starscope [options] [PATHS]
 
-The default database is `#{DEFAULT_DB}` if you don't specify one with -f.
-The default behaviour is to read and update the database.
-If no database exists and no PATHS are specified, Starscope builds a new
-database by recursing in the current directory.
+    The default database is `#{DEFAULT_DB}` if you don't specify one with -f.
+    The default behaviour is to read and update the database.
+    If no database exists and no PATHS are specified, Starscope builds a new
+    database by recursing in the current directory.
 
-Scoped queries must use `::` as the scope separator, even for languages which
-have their own scope syntax.
+    Scoped queries must use `::` as the scope separator, even for languages which
+    have their own scope syntax.
 
-Website: https://github.com/eapache/starscope
-User Manual: https://github.com/eapache/starscope/blob/master/doc/USER_GUIDE.md
-END
+    Website: https://github.com/eapache/starscope
+    User Manual: https://github.com/eapache/starscope/blob/master/doc/USER_GUIDE.md
+  BANNER
 
   opts.separator "\nQueries"
   opts.on('-d', '--dump [TABLE]', 'Dumps the DB or specified table to stdout') do |tbl|
@@ -81,32 +81,32 @@ END
   end
   opts.on('--verbose', 'Print extra status messages') do
     if options[:output] == :quiet
-      $stderr.puts "Can't be both verbose and quiet"
+      warn "Can't be both verbose and quiet"
       exit(1)
     end
     options[:output] = :verbose
   end
   opts.on('--quiet', 'Print fewer messages') do
     if options[:output] == :verbose
-      $stderr.puts "Can't be both verbose and quiet"
+      warn "Can't be both verbose and quiet"
       exit(1)
     end
     options[:output] = :quiet
   end
 
-  opts.separator <<END
-\nEXPORTING
-    At the moment two export formats are supported: 'ctags' and 'cscope'. If
-    you don't specify a path, the output is written to the file '#{Starscope::Exportable::CTAGS_DEFAULT_PATH}' (for
-    ctags) or '#{Starscope::Exportable::CSCOPE_DEFAULT_PATH}' (for cscope) in the current directory.
-END
+  opts.separator <<~TAIL
+    \nEXPORTING
+        At the moment two export formats are supported: 'ctags' and 'cscope'. If
+        you don't specify a path, the output is written to the file '#{Starscope::Exportable::CTAGS_DEFAULT_PATH}' (for
+        ctags) or '#{Starscope::Exportable::CSCOPE_DEFAULT_PATH}' (for cscope) in the current directory.
+  TAIL
 end.parse!
 
 def print_summary(db)
   tables = db.tables
   puts 'No tables' if tables.empty?
   tables.sort.each do |table|
-    printf("%-9s %6d records\n", table, db.records(table).length)
+    printf("%<table>-9s %<length>6d records\n", table: table, length: db.records(table).length)
   end
 end
 
@@ -134,7 +134,7 @@ def run_query(db, query, separator)
   match = match.join(separator)
 
   if match.empty?
-    $stderr.puts 'Invalid input - no query found.'
+    warn 'Invalid input - no query found.'
     return false
   end
   tables = (table == '*' ? db.tables : table.to_sym)
@@ -146,10 +146,10 @@ def run_query(db, query, separator)
       puts format_record(db, rec)
     end
   end
-  return true
+  true
 rescue Starscope::DB::NoTableError
-  $stderr.puts "Table '#{table}' doesn't exist."
-  return false
+  warn "Table '#{table}' doesn't exist."
+  false
 end
 
 def dump_table(db, table)
@@ -179,17 +179,17 @@ def dump(db, table)
     dump_table(db, table.to_sym)
   end
 
-  return true
+  true
 rescue Starscope::DB::NoTableError
-  $stderr.puts "Table '#{table}' doesn't exist."
-  return false
+  warn "Table '#{table}' doesn't exist."
+  false
 end
 
 def export(db, param)
   format, path = param.split(',', 2)
   db.export(format.to_sym, path)
 rescue Starscope::Exportable::UnknownExportFormatError
-  $stderr.puts "Unrecognized export format \"#{format}\""
+  warn "Unrecognized export format \"#{format}\""
 end
 
 output = Starscope::Output.new(options[:output])
@@ -246,18 +246,18 @@ if options[:dump]
 end
 
 def linemode_help
-  <<END
-Input can be a query of the form 'TABLE QUERY' or a special command starting
-with a '!'. Recognized special commands are:
-  !dump [TABLE]
-  !export FORMAT[,PATH]
-  !summary
-  !update
+  <<~HELP
+    Input can be a query of the form 'TABLE QUERY' or a special command starting
+    with a '!'. Recognized special commands are:
+      !dump [TABLE]
+      !export FORMAT[,PATH]
+      !summary
+      !update
 
-  !help
-  !version
-  !quit
-END
+      !help
+      !version
+      !quit
+  HELP
 end
 
 if options[:linemode]
@@ -265,6 +265,7 @@ if options[:linemode]
   begin
     while (input = Readline.readline('> ', true))
       next if input.empty?
+
       cmd, param = input.split(' ', 2)
       if cmd[0] == '!'
         case cmd[1..-1]

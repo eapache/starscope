@@ -1,6 +1,6 @@
 module Starscope
   class Matcher
-    MATCH_TYPES = [:literal_match, :regexp_match].freeze
+    MATCH_TYPES = %i[literal_match regexp_match].freeze
 
     def initialize(query)
       @query = query
@@ -15,7 +15,7 @@ module Starscope
     def match(input)
       if input.end_with?(@query)
         :literal_match
-      elsif @regexp && @regexp.match(input)
+      elsif @regexp&.match(input)
         :regexp_match
       end
     end

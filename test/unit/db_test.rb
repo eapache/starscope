@@ -143,14 +143,14 @@ describe Starscope::DB do
 
   it 'must run queries on multiple tables' do
     @db.add_paths([FIXTURES])
-    ret = @db.query([:calls, :defs], 'foo')
+    ret = @db.query(%i[calls defs], 'foo')
     _(ret.length).must_equal 4
     _(ret.first[:name].last).must_equal :foo
   end
 
   it 'must symbolize compound name' do
     rec = Starscope::DB.normalize_record(:foo, ['a', :b], {})
-    _(rec[:name]).must_equal [:a, :b]
+    _(rec[:name]).must_equal %i[a b]
   end
 
   it 'must symbolize and array-wrap simple name' do

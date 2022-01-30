@@ -1,6 +1,10 @@
 AllCops:
+  NewCops: enable
   Exclude:
     - 'test/fixtures/sample_ruby.rb'
+
+Layout/LineLength:
+  Max: 120
 
 Metrics/AbcSize:
   Enabled: false
@@ -16,9 +20,6 @@ Metrics/ClassLength:
 
 Metrics/CyclomaticComplexity:
   Enabled: false
-
-Metrics/LineLength:
-  Max: 120
 
 Metrics/MethodLength:
   Enabled: false

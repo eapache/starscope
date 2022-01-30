@@ -60,7 +60,7 @@ describe Starscope::Lang::Ruby do
     _(assigns[:PBAR_FORMAT].count).must_equal 1
     _(assigns[:foo].count).must_equal 1
 
-    _(assigns.keys).wont_include '='.to_sym
-    _(assigns.keys).wont_include '<'.to_sym
+    _(assigns.keys).wont_include :'='
+    _(assigns.keys).wont_include :<
   end
 end
