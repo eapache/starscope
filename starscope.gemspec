@@ -27,7 +27,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'sourcemap', '~> 0.1'
 
   gem.add_development_dependency 'bundler', '>= 1.7'
-  gem.add_development_dependency 'rake', '~> 11.2'
+  gem.add_development_dependency 'rake', '~> 13.0'
   gem.add_development_dependency 'pry', '~> 0.11'
   gem.add_development_dependency 'minitest', '~> 5.10'
   gem.add_development_dependency 'mocha', '~> 1.3'
