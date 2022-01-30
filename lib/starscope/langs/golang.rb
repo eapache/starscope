@@ -3,13 +3,13 @@ module Starscope
     module Golang
       VERSION = 1
 
-      FUNC_CALL = /([\w\.]*?\w)\(/
-      END_OF_BLOCK = /^\s*\}\s*$/
-      END_OF_GROUP = /^\s*\)\s*$/
-      STRING_LITERAL = /".+?"/
-      BUILTIN_FUNCS = %w(new make len close copy delete int int8 int16 int32 int64
-                         uint uint8 uint16 uint32 uint64 string byte).freeze
-      CONTROL_KEYS = %w(if for switch case).freeze
+      FUNC_CALL = /([\w.]*?\w)\(/.freeze
+      END_OF_BLOCK = /^\s*\}\s*$/.freeze
+      END_OF_GROUP = /^\s*\)\s*$/.freeze
+      STRING_LITERAL = /".+?"/.freeze
+      BUILTIN_FUNCS = %w[new make len close copy delete int int8 int16 int32 int64
+                         uint uint8 uint16 uint32 uint64 string byte].freeze
+      CONTROL_KEYS = %w[if for switch case].freeze
 
       def self.match_file(name)
         name.end_with?('.go')
@@ -36,6 +36,7 @@ module Starscope
           if stack[-1] == :comment
             match = %r{\*/(.*)}.match(line)
             next unless match
+
             line = match[1]
             stack.pop
           end
@@ -129,21 +130,18 @@ module Starscope
           yield :imports, name, line_no: line_no
         when /^import\s+\(/
           stack.push(:import)
-        when /^var\s+\(/
+        when /^var\s+\(/, /^const\s+\(/
           stack.push(:def)
-        when /^var\s+(\w+)\s/
-          yield :defs, scope + [Regexp.last_match(1)], line_no: line_no
-          parse_call(line, line_no, scope, &block)
-        when /^const\s+\(/
-          stack.push(:def)
-        when /^const\s+(\w+)\s/
+        when /^var\s+(\w+)\s/, /^const\s+(\w+)\s/
           yield :defs, scope + [Regexp.last_match(1)], line_no: line_no
           parse_call(line, line_no, scope, &block)
         when /^\s+(.*?) :?=[^=]/
-          Regexp.last_match(1).split(' ').each do |var|
+          Regexp.last_match(1).split.each do |var|
             next if CONTROL_KEYS.include?(var)
+
             name = var.delete(',').split('.')
             next if name[0] == '_' # assigning to _ is a discard in golang
+
             if name.length == 1
               yield :assigns, scope + [name[0]], line_no: line_no
             else
@@ -158,9 +156,10 @@ module Starscope
 
       def self.parse_call(line, line_no, scope)
         line.scan(FUNC_CALL) do |match|
-          name = match[0].split('.').select { |chunk| !chunk.empty? }
+          name = match[0].split('.').reject(&:empty?)
           if name.length == 1
             next if name[0] == 'func'
+
             if BUILTIN_FUNCS.include?(name[0])
               yield :calls, name[0], line_no: line_no
             else

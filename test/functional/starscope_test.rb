@@ -1,9 +1,9 @@
 require_relative '../test_helper'
 
-describe 'starscope executable script' do
-  BASE = 'bundle exec bin/starscope --quiet'.freeze
-  EXTRACT = "#{BASE} --no-read --no-write #{FIXTURES}".freeze
+BASE = 'bundle exec bin/starscope --quiet'.freeze
+EXTRACT = "#{BASE} --no-read --no-write #{FIXTURES}".freeze
 
+describe 'starscope executable script' do
   it 'must not produce help wider than 80 characters' do
     `#{BASE} -h`.each_line do |line|
       _(line.length).must_be :<=, 80
@@ -29,11 +29,11 @@ describe 'starscope executable script' do
 
   it 'must correctly query the database' do
     `#{EXTRACT} -q calls,add_file`.each_line do |line|
-      _(line.split[0..2]).must_equal %w(Starscope DB add_file)
+      _(line.split[0..2]).must_equal %w[Starscope DB add_file]
     end
 
     `#{EXTRACT} -q lang:ruby,calls,add_file`.each_line do |line|
-      _(line.split[0..2]).must_equal %w(Starscope DB add_file)
+      _(line.split[0..2]).must_equal %w[Starscope DB add_file]
     end
 
     `#{EXTRACT} -q lang:go,calls,add_file`.each_line do |line|

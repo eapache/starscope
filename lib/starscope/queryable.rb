@@ -26,6 +26,7 @@ module Starscope
 
       Starscope::Matcher::MATCH_TYPES.each do |type|
         next if results[type].nil? || results[type].empty?
+
         return results[type]
       end
 

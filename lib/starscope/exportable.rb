@@ -39,14 +39,14 @@ module Starscope
     private
 
     def export_ctags(file, path_prefix)
-      file.puts <<END
-!_TAG_FILE_FORMAT	2	/extended format/
-!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
-!_TAG_PROGRAM_AUTHOR	Evan Huus /eapache@gmail.com/
-!_TAG_PROGRAM_NAME	Starscope //
-!_TAG_PROGRAM_URL	https://github.com/eapache/starscope //
-!_TAG_PROGRAM_VERSION	#{Starscope::VERSION}	//
-END
+      file.puts <<~HEADER
+        !_TAG_FILE_FORMAT	2	/extended format/
+        !_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+        !_TAG_PROGRAM_AUTHOR	Evan Huus /eapache@gmail.com/
+        !_TAG_PROGRAM_NAME	Starscope //
+        !_TAG_PROGRAM_URL	https://github.com/eapache/starscope //
+        !_TAG_PROGRAM_VERSION	#{Starscope::VERSION}	//
+      HEADER
       defs = (@tables[:defs] || {}).sort_by { |x| x[:name][-1].to_s }
       defs.each do |record|
         file.puts ctag_line(record, @meta[:files][record[:file]], path_prefix)
@@ -150,7 +150,7 @@ END
       file.print("0\n")
       file.print("#{files.length}\n")
       buf = ''
-      files.each { |f| buf << f + "\n" }
+      files.each { |f| buf << "#{f}\n" }
       file.print("#{buf.length}\n#{buf}")
     end
 
@@ -159,6 +159,7 @@ END
       @tables.each do |tbl, records|
         records.each do |record|
           next unless record[:line_no]
+
           record[:tbl] = tbl
           db[record[:file]] ||= {}
           db[record[:file]][record[:line_no]] ||= []
@@ -177,16 +178,14 @@ END
         # use the column if we have it, otherwise fall back to scanning
         index = record[:col] || line.index(key)
 
-        while index && !valid_index?(line, index, key)
-          index = line.index(key, index + 1)
-        end
+        index = line.index(key, index + 1) while index && !valid_index?(line, index, key)
 
         next if index.nil?
 
         # Strip trailing non-word characters, otherwise cscope barfs on
         # function names like `include?`
         if key =~ /^\W*$/
-          next unless [:defs, :end].include?(record[:tbl])
+          next unless %i[defs end].include?(record[:tbl])
         else
           key.sub!(/\W+$/, '')
         end
@@ -209,9 +208,7 @@ END
 
         index = line.index(key, prev)
 
-        while index && index + key.length < offset && !valid_index?(line, index, key)
-          index = line.index(key, index + 1)
-        end
+        index = line.index(key, index + 1) while index && index + key.length < offset && !valid_index?(line, index, key)
 
         next unless index && index + key.length < offset
 
@@ -260,16 +257,16 @@ END
       when :file
         ret = '@'
       when :defs
-        case rec[:type]
-        when :func
-          ret = '$'
-        when :class, :module
-          ret = 'c'
-        when :type
-          ret = 't'
-        else
-          ret = 'g'
-        end
+        ret = case rec[:type]
+              when :func
+                '$'
+              when :class, :module
+                'c'
+              when :type
+                't'
+              else
+                'g'
+              end
       when :calls
         ret = '`'
       when :requires
@@ -282,7 +279,7 @@ END
         return ''
       end
 
-      "\t" + ret
+      "\t#{ret}"
     end
   end
 end

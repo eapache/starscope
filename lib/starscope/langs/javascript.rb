@@ -96,7 +96,8 @@ module Starscope
             next
           end
 
-          next if found[node.name] && found[node.name].include?(line)
+          next if found[node.name]&.include?(line)
+
           yield :defs, node.name, line_no: line
           found[node.name] ||= Set.new
           found[node.name].add(line)
@@ -113,7 +114,8 @@ module Starscope
           line = find_line(node.range.from, map, lines, name)
           next unless line
 
-          next if found[name] && found[name].include?(line)
+          next if found[name]&.include?(line)
+
           yield :reads, name, line_no: line
         end
       end

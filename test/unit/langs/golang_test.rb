@@ -34,10 +34,10 @@ describe Starscope::Lang::Golang do
     _(defs).must_include :single_var
     _(defs).must_include :single_const
 
-    _(defs).wont_include :"0x00"
-    _(defs).wont_include :"0x01"
-    _(defs).wont_include :"0x02"
-    _(defs).wont_include :"0x03"
+    _(defs).wont_include :'0x00'
+    _(defs).wont_include :'0x01'
+    _(defs).wont_include :'0x02'
+    _(defs).wont_include :'0x03'
   end
 
   it 'must identify endings' do

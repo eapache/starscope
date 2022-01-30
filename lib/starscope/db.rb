@@ -17,7 +17,7 @@ module Starscope
     FRAGMENT = :'!fragment'
 
     # dynamically load all our language extractors
-    Dir.glob("#{File.dirname(__FILE__)}/langs/*.rb").each { |path| require path }
+    Dir.glob("#{File.dirname(__FILE__)}/langs/*.rb").sort.each { |path| require path }
 
     langs = {}
     extractors = []
@@ -88,6 +88,7 @@ module Starscope
       files = Dir.glob(paths).select { |f| File.file? f }
       files.delete_if { |f| matches_exclude?(f) }
       return if files.empty?
+
       @output.new_pbar('Building', files.length)
       add_files(files)
       @output.finish_pbar
@@ -150,14 +151,12 @@ module Starscope
 
     def open_db(filename)
       File.open(filename, 'rb') do |file|
-        begin
-          Zlib::GzipReader.wrap(file) do |stream|
-            parse_db(stream)
-          end
-        rescue Zlib::GzipFile::Error
-          file.rewind
-          parse_db(file)
+        Zlib::GzipReader.wrap(file) do |stream|
+          parse_db(stream)
         end
+      rescue Zlib::GzipFile::Error
+        file.rewind
+        parse_db(file)
       end
     end
 
@@ -167,11 +166,11 @@ module Starscope
       when DB_FORMAT
         @meta   = Oj.load(stream.gets)
         @tables = Oj.load(stream.gets)
-        return true
+        true
       when 3..4
         # Old format, so read the directories segment then rebuild
         add_paths(Oj.load(stream.gets))
-        return false
+        false
       when 0..2
         raise TooOldDBFormatError
       else
@@ -180,12 +179,13 @@ module Starscope
     rescue Oj::ParseError
       stream.rewind
       raise unless stream.gets.to_i == DB_FORMAT
+
       # try reading as formated json, which is much slower, but it is sometimes
       # useful to be able to directly read your db
       objects = []
       Oj.load(stream) { |obj| objects << obj }
       @meta, @tables = objects
-      return true
+      true
     end
 
     def fixup
@@ -231,7 +231,7 @@ module Starscope
       self.class.extractors.each do |extractor|
         begin
           next unless extractor.match_file file
-        rescue => e
+        rescue StandardError => e
           @output.normal("#{extractor} raised \"#{e}\" while matching #{file}")
           next
         end
@@ -269,8 +269,7 @@ module Starscope
         extract_file(Starscope::FragmentExtractor.new(lang, frags), file, line_cache, lines)
         @meta[:files][file][:sublangs] << lang
       end
-
-    rescue => e
+    rescue StandardError => e
       @output.normal("#{extractor} raised \"#{e}\" while extracting #{file}")
     ensure
       # metadata must be created for any record that was inserted into a tbl
@@ -278,9 +277,7 @@ module Starscope
       @meta[:files][file][:lang] = extractor.name.split('::').last.to_sym
       @meta[:files][file][:lines] = lines
 
-      if extractor_metadata.is_a? Hash
-        @meta[:files][file] = extractor_metadata.merge!(@meta[:files][file])
-      end
+      @meta[:files][file] = extractor_metadata.merge!(@meta[:files][file]) if extractor_metadata.is_a? Hash
     end
 
     def file_changed(name)
@@ -299,6 +296,7 @@ module Starscope
     def language_out_of_date(lang)
       return false unless lang
       return true unless LANGS[lang]
+
       (@meta[:langs][lang] || 0) < LANGS[lang]
     end
 
@@ -332,7 +330,8 @@ module Starscope
         args
       end
 
-      def extractors # so we can stub it in tests
+      # so we can stub it in tests
+      def extractors
         EXTRACTORS
       end
     end
