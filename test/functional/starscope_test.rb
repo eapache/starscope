@@ -6,38 +6,38 @@ describe 'starscope executable script' do
 
   it 'must not produce help wider than 80 characters' do
     `#{BASE} -h`.each_line do |line|
-      line.length.must_be :<=, 80
+      _(line.length).must_be :<=, 80
     end
   end
 
   it 'must produce the right version' do
-    `#{BASE} -v`.chomp.must_equal Starscope::VERSION
+    _(`#{BASE} -v`.chomp).must_equal Starscope::VERSION
   end
 
   it 'must produce a valid database summary' do
     lines = `#{EXTRACT} -s`.lines.to_a
-    lines.length.must_equal 8
+    _(lines.length).must_equal 8
   end
 
   it 'must produce a valid database dump' do
     lines = `#{EXTRACT} -d requires`.lines.to_a
-    lines[1].split.first.must_equal 'date'
-    lines[2].split.first.must_equal 'foo-bar'
-    lines[3].split.first.must_equal 'react-native'
-    lines[4].split.first.must_equal 'zlib'
+    _(lines[1].split.first).must_equal 'date'
+    _(lines[2].split.first).must_equal 'foo-bar'
+    _(lines[3].split.first).must_equal 'react-native'
+    _(lines[4].split.first).must_equal 'zlib'
   end
 
   it 'must correctly query the database' do
     `#{EXTRACT} -q calls,add_file`.each_line do |line|
-      line.split[0..2].must_equal %w(Starscope DB add_file)
+      _(line.split[0..2]).must_equal %w(Starscope DB add_file)
     end
 
     `#{EXTRACT} -q lang:ruby,calls,add_file`.each_line do |line|
-      line.split[0..2].must_equal %w(Starscope DB add_file)
+      _(line.split[0..2]).must_equal %w(Starscope DB add_file)
     end
 
     `#{EXTRACT} -q lang:go,calls,add_file`.each_line do |line|
-      line.must_equal "No results found.\n"
+      _(line).must_equal "No results found.\n"
     end
   end
 
@@ -45,7 +45,7 @@ describe 'starscope executable script' do
     file = Tempfile.new('starscope_test')
     begin
       `#{EXTRACT} -e cscope,#{file.path}`
-      $?.exitstatus.must_equal 0
+      _($?.exitstatus).must_equal 0
     ensure
       file.close
       file.unlink
@@ -56,7 +56,7 @@ describe 'starscope executable script' do
     file = Tempfile.new('starscope_test')
     begin
       `#{EXTRACT} -e ctags,#{file.path}`
-      $?.exitstatus.must_equal 0
+      _($?.exitstatus).must_equal 0
     ensure
       file.close
       file.unlink

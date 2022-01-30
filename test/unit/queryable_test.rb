@@ -29,33 +29,33 @@ describe Starscope::Queryable do
   end
 
   it 'must handle empty input' do
-    @mock.query(:empty_table, 'foo').must_be_empty
+    _(@mock.query(:empty_table, 'foo')).must_be_empty
   end
 
   it 'must handle scoped queries' do
-    @mock.query(:mytable, 'a::b::').must_equal [SAMPLE_RECORDS[2]]
+    _(@mock.query(:mytable, 'a::b::')).must_equal [SAMPLE_RECORDS[2]]
   end
 
   it 'must handle regex queries' do
-    @mock.query(:mytable, 'a[bc]{2}').must_equal [SAMPLE_RECORDS[0]]
+    _(@mock.query(:mytable, 'a[bc]{2}')).must_equal [SAMPLE_RECORDS[0]]
 
-    @mock.query(:mytable, 'a.*d').must_equal [SAMPLE_RECORDS[2]]
+    _(@mock.query(:mytable, 'a.*d')).must_equal [SAMPLE_RECORDS[2]]
   end
 
   it 'must handle malformed regexes' do
-    @mock.query(:mytable, '[abc').must_equal [SAMPLE_RECORDS[0]]
+    _(@mock.query(:mytable, '[abc')).must_equal [SAMPLE_RECORDS[0]]
   end
 
   it 'must handle simple filters' do
-    @mock.query(:mytable, '.*', foo: 'bar').must_equal [SAMPLE_RECORDS[1]]
+    _(@mock.query(:mytable, '.*', foo: 'bar')).must_equal [SAMPLE_RECORDS[1]]
   end
 
   it 'must handle multiple filters' do
-    @mock.query(:mytable, '.*', foo: 'bar', x: 'y').must_equal [SAMPLE_RECORDS[1]]
-    @mock.query(:mytable, '.*', foo: 'bar', x: 'nope').must_be_empty
+    _(@mock.query(:mytable, '.*', foo: 'bar', x: 'y')).must_equal [SAMPLE_RECORDS[1]]
+    _(@mock.query(:mytable, '.*', foo: 'bar', x: 'nope')).must_be_empty
   end
 
   it 'must handle filters on file properties' do
-    @mock.query(:mytable, '.*', lang: 'ruby').must_equal [SAMPLE_RECORDS[2]]
+    _(@mock.query(:mytable, '.*', lang: 'ruby')).must_equal [SAMPLE_RECORDS[2]]
   end
 end

@@ -6,7 +6,7 @@ describe Starscope::Output do
     out = Starscope::Output.new(:quiet, buf)
     out.normal('foo')
     out.extra('foo')
-    buf.size.must_equal 0
+    _(buf.size).must_equal 0
   end
 
   it 'must be normal' do
@@ -14,7 +14,7 @@ describe Starscope::Output do
     out = Starscope::Output.new(:normal, buf)
     out.normal('foo')
     out.extra('foo')
-    buf.size.must_equal 4
+    _(buf.size).must_equal 4
   end
 
   it 'must be verbose' do
@@ -22,6 +22,6 @@ describe Starscope::Output do
     out = Starscope::Output.new(:verbose, buf)
     out.normal('foo')
     out.extra('foo')
-    buf.size.must_equal 8
+    _(buf.size).must_equal 8
   end
 end

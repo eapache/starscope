@@ -11,7 +11,7 @@ describe Starscope::Exportable do
     @db.export_to(:ctags, @buf, '.')
     @buf.rewind
     lines = @buf.each_line.to_a
-    lines.must_include(
+    _(lines).must_include(
       "NoTableError\t" \
       "./#{FIXTURES}/sample_ruby.rb\t" \
       "/^  class NoTableError < StandardError; end$/;\"\t" \
@@ -24,7 +24,7 @@ describe Starscope::Exportable do
     @db.export_to(:ctags, @buf, '../foo')
     @buf.rewind
     lines = @buf.each_line.to_a
-    lines.must_include(
+    _(lines).must_include(
       "NoTableError\t" \
       "../foo/#{FIXTURES}/sample_ruby.rb\t" \
       "/^  class NoTableError < StandardError; end$/;\"\t" \
@@ -38,14 +38,14 @@ describe Starscope::Exportable do
     @buf.rewind
     lines = @buf.each_line.to_a
 
-    lines.must_include "\t@#{FIXTURES}/sample_golang.go\n"
-    lines.must_include "\tgSunday\n"
-    lines.must_include "\t`add_file\n"
-    lines.must_include "\t}}\n"
-    lines.must_include "13 class \n"
+    _(lines).must_include "\t@#{FIXTURES}/sample_golang.go\n"
+    _(lines).must_include "\tgSunday\n"
+    _(lines).must_include "\t`add_file\n"
+    _(lines).must_include "\t}}\n"
+    _(lines).must_include "13 class \n"
 
-    lines.wont_include "= [\n"
-    lines.wont_include "4 LANGS = [\n"
-    lines.wont_include "116 tmpdb[entry[:file]][entry[:line_no]] ||= []\n"
+    _(lines).wont_include "= [\n"
+    _(lines).wont_include "4 LANGS = [\n"
+    _(lines).wont_include "116 tmpdb[entry[:file]][entry[:line_no]] ||= []\n"
   end
 end

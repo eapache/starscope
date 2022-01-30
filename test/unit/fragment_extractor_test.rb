@@ -27,20 +27,20 @@ describe Starscope::FragmentExtractor do
 
   it 'must pass along extractor metadata from the child' do
     ::Starscope::Lang::Dummy.expects(:extract).returns a: 1, b: 3
-    @extractor.extract(:foo, '---').must_equal a: 1, b: 3
+    _(@extractor.extract(:foo, '---')).must_equal a: 1, b: 3
   end
 
   it 'must pass along the name from the child' do
-    @extractor.name.must_equal ::Starscope::Lang::Dummy.name
+    _(@extractor.name).must_equal ::Starscope::Lang::Dummy.name
   end
 
   it 'must override-merge yielded args based on line number' do
     ::Starscope::Lang::Dummy.expects(:extract).yields(:foo, :bar, line_no: 2, foo: :bar)
 
     @extractor.extract(:foo, '---') do |tbl, name, args|
-      tbl.must_equal :foo
-      name.must_equal :bar
-      args.must_equal line_no: 15, foo: :bar
+      _(tbl).must_equal :foo
+      _(name).must_equal :bar
+      _(args).must_equal line_no: 15, foo: :bar
     end
   end
 end
