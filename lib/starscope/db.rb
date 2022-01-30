@@ -31,6 +31,7 @@ module Starscope
 
     class NoTableError < StandardError; end
     class UnknownDBFormatError < StandardError; end
+    class TooOldDBFormatError < StandardError; end
 
     def initialize(output, config = {})
       @output = output
@@ -172,10 +173,7 @@ module Starscope
         add_paths(Oj.load(stream.gets))
         return false
       when 0..2
-        # Old format (pre-json), so read the directories segment then rebuild
-        len = stream.gets.to_i
-        add_paths(Marshal.load(stream.read(len)))
-        return false
+        raise TooOldDBFormatError
       else
         raise UnknownDBFormatError
       end
