@@ -6,6 +6,7 @@ v1.6.0 (TODO)
 
  * Support per-directory `.starscope.json` config (#181).
  * Drop support for ancient Marshall-format databases.
+ * Drop support for several old Ruby versions. 2.6 is now the oldest supported.
  * Dependency upgrades.
 
 v1.5.7 (2019-04-04)
