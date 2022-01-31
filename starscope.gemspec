@@ -17,7 +17,7 @@ Gem::Specification.new do |gem|
   gem.executables   = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
   gem.test_files    = `git ls-files -- test/*`.split("\n")
   gem.require_paths = ['lib']
-  gem.required_ruby_version = '>= 2.5'
+  gem.required_ruby_version = '>= 2.6'
 
   gem.add_dependency 'babel-transpiler', '~> 0.7'
   gem.add_dependency 'oj', '~> 3.7'

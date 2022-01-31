@@ -174,7 +174,7 @@ def dump(db, table)
   when '_files'
     puts db.metadata(:files).keys
   when /^_/
-    puts db.metadata(table[1..-1].to_sym)
+    puts db.metadata(table[1..].to_sym)
   else
     dump_table(db, table.to_sym)
   end
@@ -268,7 +268,7 @@ if options[:linemode]
 
       cmd, param = input.split(' ', 2)
       if cmd[0] == '!'
-        case cmd[1..-1]
+        case cmd[1..]
         when 'dump'
           dump(db, param)
         when 'export'

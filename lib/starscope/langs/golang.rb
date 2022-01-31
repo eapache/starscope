@@ -46,7 +46,7 @@ module Starscope
             pos = 0
             while (match = STRING_LITERAL.match(line, pos))
               eos = find_end_of_string(line, match.begin(0))
-              line = line[0..match.begin(0)] + line[eos..-1]
+              line = line[0..match.begin(0)] + line[eos..]
               pos = match.begin(0) + 2
             end
           end

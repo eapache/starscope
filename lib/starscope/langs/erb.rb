@@ -20,7 +20,7 @@ module Starscope
             term = line.index(ERB_END)
             if term
               yield Starscope::DB::FRAGMENT, :Ruby, frag: line[0...term], line_no: line_no
-              line = line[term + 1..-1]
+              line = line[term + 1..]
               multiline = false
             else
               yield Starscope::DB::FRAGMENT, :Ruby, frag: line, line_no: line_no
