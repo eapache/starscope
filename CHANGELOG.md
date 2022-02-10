@@ -4,13 +4,20 @@ Changelog
 v1.6.0 (TODO)
 -------------------
 
+Improvements:
  * Support per-directory `.starscope.json` config (#181).
  * Support abbreviated special commands in line mode (e.g. `!u`, `!s`, `!q`).
  * Properly support non-ASCII identifiers in Golang.
+ * Tiny performance improvements.
+
+Bug Fixes:
  * Strip non-ASCII characters from cscope export to avoid cscope crashes (#182).
+
+Misc:
  * Drop support for ancient Marshall-format databases.
  * Drop support for several old Ruby versions. 2.6 is now the oldest supported.
  * Dependency upgrades.
+ * Documentation improvements.
 
 v1.5.7 (2019-04-04)
 --------------------
