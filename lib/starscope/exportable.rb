@@ -284,7 +284,7 @@ module Starscope
     end
 
     def strip_unicode(str)
-      str.encode(ASCII, { invalid: :replace, undef: :replace, replace: '' })
+      str.encode(ASCII, invalid: :replace, undef: :replace, replace: '')
     end
   end
 end
