@@ -4,6 +4,7 @@ module Starscope
   module Exportable
     CTAGS_DEFAULT_PATH = 'tags'.freeze
     CSCOPE_DEFAULT_PATH = 'cscope.out'.freeze
+    ASCII = Encoding.find('ASCII')
 
     class UnknownExportFormatError < StandardError; end
 
@@ -213,18 +214,18 @@ module Starscope
         next unless index && index + key.length < offset
 
         buf << cscope_plaintext(line, prev, index) << "\n"
-        buf << "#{key}\n"
+        buf << "#{strip_unicode(key)}\n"
         prev = index + key.length
       end
 
       buf << cscope_plaintext(line, prev, offset) << "\n"
-      buf << cscope_mark(record) << record[:key] << "\n"
+      buf << cscope_mark(record) << strip_unicode(record[:key]) << "\n"
 
       buf << CSCOPE_GLOBAL_HACK_START if record[:type] == :func && record[:tbl] == :end
       buf
     rescue ArgumentError
       # invalid utf-8 byte sequence in the line, oh well
-      line
+      strip_unicode(line)
     end
 
     def valid_index?(line, index, key)
@@ -239,10 +240,10 @@ module Starscope
       ret.lstrip! if start == 0
       ret.rstrip! if stop == line.length
       ret.gsub!(/\s+/, ' ')
-      ret.empty? ? ' ' : ret
+      ret.empty? ? ' ' : strip_unicode(ret)
     rescue ArgumentError
       # invalid utf-8 byte sequence in the line, oh well
-      line
+      strip_unicode(line)
     end
 
     def cscope_mark(rec)
@@ -280,6 +281,10 @@ module Starscope
       end
 
       "\t#{ret}"
+    end
+
+    def strip_unicode(str)
+      str.encode(ASCII, { invalid: :replace, undef: :replace, replace: '' })
     end
   end
 end

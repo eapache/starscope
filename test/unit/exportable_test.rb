@@ -43,7 +43,9 @@ describe Starscope::Exportable do
     _(lines).must_include "\t`add_file\n"
     _(lines).must_include "\t}}\n"
     _(lines).must_include "13 class \n"
+    _(lines).must_include "\tgsingle_var_unicode\n"
 
+    _(lines).wont_include "\tgsingle_var_Äunicode\n"
     _(lines).wont_include "= [\n"
     _(lines).wont_include "4 LANGS = [\n"
     _(lines).wont_include "116 tmpdb[entry[:file]][entry[:line_no]] ||= []\n"
