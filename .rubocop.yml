@@ -5,7 +5,8 @@ require:
 AllCops:
   NewCops: enable
   Exclude:
-    - 'test/fixtures/sample_ruby.rb'
+    - test/fixtures/sample_ruby.rb
+    - vendor/bundle/**/*
 
 Layout/LineLength:
   Max: 120
