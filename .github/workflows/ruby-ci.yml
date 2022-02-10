@@ -22,6 +22,5 @@ jobs:
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
     - name: Run tests
       run: bundle exec rake test
-  # Rubocop isn't working in CI right now for some reason
-  # - name: Lint
-  #   run: bundle exec rake rubocop
+    - name: Lint
+      run: bundle exec rubocop
