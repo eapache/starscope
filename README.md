@@ -2,7 +2,7 @@ Starscope
 =========
 
 [![Gem Version](https://img.shields.io/gem/v/starscope.svg)](https://rubygems.org/gems/starscope)
-[![Build Status](https://app.travis-ci.com/eapache/starscope.svg?branch=master)](https://app.travis-ci.com/eapache/starscope)
+[![Ruby CI](https://github.com/eapache/starscope/actions/workflows/ruby-ci.yml/badge.svg)](https://github.com/eapache/starscope/actions/workflows/ruby-ci.yml)
 [![Code of Conduct](https://img.shields.io/badge/code%20of%20conduct-active-blue.svg)](https://eapache.github.io/conduct.html)
 
 Starscope is a code indexer, search and navigation tool for
