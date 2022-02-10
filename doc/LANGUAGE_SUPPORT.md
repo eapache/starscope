@@ -9,6 +9,14 @@ Already Supported
  * [JavaScript](https://en.wikipedia.org/wiki/JavaScript)
    (including ES6/ES7 and JSX via [Babel](https://babeljs.io/))
 
+External Support
+-----------------
+
+Other languages are sometimes supported in third-party plugin files, or forks
+which don't upstream their changes, but I try and list them here. I make no
+warranty that these are still maintained or even work.
+ * [Puppet](https://github.com/fihuer/starscope/tree/language/puppet)
+
 How to Add Another Language
 ---------------------------
 
