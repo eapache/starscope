@@ -180,6 +180,8 @@ non-line-mode options:
  * `!version` - same as the `--version` flag
  * `!quit` - exit line-mode
 
+Abbreviations of special commands are also recognized (e.g. `!q` for `!quit`,
+`!s` for `!summary`, etc).
 
 Miscellaneous
 -------------

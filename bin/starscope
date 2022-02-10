@@ -257,6 +257,7 @@ def linemode_help
       !help
       !version
       !quit
+    Abbreviations of special commands (e.g `!u` or `!q`) are also recognized.
   HELP
 end
 
@@ -269,24 +270,24 @@ if options[:linemode]
       cmd, param = input.split(' ', 2)
       if cmd[0] == '!'
         case cmd[1..]
-        when 'dump'
+        when 'dump', 'd'
           dump(db, param)
-        when 'export'
+        when 'export', 'e', 'ex'
           if param
             export(db, param)
           else
             puts '!export requires an argument'
           end
-        when 'summary'
+        when 'summary', 's', 'sum'
           print_summary(db)
-        when 'update'
+        when 'update', 'u', 'up'
           changed = db.update
           db.save(options[:db]) if options[:write] && changed
-        when 'help'
+        when 'help', 'h'
           puts linemode_help
-        when 'version'
+        when 'version', 'v'
           puts Starscope::VERSION
-        when 'quit'
+        when 'quit', 'q'
           exit
         else
           puts "Unknown command: '#{input}', try '!help'."

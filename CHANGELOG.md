@@ -5,6 +5,7 @@ v1.6.0 (TODO)
 -------------------
 
  * Support per-directory `.starscope.json` config (#181).
+ * Support abbreviated special commands in line mode (e.g. `!u`, `!s`, `!q`).
  * Drop support for ancient Marshall-format databases.
  * Drop support for several old Ruby versions. 2.6 is now the oldest supported.
  * Dependency upgrades.
