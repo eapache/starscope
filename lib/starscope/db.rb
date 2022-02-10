@@ -85,8 +85,7 @@ module Starscope
       paths = paths.map { |p| self.class.normalize_glob(p) }
       @meta[:paths] += paths
       @meta[:paths].uniq!
-      files = Dir.glob(paths).select { |f| File.file? f }
-      files.delete_if { |f| matches_exclude?(f) }
+      files = Dir.glob(paths).select { |f| File.file?(f) && !matches_exclude?(f) }
       return if files.empty?
 
       @output.new_pbar('Building', files.length)
