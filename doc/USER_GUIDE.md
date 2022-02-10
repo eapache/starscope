@@ -109,8 +109,12 @@ Excluded patterns are also remembered, and can be added at any time. If an
 existing file in the database matches a newly added exclusion rule, it will be
 removed.
 
-You can exclude files on a per-directory basis by creating a `.starscope.json`
-file in a given directory with contents like:
+Paths to add and exclude are recursive by default. If you need more control, you
+may use any special characters accepted by Ruby's
+[`File::fnmatch`](https://ruby-doc.org/core-2.6.9/File.html#method-c-fnmatch).
+
+You can automatically exclude files on a per-directory basis by creating a
+`.starscope.json` file in a given directory with contents like:
 ```json
 {
   "excludes": ["foo", "bar/", "**/*.ext"]
@@ -119,7 +123,8 @@ file in a given directory with contents like:
 
 For commonly excluded files you can create a home directory config file at 
 `~/.starscope.json`. Patterns listed there will be excluded from all starscope 
-databases by default.
+databases by default. Currently `excludes` is the only valid key for
+`.starscope.json` files.
 
 Queries
 -------
