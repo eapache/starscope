@@ -31,7 +31,7 @@ describe Starscope::Lang::Golang do
     _(defs).must_include :v2
     _(defs).must_include :Sunday
     _(defs).must_include :Monday
-    _(defs).must_include :single_var
+    _(defs).must_include :single_var_Äunicode
     _(defs).must_include :single_const
 
     _(defs).wont_include :'0x00'

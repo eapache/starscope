@@ -3,7 +3,7 @@ module Starscope
     module Golang
       VERSION = 1
 
-      FUNC_CALL = /([\w.]*?\w)\(/.freeze
+      FUNC_CALL = /([[[:word:]].]*?[[:word:]])\(/.freeze
       END_OF_BLOCK = /^\s*\}\s*$/.freeze
       END_OF_GROUP = /^\s*\)\s*$/.freeze
       STRING_LITERAL = /".+?"/.freeze
@@ -57,14 +57,14 @@ module Starscope
             case line
             when END_OF_BLOCK
               end_block(line_no, scope, stack, &block)
-            when /(.+)\s+\w+/
+            when /(.+)\s+[[:word:]]+/
               parse_def(Regexp.last_match(1), line_no, scope, &block)
             end
           when :interface
             case line
             when END_OF_BLOCK
               end_block(line_no, scope, stack, &block)
-            when /(\w+)\(.*\)\s+/
+            when /([[:word:]]+)\(.*\)\s+/
               yield :defs, scope + [Regexp.last_match(1)], line_no: line_no
             end
           when :def
@@ -106,24 +106,24 @@ module Starscope
       # handles new lines (when not in the middle of an existing definition)
       def self.parse_new_line(line, line_no, scope, stack, &block)
         case line
-        when /^func\s+(\w+)\(/
+        when /^func\s+([[:word:]]+)\(/
           yield :defs, scope + [Regexp.last_match(1)], line_no: line_no, type: :func
           stack.push(:func)
-        when /^func\s+\(\w+\s+\*?(\w+)\)\s*(\w+)\(/
+        when /^func\s+\([[:word:]]+\s+\*?([[:word:]]+)\)\s*([[:word:]]+)\(/
           yield :defs, scope + [Regexp.last_match(1), Regexp.last_match(2)], line_no: line_no, type: :func
           stack.push(:func)
-        when /^package\s+(\w+)/
+        when /^package\s+([[:word:]]+)/
           scope.push(Regexp.last_match(1))
           yield :defs, scope, line_no: line_no, type: :package
-        when /^type\s+(\w+)\s+struct\s*\{/
+        when /^type\s+([[:word:]]+)\s+struct\s*\{/
           scope.push(Regexp.last_match(1))
           stack.push(:struct)
           yield :defs, scope, line_no: line_no, type: :class
-        when /^type\s+(\w+)\s+interface\s*\{/
+        when /^type\s+([[:word:]]+)\s+interface\s*\{/
           scope.push(Regexp.last_match(1))
           stack.push(:interface)
           yield :defs, scope, line_no: line_no, type: :class
-        when /^type\s+(\w+)/
+        when /^type\s+([[:word:]]+)/
           yield :defs, scope + [Regexp.last_match(1)], line_no: line_no, type: :type
         when /^import\s+"(.+)"/
           name = Regexp.last_match(1).split('/')
@@ -132,7 +132,7 @@ module Starscope
           stack.push(:import)
         when /^var\s+\(/, /^const\s+\(/
           stack.push(:def)
-        when /^var\s+(\w+)\s/, /^const\s+(\w+)\s/
+        when /^var\s+([[:word:]]+)\s/, /^const\s+([[:word:]]+)\s/
           yield :defs, scope + [Regexp.last_match(1)], line_no: line_no
           parse_call(line, line_no, scope, &block)
         when /^\s+(.*?) :?=[^=]/

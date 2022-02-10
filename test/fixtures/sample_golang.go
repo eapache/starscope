@@ -10,7 +10,7 @@ var (
 	}
 )
 
-var single_var = 3
+var single_var_Äunicode = 3
 
 const single_const = 4
 
