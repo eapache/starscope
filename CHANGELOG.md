@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.6.1 (TODO)
+-------------------
+
+* Support for extracting javascript blocks from vue files.
+
 v1.6.0 (2022-02-10)
 -------------------
 

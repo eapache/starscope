@@ -23,8 +23,9 @@ describe 'starscope executable script' do
     lines = `#{EXTRACT} -d requires`.lines.to_a
     _(lines[1].split.first).must_equal 'date'
     _(lines[2].split.first).must_equal 'foo-bar'
-    _(lines[3].split.first).must_equal 'react-native'
-    _(lines[4].split.first).must_equal 'zlib'
+    _(lines[3].split.first).must_equal 'marked'
+    _(lines[4].split.first).must_equal 'react-native'
+    _(lines[5].split.first).must_equal 'zlib'
   end
 
   it 'must correctly query the database' do
