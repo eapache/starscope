@@ -298,6 +298,7 @@ if options[:linemode]
       end
     end
   rescue Interrupt
+    puts
     exit
   end
 end

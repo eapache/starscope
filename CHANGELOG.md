@@ -5,6 +5,7 @@ v1.6.1 (TODO)
 -------------------
 
 * Support for extracting javascript blocks from vue files.
+* Print a newline when exiting from line-mode via interrupt.
 
 v1.6.0 (2022-02-10)
 -------------------
