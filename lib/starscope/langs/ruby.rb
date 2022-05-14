@@ -41,12 +41,15 @@ module Starscope
         extract_node(tree, scope, &block)
 
         new_scope = []
+        child_nodes = tree.children
+
         if %i[class module].include? tree.type
           new_scope = scoped_name(tree.children[0], scope)
           scope += new_scope
+          child_nodes = child_nodes[1..] # module and class constant definitions are not "read"s
         end
 
-        tree.children.each { |node| extract_tree(node, scope, &block) if node.is_a? AST::Node }
+        child_nodes.each { |node| extract_tree(node, scope, &block) if node.is_a? AST::Node }
 
         scope.pop(new_scope.count)
       end
