@@ -28,6 +28,7 @@ describe Starscope::Lang::Ruby do
     _(defs).must_include :load
     _(defs).must_include :update
     _(defs).must_include :files_from_path
+    _(defs).must_include :get_lastfile
   end
 
   it 'must identify constant definitions' do
@@ -36,7 +37,7 @@ describe Starscope::Lang::Ruby do
 
   it 'must identify endings' do
     _(@db.keys).must_include :end
-    _(@db[:end].count).must_equal 13
+    _(@db[:end].count).must_equal 14
   end
 
   it 'must identify function calls' do

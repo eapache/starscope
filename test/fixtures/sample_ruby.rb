@@ -164,3 +164,6 @@ class Starscope::DB
 end
 
 puts __ENCODING__
+
+# Ruby 3.x syntax
+def get_lastfile(dirpath) = Dir.glob("#{ dirpath }/*").reject { |i| File.directory?(i) }.sort.last

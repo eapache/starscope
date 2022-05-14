@@ -27,9 +27,9 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'sourcemap', '~> 0.1'
 
   gem.add_development_dependency 'bundler', '>= 1.7'
+  gem.add_development_dependency 'byebug', '~> 11.1'
   gem.add_development_dependency 'minitest', '~> 5.12'
   gem.add_development_dependency 'mocha', '~> 1.3'
-  gem.add_development_dependency 'pry', '~> 0.11'
   gem.add_development_dependency 'rake', '~> 13.0'
   gem.add_development_dependency 'rubocop', '~> 1.25.0'
   gem.add_development_dependency 'rubocop-minitest', '~> 0.17.1'

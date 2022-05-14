@@ -1,4 +1,4 @@
-require 'parser/current'
+require 'parser/ruby31'
 
 module Starscope
   module Lang
@@ -29,7 +29,7 @@ module Starscope
         buffer = Parser::Source::Buffer.new(path, 1)
         buffer.source = contents.force_encoding(Encoding::UTF_8)
 
-        parser = Parser::CurrentRuby.new(Builder.new)
+        parser = Parser::Ruby31.new(Builder.new)
         parser.diagnostics.ignore_warnings = true
         parser.diagnostics.all_errors_are_fatal = false
 
@@ -70,7 +70,12 @@ module Starscope
         when :def
           yield :defs, scope + [node.children[0]],
             line_no: loc.line, type: :func, col: loc.name.column
-          yield :end, :end, line_no: loc.end.line, type: :func, col: loc.end.column
+          if loc.end
+            yield :end, :end, line_no: loc.end.line, type: :func, col: loc.end.column
+          else
+            # ruby 3.x syntax for "def foo = ..."
+            yield :end, :end, line_no: loc.line, type: :func, col: loc.expression.end.column
+          end
 
         when :defs
           yield :defs, scope + [node.children[1]],

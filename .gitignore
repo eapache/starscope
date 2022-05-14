@@ -2,6 +2,7 @@
 *.rbc
 .starscope.db
 .bundle
+.byebug_history
 .config
 Gemfile.lock
 coverage
