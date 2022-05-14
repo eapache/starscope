@@ -32,7 +32,11 @@ describe Starscope::Lang::Ruby do
   end
 
   it 'must identify constant definitions' do
-    _(@db[:defs].map { |x| x[:name][-1] }).must_include :PBAR_FORMAT
+    _(@db.keys).must_include :defs
+    defs = @db[:defs].map { |x| x[:name][-1] }
+
+    _(defs).must_include :PBAR_FORMAT
+    _(defs).must_include :SOME_INVALID_ENCODING
   end
 
   it 'must identify endings' do
@@ -63,5 +67,19 @@ describe Starscope::Lang::Ruby do
 
     _(assigns.keys).wont_include :'='
     _(assigns.keys).wont_include :<
+  end
+
+  it 'must identify variable and constant reads' do
+    _(@db.keys).must_include :reads
+    reads = @db[:reads].map { |x| x[:name][-1] }
+
+    _(reads).must_include :Go
+    _(reads).must_include :Ruby
+    _(reads).must_include :DB_FORMAT
+    _(reads).must_include :UnknownDBFormatError
+    _(reads).must_include :path
+    _(reads).must_include :entry
+    _(reads).must_include :file
+    _(reads).must_include :@files
   end
 end
