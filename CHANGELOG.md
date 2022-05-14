@@ -6,7 +6,9 @@ v1.6.1 (TODO)
 
 * Support for extracting javascript blocks from vue files.
 * Print a newline when exiting from line-mode via interrupt.
-* Support for Ruby 3.x "def foo = ..." method syntax.
+* Support for Ruby 3.x "def foo = ..." method syntax (#192).
+* Don't generate conflicting `read` and `defs` entries for class and module
+  definitions (#176).
 
 v1.6.0 (2022-02-10)
 -------------------
