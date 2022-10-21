@@ -1,6 +1,12 @@
 Changelog
 =========
 
+main (unreleased)
+-------------------
+
+* Split --export flag into --export and --export-path to avoid confusion and
+  subtle command-line syntax errors.
+
 v1.6.1 (2022-08-07)
 -------------------
 

@@ -51,8 +51,16 @@ OptionParser.new do |opts|
   end
 
   opts.separator "\nDatabase Management"
-  opts.on('-e', '--export FORMAT[,PATH]', 'Export in FORMAT to PATH, (see EXPORTING)') do |export|
-    options[:export] << export
+  opts.on('-e', '--export FORMAT', 'Exports database in FORMAT (see EXPORTING)') do |export|
+    options[:export] ||= []
+    options[:export] << export.split(',', 2)
+  end
+  opts.on('--export-path PATH', 'Sets custom export PATH for exported file') do |path|
+    if options[:export].nil? || options[:export].last.size == 2
+      warn '--export-path must follow an --export flag which does not itself specify a PATH'
+      exit(1)
+    end
+    options[:export].last << path
   end
   opts.on('-f', '--file FILE', "Use FILE instead of `#{DEFAULT_DB}`") do |path|
     options[:db] = path
@@ -97,8 +105,9 @@ OptionParser.new do |opts|
   opts.separator <<~TAIL
     \nEXPORTING
         At the moment two export formats are supported: 'ctags' and 'cscope'. If
-        you don't specify a path, the output is written to the file '#{Starscope::Exportable::CTAGS_DEFAULT_PATH}' (for
-        ctags) or '#{Starscope::Exportable::CSCOPE_DEFAULT_PATH}' (for cscope) in the current directory.
+        you don't specify a path with --export-path, the output is written to the
+        file '#{Starscope::Exportable::CTAGS_DEFAULT_PATH}' (for ctags) or '#{Starscope::Exportable::CSCOPE_DEFAULT_PATH}' (for cscope) in the current
+        directory.
   TAIL
 end.parse!
 
@@ -185,8 +194,7 @@ rescue Starscope::DB::NoTableError
   false
 end
 
-def export(db, param)
-  format, path = param.split(',', 2)
+def export(db, format, path)
   db.export(format.to_sym, path)
 rescue Starscope::Exportable::UnknownExportFormatError
   warn "Unrecognized export format \"#{format}\""
@@ -231,7 +239,7 @@ new_data ||= updated
 
 db.save(options[:db]) if options[:write] && (new_data || !db_exists)
 
-options[:export].each { |target| export(db, target) }
+options[:export].each { |target| export(db, target[0], target[1]) }
 
 run_query(db, options[:query], ',') if options[:query]
 
