@@ -158,10 +158,10 @@ third-party tools:
  * cscope format (default path: `cscope.out`)
  * ctags format (default path: `tags`)
 
-To export, pass the `-e` or `--export` flag with one of the above formats. Each
-format has its own default path which is where the exported file will go. If you
-want to specify a custom location, append it after the format with a comma (so
-`--export cscope,myfile` would export to `myfile` in the cscope format).
+To export, pass the `-e` or `--export` flag with one of the above format names
+(e.g. `--export ctags`). Each format has its own default path which is where the
+exported file will be put. If you want to export to a custom location, specify
+it with the `--export-path` flag.
 
 You can also dump entire tables (or the entire database) to raw text output for
 manual inspection. This is mostly useful for debugging, but means you can pipe
@@ -178,7 +178,7 @@ input is normally a query of the form `[FILTERS ]TABLE QUERY`, or a special
 command starting with a `!`. Recognized special commands generally map to
 non-line-mode options:
  * `!dump [TABLE]` - same as the `--dump` flag
- * `!export FORMAT[,PATH]` - same as the `--export` flag
+ * `!export FORMAT[,PATH]` - same as the `--export` and `--export-path` flags
  * `!summary` - same as the `--summary` flag
  * `!update` - updates the database without exiting line-mode
  * `!help` - prints basic line-mode help
