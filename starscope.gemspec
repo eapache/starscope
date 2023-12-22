@@ -15,7 +15,6 @@ Gem::Specification.new do |gem|
   gem.license       = 'MIT'
   gem.files         = `git ls-files`.split("\n")
   gem.executables   = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
-  gem.test_files    = `git ls-files -- test/*`.split("\n")
   gem.require_paths = ['lib']
   gem.required_ruby_version = '>= 2.6'
 
@@ -29,10 +28,10 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'bundler', '>= 1.7'
   gem.add_development_dependency 'byebug', '~> 11.1'
   gem.add_development_dependency 'minitest', '~> 5.12'
-  gem.add_development_dependency 'mocha', '~> 1.3'
+  gem.add_development_dependency 'mocha', '~> 2.1'
   gem.add_development_dependency 'rake', '~> 13.0'
-  gem.add_development_dependency 'rubocop', '~> 1.25.0'
-  gem.add_development_dependency 'rubocop-minitest', '~> 0.17.1'
+  gem.add_development_dependency 'rubocop', '~> 1.39.0'
+  gem.add_development_dependency 'rubocop-minitest', '~> 0.34.1'
   gem.add_development_dependency 'rubocop-rake', '~> 0.6.0'
   gem.metadata['rubygems_mfa_required'] = 'true'
 end
